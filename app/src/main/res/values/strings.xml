@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">A Table !</string>
+    <string name="err_msg_email">Email requis</string>
+    <string name="err_msg_password">Mot de passe requis</string>
+</resources>
