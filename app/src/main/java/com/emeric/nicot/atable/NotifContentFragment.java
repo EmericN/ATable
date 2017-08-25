@@ -5,9 +5,6 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +23,22 @@ import java.util.HashMap;
  * Created by Nicot Emeric on 27/06/2017.
  */
 
-public class NotifContentFragment extends Fragment implements AdapterCallback{
+public class NotifContentFragment extends Fragment implements AdapterCallback {
 
+    private static final String TAG_RESULT = "result";
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_RESULT_2 = "result2";
+    private static final String TAG_INVITATION = "invitation";
+    private static final String TAG_INVITATION_2 = "invitation2";
+    private static final String TAG_SALON = "nom_salon";
+    private static final String GetSalon2 = "GetSalon";
+    private static final String AcceptInvitation = "AcceptInvitation";
+    private static final String GetInvitation = "GetInvitation";
+    public static ArrayList<String> invitation = new ArrayList<>();
+    public static ArrayList<String> invitation2 = new ArrayList<>();
+    public static ArrayList<String> nomsalon = new ArrayList<>();
+    private static String url_accept_invitation = "http://192.168.1.24:80/DB/db_accept_invitation.php";
+    private static String url_recuperation_invitation = "http://192.168.1.24:80/DB/db_recuperation_invitation.php";
     ListView LV;
     SessionManagement session;
     String mail;
@@ -35,33 +46,17 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
     JSONArray NomSalonArray = null;
     JSONParser jsonParser = new JSONParser();
     ListAdapter adapter;
-    public static ArrayList<String> invitation = new ArrayList<>();
-    public static ArrayList<String> invitation2 = new ArrayList<>();
-    public static ArrayList<String> nomsalon = new ArrayList<>();
-    private static final String TAG_RESULT = "result";
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_RESULT_2 = "result2";
-    private static final String TAG_INVITATION= "invitation";
-    private static final String TAG_INVITATION_2= "invitation2";
-    private static final String TAG_SALON= "nom_salon";
-    private static final String GetSalon2= "GetSalon";
     private ProgressDialog pDialog;
-    private static final String AcceptInvitation = "AcceptInvitation";
-    private static final String GetInvitation = "GetInvitation";
-    private static String url_accept_invitation = "http://192.168.1.24:80/DB/db_accept_invitation.php";
-    private static String url_recuperation_invitation = "http://192.168.1.24:80/DB/db_recuperation_invitation.php";
-
     private RefreshCallback RefreshCallback;
 
     public void onMethodCallback(String NomSalon) {
-        new AcceptInvitation().execute(AcceptInvitation,mail,NomSalon);
+        new AcceptInvitation().execute(AcceptInvitation, mail, NomSalon);
         new GetInvitation().execute(GetInvitation, mail);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
-        View v = inflater.inflate(R.layout.tab_notification_list,null);
-
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.tab_notification_list, null);
 
 
         LV = (ListView) v.findViewById(R.id.ListView1);
@@ -70,14 +65,14 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
         HashMap<String, String> user = session.getUserDetails();
         mail = user.get(SessionManagement.KEY_EMAIL);
 
-        if(mail != null) {
+        if (mail != null) {
             new GetInvitation().execute(GetInvitation, mail);
         }
 
         return v;
     }
 
-     class GetInvitation extends AsyncTask<String, String, String> {
+    class GetInvitation extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -86,6 +81,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
         protected void onPreExecute() {
             super.onPreExecute();
         }
+
         /**
          * Creating user in background thread
          */
@@ -106,11 +102,11 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
             // check for success tag
 
             try {
-               // InvitArray = json.getJSONArray(TAG_RESULT);
+                // InvitArray = json.getJSONArray(TAG_RESULT);
                 NomSalonArray = json.getJSONArray(TAG_RESULT_2);
 
-               // invitation.clear();
-               // invitation2.clear();
+                // invitation.clear();
+                // invitation2.clear();
                 nomsalon.clear();
 
                /* for (int i = 0; i < InvitArray.length(); i++) {
@@ -137,6 +133,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
             return null;
 
         }
+
         /**
          * After completing background task Dismiss the progress dialog
          **/
@@ -146,7 +143,8 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
 
 
     }
-     class AcceptInvitation extends AsyncTask<String, String, String> {
+
+    class AcceptInvitation extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -160,6 +158,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
             pDialog.setCancelable(true);
             pDialog.show();
         }
+
         /**
          * Creating user in background thread
          */
@@ -191,6 +190,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback{
             return null;
 
         }
+
         /**
          * After completing background task Dismiss the progress dialog
          **/

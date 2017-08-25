@@ -3,9 +3,7 @@ package com.emeric.nicot.atable;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.database.DataSetObserver;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -16,7 +14,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,12 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +38,9 @@ import java.util.HashMap;
 
 public class Salon extends Activity {
 
+    private static final String TAG_SUCCESS = "success";
+    private static String url_invitation = "http://192.168.1.24:80/DB/db_invitation.php";
+    JSONParser jsonParser = new JSONParser();
     private RecyclerView mRecyclerView, mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter, mAdapter2;
@@ -64,9 +60,6 @@ public class Salon extends Activity {
     private BufferedReader bufferedReader;
     private String IP_SERVER = "192.168.1.24";
     private Integer PORT = 4111;
-    JSONParser jsonParser = new JSONParser();
-    private static String url_invitation = "http://192.168.1.24:80/DB/db_invitation.php";
-    private static final String TAG_SUCCESS = "success";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,8 +159,8 @@ public class Salon extends Activity {
             floatAddFriend.hide();
         }
 
-        Chat chat = new Chat();
-        chat.execute();
+       /* Chat chat = new Chat();
+        chat.execute();*/
 
 
     }
@@ -223,7 +216,7 @@ public class Salon extends Activity {
             pDialog.dismiss();
         }
     }
-
+/*
     class Chat extends AsyncTask<Void, Void, Void> {
         private String message;
 
@@ -269,7 +262,7 @@ public class Salon extends Activity {
 
     }
 
-    class Receiver extends AsyncTask<Void, Void, Void> {
+   class Receiver extends AsyncTask<Void, Void, Void> {
 
         private String message;
 
@@ -330,7 +323,7 @@ public class Salon extends Activity {
             mRecyclerViewChat.smoothScrollToPosition(mAdapter2.getItemCount() -1);
             mAdapter2.notifyDataSetChanged();
         }
-    }
+    }*/
 }
 
 

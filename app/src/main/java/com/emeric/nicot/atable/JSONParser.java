@@ -48,7 +48,7 @@ public class JSONParser {
         int i = 0;
         for (String key : params.keySet()) {
             try {
-                if (i != 0){
+                if (i != 0) {
                     sbParams.append("&");
                 }
                 sbParams.append(key).append("=")

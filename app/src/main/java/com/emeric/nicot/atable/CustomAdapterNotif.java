@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Nicot Emeric on 27/07/2017.
@@ -18,11 +17,11 @@ import java.util.Arrays;
 
 public class CustomAdapterNotif extends BaseAdapter {
 
-    ArrayList<String> invitation, invitation2, NomSalon;
-    Context context;
-    private static LayoutInflater inflater = null;
     private static final String AcceptInvitation = "AcceptInvitation";
     private static final String GetInvitation = "GetInvitation";
+    private static LayoutInflater inflater = null;
+    ArrayList<String> invitation, invitation2, NomSalon;
+    Context context;
     private AdapterCallback mAdapterCallback;
 
     public CustomAdapterNotif(Context context, ArrayList<String> NomSalon, AdapterCallback callback) {
@@ -35,8 +34,6 @@ public class CustomAdapterNotif extends BaseAdapter {
         inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
-
-
 
 
     @Override
@@ -54,35 +51,34 @@ public class CustomAdapterNotif extends BaseAdapter {
         return position;
     }
 
-    public class Holder {
-        TextView tv;
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
         View rowView;
 
-            rowView = inflater.inflate(R.layout.list_item_notif, null);
-            holder.tv = (TextView) rowView.findViewById(R.id.nomSalonInv);
-            holder.tv.setText(NomSalon.get(position));
+        rowView = inflater.inflate(R.layout.list_item_notif, null);
+        holder.tv = (TextView) rowView.findViewById(R.id.nomSalonInv);
+        holder.tv.setText(NomSalon.get(position));
 
-            FloatingActionButton floatAddFriend = (FloatingActionButton) rowView.findViewById(R.id.floatingActionButtonAccept);
+        FloatingActionButton floatAddFriend = (FloatingActionButton) rowView.findViewById(R.id.floatingActionButtonAccept);
 
-            floatAddFriend.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        floatAddFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                    CoordinatorLayout cl = (CoordinatorLayout)v.getParent();
-                    TextView tv = (TextView)cl.findViewById(R.id.nomSalonInv);
-                    String NomSalon = tv.getText().toString();
+                CoordinatorLayout cl = (CoordinatorLayout) v.getParent();
+                TextView tv = (TextView) cl.findViewById(R.id.nomSalonInv);
+                String NomSalon = tv.getText().toString();
 
-                   mAdapterCallback.onMethodCallback(NomSalon);
-                }
-            });
-
+                mAdapterCallback.onMethodCallback(NomSalon);
+            }
+        });
 
 
         return rowView;
+    }
+
+    public class Holder {
+        TextView tv;
     }
 }

@@ -3,9 +3,9 @@ package com.emeric.nicot.atable;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,14 +18,14 @@ import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG_SUCCESS = "success";
+    private static String url_lecture_user = "http://192.168.1.24:80/DB/db_lecture_user.php";
     Button btnConnecter, btnInscription;
     EditText editTextMail, editTextPassword;
     TextInputLayout input_layout_mail, input_layout_pass;
     JSONParser jsonParser = new JSONParser();
-    private ProgressDialog pDialog;
-    private static String url_lecture_user = "http://192.168.1.24:80/DB/db_lecture_user.php";
-    private static final String TAG_SUCCESS = "success";
     SessionManagement session;
+    private ProgressDialog pDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,20 +66,22 @@ public class LoginActivity extends AppCompatActivity {
 
                 String mail = editTextMail.getText().toString();
                 String password = editTextPassword.getText().toString();
-                if(!mail.isEmpty() && !password.isEmpty()) {
+                if (!mail.isEmpty() && !password.isEmpty()) {
                     new CheckUser().execute(mail, password);
-                    } else{
-                    if(mail.isEmpty()) {
+
+                } else {
+                    if (mail.isEmpty()) {
                         input_layout_mail.setError(getString(R.string.err_msg_email));
                     }
-                    if(password.isEmpty()) {
+                    if (password.isEmpty()) {
                         input_layout_pass.setError(getString(R.string.err_msg_password));
                     }
                 }
             }
         });
     }
-     class CheckUser extends AsyncTask<String, String, String> {
+
+    class CheckUser extends AsyncTask<String, String, String> {
         /**
          * Before starting background thread Show Progress Dialog
          */
@@ -92,6 +94,7 @@ public class LoginActivity extends AppCompatActivity {
             pDialog.setCancelable(true);
             pDialog.show();
         }
+
         /**
          * Creating user in background thread
          */
@@ -100,7 +103,6 @@ public class LoginActivity extends AppCompatActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("mail", args[0]);
             params.put("password", args[1]);
-            String mailextra = params.get("mail");
 
             // getting JSON Object
             // Note that create product url accepts POST method

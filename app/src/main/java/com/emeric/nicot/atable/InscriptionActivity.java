@@ -8,12 +8,20 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,13 +34,15 @@ import java.util.HashMap;
 
 public class InscriptionActivity extends AppCompatActivity {
 
+    private static final String TAG_SUCCESS = "success";
+    private static String url_create_user = "http://192.168.1.24:80/DB/db_creation_user.php";
     EditText inputNom, inputPrenom, inputMail, inputPassword;
     JSONParser jsonParser = new JSONParser();
-    private static String url_create_user = "http://192.168.1.24:80/DB/db_creation_user.php";
-    private static final String TAG_SUCCESS = "success";
     //private static final String TAG_SERVER = "success";
+    private String TAG = "DEBUG / FIREBASE";
     private ProgressDialog pDialog;
-
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +68,78 @@ public class InscriptionActivity extends AppCompatActivity {
                 String nom = inputNom.getText().toString();
                 String prenom = inputPrenom.getText().toString();
                 String mail = inputMail.getText().toString();
-                String password = inputPassword.getText().toString();
+                String password = inputMail.getText().toString();
+                // new CreateNewUser().execute(nom, prenom, mail, password);
+                createAccount(mail, password);
 
-                new CreateNewUser().execute(nom, prenom, mail, password);
 
             }
         });
+
+        mAuth = FirebaseAuth.getInstance();
     }
+
+    private void createAccount(String mail, String password) {
+        Log.d(TAG, "createAccount:" + mail);
+        if (!validateForm()) {
+            return;
+        }
+
+        // showProgressDialog();
+
+        // [START create_user_with_email]
+        mAuth.createUserWithEmailAndPassword(mail, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+//                            FirebaseUser user = mAuth.getCurrentUser();
+//                            updateUI(user);
+                            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                            startActivity(i);
+                            finish();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(InscriptionActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            // updateUI(null);
+                        }
+
+                        // [START_EXCLUDE]
+                        //   hideProgressDialog();
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END create_user_with_email]
+    }
+
+
+    private boolean validateForm() {
+        boolean valid = true;
+
+        String mail = inputMail.getText().toString();
+        if (TextUtils.isEmpty(mail)) {
+            inputMail.setError("Required.");
+            valid = false;
+        } else {
+            inputMail.setError(null);
+        }
+
+        String password = inputPassword.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            inputPassword.setError("Required.");
+            valid = false;
+        } else {
+            inputPassword.setError(null);
+        }
+
+        return valid;
+    }
+
 
     /**
      * Background Async Task to Create new user
@@ -89,9 +164,9 @@ public class InscriptionActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
-                    pDialog.dismiss();
+                 /*   pDialog.dismiss();
                     Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(i);
+                    startActivity(i);*/
                     finish();
                 }
 
@@ -119,7 +194,7 @@ public class InscriptionActivity extends AppCompatActivity {
                 JSONObject json = jsonParser.makeHttpRequest(url_create_user,
                         "POST", params);
 
-            // check log cat fro response
+            // check log cat fro responseA
             Log.d("Create Response", json.toString());
 
 
@@ -141,9 +216,7 @@ public class InscriptionActivity extends AppCompatActivity {
             return "errorserver";
         }
 
-        /**
-         * After completing background task Dismiss the progress dialog
-         **/
+
         protected void onPostExecute(String result) {
 
             ProgressBar bar = (ProgressBar) pDialog.findViewById(android.R.id.progress);

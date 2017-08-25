@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * Created by Nicot Emeric on 07/07/2017.
  */
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder>{
+public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
     ArrayList<String> Ordre;
     ArrayList<Integer> Image;
@@ -26,10 +26,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         this.Ordre = Ordre;
         this.Image = Image;
     }
+
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.bubble, viewGroup, false);
-       ViewHolder viewHolder = new ViewHolder(v);
+        ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }
 
@@ -42,7 +43,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return Ordre.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textviewBubble;
         public ImageView flag;

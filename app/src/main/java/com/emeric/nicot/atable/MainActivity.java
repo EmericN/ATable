@@ -41,7 +41,7 @@ public class MainActivity extends FragmentActivity {
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(1).setIcon(R.drawable.ic_notifications);
         button = (Button) findViewById(R.id.buttonLogOut);
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -63,8 +63,7 @@ public class MainActivity extends FragmentActivity {
         fragmentManager.beginTransaction().add(adapter2.getItem(0),"tabsSalon").commit();
         fragmentManager.beginTransaction().add(adapter2.getItem(1),"tabsNotif").commit();*/
 
-        }
-
+    }
 
 
     class Adapter2 extends FragmentPagerAdapter {
@@ -85,7 +84,7 @@ public class MainActivity extends FragmentActivity {
             return mFragmentList.size();
         }
 
-        public int getItemPosition(Object object){
+        public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
 
