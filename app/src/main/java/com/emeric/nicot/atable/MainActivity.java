@@ -1,5 +1,6 @@
 package com.emeric.nicot.atable;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,9 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +30,19 @@ public class MainActivity extends FragmentActivity {
     Button button;
     SessionManagement session;
 
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_salon);
 
         session = new SessionManagement(getApplicationContext());
         textView = (TextView) findViewById(R.id.textViewUser);
-        textView.setText("Emeric Nicot");
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        textView.setText(user.getEmail());
+
+
+
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -46,8 +56,12 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
 
-                session.logoutUser();
-                session.checkLogin();
+                /*session.logoutUser();
+                session.checkLogin();*/
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(i);
+                finish();
             }
         });
 

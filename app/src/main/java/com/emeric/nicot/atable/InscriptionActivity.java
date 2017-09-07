@@ -22,6 +22,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,11 +46,15 @@ public class InscriptionActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference mDatabase;
+    private String nom, prenom, mail, password;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inscription);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
 
         // Edit Text
         inputNom = (EditText) findViewById(R.id.editTextNom);
@@ -65,18 +72,17 @@ public class InscriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String nom = inputNom.getText().toString();
-                String prenom = inputPrenom.getText().toString();
-                String mail = inputMail.getText().toString();
-                String password = inputMail.getText().toString();
+                nom = inputNom.getText().toString();
+                prenom = inputPrenom.getText().toString();
+                mail = inputMail.getText().toString();
+                password = inputPassword.getText().toString();
                 // new CreateNewUser().execute(nom, prenom, mail, password);
                 createAccount(mail, password);
-
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                System.out.println("USER ID : " + user.getUid());
 
             }
         });
-
-        mAuth = FirebaseAuth.getInstance();
     }
 
     private void createAccount(String mail, String password) {
@@ -98,13 +104,12 @@ public class InscriptionActivity extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
 //                            FirebaseUser user = mAuth.getCurrentUser();
 //                            updateUI(user);
-                            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                            startActivity(i);
-                            finish();
+                            onAuthSuccess(task.getResult().getUser());
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(InscriptionActivity.this, "Authentication failed.",
+                            Toast.makeText(InscriptionActivity.this, "Registration failed.",
                                     Toast.LENGTH_SHORT).show();
                             // updateUI(null);
                         }
@@ -115,6 +120,17 @@ public class InscriptionActivity extends AppCompatActivity {
                     }
                 });
         // [END create_user_with_email]
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+
+        writeNewUser(user.getUid(), nom, prenom, user.getEmail());
+
+        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                            /*i.putExtra("Nom",nom);
+                            i.putExtra("Prenom",prenom);*/
+        startActivity(i);
+        finish();
     }
 
 
@@ -140,6 +156,28 @@ public class InscriptionActivity extends AppCompatActivity {
         return valid;
     }
 
+    public void writeNewUser(String userId, String nom, String prenom, String mail) {
+
+        User user = new User(nom, prenom, mail);
+        mDatabase.child("users").child(userId).setValue(user);
+    }
+
+    public static class User {
+
+        public String nom;
+        public String prenom;
+        public String mail;
+
+        public User() {
+        }
+
+        public User(String nom, String prenom, String mail) {
+            this.nom = nom;
+            this.mail = mail;
+            this.prenom = prenom;
+        }
+
+    }
 
     /**
      * Background Async Task to Create new user
@@ -158,7 +196,7 @@ public class InscriptionActivity extends AppCompatActivity {
             pDialog.setMessage("Création du compte ...");
             pDialog.setIndeterminate(true);
             pDialog.setCancelable(false);
-            pDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener(){
+            pDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 
 
                 @Override
@@ -170,7 +208,7 @@ public class InscriptionActivity extends AppCompatActivity {
                     finish();
                 }
 
-            } );
+            });
             pDialog.show();
             pDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.INVISIBLE);
             //pDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.INVISIBLE);
@@ -191,8 +229,8 @@ public class InscriptionActivity extends AppCompatActivity {
             // getting JSON Object
             // Note that create product url accepts POST method
 
-                JSONObject json = jsonParser.makeHttpRequest(url_create_user,
-                        "POST", params);
+            JSONObject json = jsonParser.makeHttpRequest(url_create_user,
+                    "POST", params);
 
             // check log cat fro responseA
             Log.d("Create Response", json.toString());
@@ -226,7 +264,7 @@ public class InscriptionActivity extends AppCompatActivity {
             if (result != "errorserver") {
                 pDialog.setMessage("Compte créé, Connecte toi !");
 
-               if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Drawable drawable = getDrawable(R.drawable.ic_checked);
                     drawable.setBounds(bounds);
                     bar.setIndeterminateDrawable(drawable);
@@ -235,7 +273,7 @@ public class InscriptionActivity extends AppCompatActivity {
             } else {
                 pDialog.setMessage("Erreur Serveur");
 
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Drawable drawable = getDrawable(R.drawable.ic_error);
                     drawable.setBounds(bounds);
                     bar.setIndeterminateDrawable(drawable);
