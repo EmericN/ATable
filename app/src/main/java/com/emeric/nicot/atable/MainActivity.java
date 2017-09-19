@@ -35,11 +35,20 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_salon);
 
-        session = new SessionManagement(getApplicationContext());
+        //session = new SessionManagement(getApplicationContext());
         textView = (TextView) findViewById(R.id.textViewUser);
 
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        textView.setText(user.getEmail());
+        if (user != null) {
+            textView.setText(user.getEmail());
+        } else {
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(i);
+            finish();
+        }
+
+
 
 
 

@@ -51,6 +51,10 @@ public class CustomAdapterSalon extends BaseAdapter {
         return salonAll.get(position);
     }
 
+    /*public void addSalon(GetSalonFirebase salonTest) {
+        salon.add(String.valueOf(salonTest));
+
+    }*/
     @Override
     public long getItemId(int position) {
         return position;
@@ -64,6 +68,7 @@ public class CustomAdapterSalon extends BaseAdapter {
         holder.tv = (TextView) rowView.findViewById(R.id.nomSalon);
         holder.img = (ImageView) rowView.findViewById(R.id.imageViewCrown);
         holder.tv.setText(salonAll.get(position));
+
         if (position < salon.size()) {
             holder.img.setImageResource(imageId[0]);
         } else {

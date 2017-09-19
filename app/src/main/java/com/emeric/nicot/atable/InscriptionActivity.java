@@ -79,7 +79,6 @@ public class InscriptionActivity extends AppCompatActivity {
                 // new CreateNewUser().execute(nom, prenom, mail, password);
                 createAccount(mail, password);
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                System.out.println("USER ID : " + user.getUid());
 
             }
         });

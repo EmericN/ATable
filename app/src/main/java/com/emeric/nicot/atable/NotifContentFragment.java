@@ -47,7 +47,6 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
     JSONParser jsonParser = new JSONParser();
     ListAdapter adapter;
     private ProgressDialog pDialog;
-    private RefreshCallback RefreshCallback;
 
     public void onMethodCallback(String NomSalon) {
         new AcceptInvitation().execute(AcceptInvitation, mail, NomSalon);

@@ -84,9 +84,6 @@ public class LoginActivity extends AppCompatActivity {
                     // new CheckUser().execute(mail, password);
                     signIn(mail, password);
 
-           /*         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    writeNewUser(nom,prenom,mail);*/
-
                 } else {
                     if (mail.isEmpty()) {
                         input_layout_mail.setError(getString(R.string.err_msg_email));
@@ -169,29 +166,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
-    }
-
-    public void writeNewUser(String nom, String prenom, String mail) {
-
-        InscriptionActivity.User user = new InscriptionActivity.User(nom, prenom, mail);
-        mDatabase.child("users").push().setValue(user);
-    }
-
-    public static class User {
-
-        public String nom;
-        public String prenom;
-        public String mail;
-
-        public User() {
-        }
-
-        public User(String nom, String prenom, String mail) {
-            this.nom = nom;
-            this.mail = mail;
-            this.prenom = prenom;
-        }
-
     }
 
     class CheckUser extends AsyncTask<String, String, String> {

@@ -11,7 +11,7 @@ public class SessionManagement {
 
     // Email address (make variable public to access from outside)
     public static final String KEY_EMAIL = "email";
-    // User name (make variable public to access from outside)
+    // UserSalon name (make variable public to access from outside)
     public static final String KEY_PASSWORD = "password";
     // Sharedpref file name
     private static final String PREF_NAME = "ATable";

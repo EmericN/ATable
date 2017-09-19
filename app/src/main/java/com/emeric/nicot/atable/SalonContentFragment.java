@@ -19,8 +19,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +40,7 @@ import java.util.HashMap;
  * Created by Nicot Emeric on 27/06/2017.
  */
 
-public class SalonContentFragment extends Fragment {
+public class SalonContentFragment extends Fragment implements QueryFirebase {
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_RESULT = "result";
     private static final String TAG_RESULT_2 = "result2";
@@ -42,37 +49,82 @@ public class SalonContentFragment extends Fragment {
     private static final String GetSalon = "GetSalon";
     public static ArrayList<String> salon = new ArrayList<>();
     public static ArrayList<String> salon2 = new ArrayList<>();
+    public static ArrayList<String> salonTest = new ArrayList<>();
     public static int[] imageId = {R.drawable.ic_crown, R.drawable.ic_checked};
     private static String url_creation_salon = "http://192.168.1.24:80/DB/db_creation_salon.php";
     private static String url_recuperation_salon = "http://192.168.1.24:80/DB/db_recuperation_salon.php";
     ListView LV;
-    ListAdapter adapter;
+    CustomAdapterSalon adapter;
     String mail;
     JSONParser jsonParser = new JSONParser();
     JSONArray salonArray = null;
     JSONArray salonArray2 = null;
     SessionManagement session;
+    private String TAG = "Check authent", valueId2;
     private ProgressDialog pDialog;
     private ProgressDialog pDialog2;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase database;
+    private DatabaseReference myRefRelationship, myRefMessage, myRefChat, myRefRelationshipUser, myRefGetChat, myRefGetChatTs;
+    private QueryFirebase mQueryFirebase;
+    private String userId, ts;
+    private Long tsLong;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRefRelationship = database.getReference("relationship");
+        myRefChat = database.getReference("chats");
+        myRefMessage = database.getReference("messages");
+        tsLong = System.currentTimeMillis();
+        ts = tsLong.toString();
+
         View v = inflater.inflate(R.layout.tab_salon_list, null);
-
-        session = new SessionManagement(getActivity());
-        session.checkLogin();
-
-        HashMap<String, String> user = session.getUserDetails();
-        mail = user.get(SessionManagement.KEY_EMAIL);
-
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
         FloatingActionButton floatRefresh = (FloatingActionButton) v.findViewById(R.id.FloatButtonRefresh);
-
         LV = (ListView) v.findViewById(R.id.ListView1);
-        if (mail != null) {
-            new GetSalon().execute(GetSalon, mail);
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            userId = user.getUid();
+
+            loadSalon();
+            adapter = new CustomAdapterSalon(getContext(), salon, salon2, imageId);
+            LV.setAdapter(adapter);
+
+        } else {
+
+            Intent i = new Intent(v.getContext(), LoginActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            // closing this screen
+            getActivity().finish();
+
         }
+
+
+
+      /*  myRefRelationshipUser = database.getReference("relationship/"+userId+"/user/");
+        myRefRelationshipUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                salon2.clear();
+                for(DataSnapshot postSnapshot: dataSnapshot.getChildren()){
+                    SalonContentFragment.UserSalon salonUserSalon = postSnapshot.getValue(SalonContentFragment.UserSalon.class);
+                    System.out.println("SALON USER ! :" + salonUserSalon.getSalonUser());
+                    salon2.add(salonUserSalon.getSalonUser());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
 
         LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -94,7 +146,6 @@ public class SalonContentFragment extends Fragment {
             }
         });
 
-
         floatAdd.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -105,10 +156,33 @@ public class SalonContentFragment extends Fragment {
                 alert.setView(edittext);
                 alert.setPositiveButton("Créer", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String nomsalon = edittext.getText().toString();
-                        new CreateSalon().execute(nomsalon, mail);
+                        final String nomsalon = edittext.getText().toString();
+
+                        // new CreateSalon().execute(nomsalon, mail);
+                        // new GetSalon().execute(GetSalon, mail);
+
+                        //myRefChat = /chats/
+
+                        myRefChat.child(ts).child(nomsalon).setValue("", new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                myRefRelationship.child(ts).child(userId).setValue("admin", new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                        myRefMessage.child(ts).setValue("", new DatabaseReference.CompletionListener() {
+                                            @Override
+                                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                                salon.add(nomsalon);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+
                         dialog.dismiss();
-                        new GetSalon().execute(GetSalon, mail);
+
                     }
                 });
 
@@ -154,12 +228,83 @@ public class SalonContentFragment extends Fragment {
         floatRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new GetSalon().execute(GetSalon, mail);
+                // new GetSalon().execute(GetSalon, mail);
+
             }
         });
         return v;
     }
 
+    @Override
+    public void onMethodCallback(String valueUserId) {
+        String valueId2 = valueUserId;
+    }
+
+    public void loadSalon() {
+
+        myRefGetChatTs = database.getReference().child("relationship");
+        myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                salon.clear();
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    final String salonAdminTs = postSnapshot.getKey();
+
+                    myRefGetChat = database.getReference("chats/" + salonAdminTs + "/");
+                    myRefGetChat.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+
+                                String salonAdmin = postSnapshot.getKey();
+                                salon.add(salonAdmin);
+                                Log.d("list1", salon.toString());
+
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void loadSalonAfterNewOne() {
+
+        myRefGetChatTs = database.getReference().child("relationship");
+        myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    final String salonAdminTs = postSnapshot.getKey();
+
+                    salon.add(salonAdminTs);
+                }
+                adapter.notifyDataSetChanged();
+                Log.d("list1", salon.toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     class CreateSalon extends AsyncTask<String, String, String> {
         /**
@@ -282,7 +427,6 @@ public class SalonContentFragment extends Fragment {
             pDialog2.dismiss();
             LV.setAdapter(adapter);
         }
-
 
     }
 
