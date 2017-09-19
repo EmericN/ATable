@@ -4,7 +4,6 @@ package com.emeric.nicot.atable;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -19,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,32 +30,29 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Nicot Emeric on 27/06/2017.
  */
 
-public class SalonContentFragment extends Fragment implements QueryFirebase {
+public class SalonContentFragment extends Fragment {
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_RESULT = "result";
     private static final String TAG_RESULT_2 = "result2";
     private static final String TAG_SALON = "nom_salon";
     private static final String TAG_SALON_2 = "nom_salon_2";
     private static final String GetSalon = "GetSalon";
-    public static ArrayList<String> salon = new ArrayList<>();
     public static ArrayList<String> salon2 = new ArrayList<>();
     public static ArrayList<String> salonTest = new ArrayList<>();
     public static int[] imageId = {R.drawable.ic_crown, R.drawable.ic_checked};
     private static String url_creation_salon = "http://192.168.1.24:80/DB/db_creation_salon.php";
     private static String url_recuperation_salon = "http://192.168.1.24:80/DB/db_recuperation_salon.php";
+    public ArrayList<FirebaseSalon> salon;
     ListView LV;
-    CustomAdapterSalon adapter;
     String mail;
+    ListAdapter adapter;
     JSONParser jsonParser = new JSONParser();
     JSONArray salonArray = null;
     JSONArray salonArray2 = null;
@@ -81,6 +78,7 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
         myRefMessage = database.getReference("messages");
         tsLong = System.currentTimeMillis();
         ts = tsLong.toString();
+        salon = new ArrayList<FirebaseSalon>();
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
@@ -92,10 +90,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             userId = user.getUid();
 
-            loadSalon();
-            adapter = new CustomAdapterSalon(getContext(), salon, salon2, imageId);
+            adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon);
             LV.setAdapter(adapter);
-
+            loadSalon();
         } else {
 
             Intent i = new Intent(v.getContext(), LoginActivity.class);
@@ -172,8 +169,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
                                         myRefMessage.child(ts).setValue("", new DatabaseReference.CompletionListener() {
                                             @Override
                                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                                salon.add(nomsalon);
-                                                adapter.notifyDataSetChanged();
+                                                FirebaseSalon salonAdd = new FirebaseSalon(nomsalon);
+                                                salon.add(salonAdd);
+
                                             }
                                         });
                                     }
@@ -235,10 +233,6 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
         return v;
     }
 
-    @Override
-    public void onMethodCallback(String valueUserId) {
-        String valueId2 = valueUserId;
-    }
 
     public void loadSalon() {
 
@@ -247,7 +241,6 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                salon.clear();
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     final String salonAdminTs = postSnapshot.getKey();
@@ -260,11 +253,12 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
                             for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                                 String salonAdmin = postSnapshot.getKey();
-                                salon.add(salonAdmin);
+                                FirebaseSalon addedsalon = new FirebaseSalon(salonAdmin);
+                                salon.add(addedsalon);
                                 Log.d("list1", salon.toString());
 
                             }
-                            adapter.notifyDataSetChanged();
+                           /* adapter.notifyDataSetChanged();*/
                         }
 
                         @Override
@@ -282,34 +276,11 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
         });
     }
 
-    public void loadSalonAfterNewOne() {
 
-        myRefGetChatTs = database.getReference().child("relationship");
-        myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    final String salonAdminTs = postSnapshot.getKey();
-
-                    salon.add(salonAdminTs);
-                }
-                adapter.notifyDataSetChanged();
-                Log.d("list1", salon.toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    class CreateSalon extends AsyncTask<String, String, String> {
-        /**
-         * Before starting background thread Show Progress Dialog
-         */
+   /* class CreateSalon extends AsyncTask<String, String, String> {
+        *//**
+     * Before starting background thread Show Progress Dialog
+     *//*
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -320,9 +291,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
             pDialog.show();
         }
 
-        /**
-         * Creating user in background thread
-         */
+        *//**
+     * Creating user in background thread
+     *//*
         protected String doInBackground(String... args) {
             // Building Parameters
             HashMap<String, String> params = new HashMap<>();
@@ -349,9 +320,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
             return null;
         }
 
-        /**
-         * After completing background task Dismiss the progress dialog
-         **/
+        *//**
+     * After completing background task Dismiss the progress dialog
+     **//*
         protected void onPostExecute(String result) {
             pDialog.dismiss();
         }
@@ -359,9 +330,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
 
     class GetSalon extends AsyncTask<String, String, String> {
 
-        /**
-         * Before starting background thread Show Progress Dialog
-         */
+        *//**
+     * Before starting background thread Show Progress Dialog
+     *//*
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -372,9 +343,9 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
             pDialog2.show();
         }
 
-        /**
-         * Creating user in background thread
-         */
+        *//**
+     * Creating user in background thread
+     *//*
         protected String doInBackground(String... args) {
             // Building Parameters
             HashMap<String, String> params = new HashMap<>();
@@ -420,14 +391,14 @@ public class SalonContentFragment extends Fragment implements QueryFirebase {
 
         }
 
-        /**
-         * After completing background task Dismiss the progress dialog
-         **/
+        *//**
+     * After completing background task Dismiss the progress dialog
+     **//*
         protected void onPostExecute(String file_url) {
             pDialog2.dismiss();
             LV.setAdapter(adapter);
         }
 
-    }
+    }*/
 
 }

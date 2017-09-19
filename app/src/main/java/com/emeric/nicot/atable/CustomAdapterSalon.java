@@ -1,83 +1,61 @@
 package com.emeric.nicot.atable;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 /**
  * Created by Nicot Emeric on 12/07/2017.
  */
 
-public class CustomAdapterSalon extends BaseAdapter {
+public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalon> {
 
-    private static LayoutInflater inflater = null;
-    ArrayList<String> salon, salon2, salonAll;
+    private final int layoutResourceId;
+    ArrayList<FirebaseSalon> salon;
     Context context;
-    int[] imageId;
 
-    public CustomAdapterSalon(Context context, ArrayList<String> salon, ArrayList<String> salon2, int[] imageId) {
-        // TODO Auto-generated constructor stub
+    public CustomAdapterSalon(Context context, int layoutResourceId, ArrayList<FirebaseSalon> salon) {
+
+        super(context, layoutResourceId, salon);
         this.salon = salon;
-        this.salon2 = salon2;
         this.context = context;
-        this.imageId = imageId;
-        salonAll = new ArrayList<String>();
-        salonAll.addAll(salon);
-        salonAll.addAll(salon2);
-        Arrays.toString(salonAll.toArray());
-        inflater = (LayoutInflater) context.
-                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        this.layoutResourceId = layoutResourceId;
     }
 
-    @Override
-    public int getCount() {
-        return salonAll.size();
-    }
 
-    public int getCount1() {
-        return salon.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return salonAll.get(position);
-    }
-
-    /*public void addSalon(GetSalonFirebase salonTest) {
-        salon.add(String.valueOf(salonTest));
-
-    }*/
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
-        View rowView;
-        rowView = inflater.inflate(R.layout.list_item, null);
-        holder.tv = (TextView) rowView.findViewById(R.id.nomSalon);
-        holder.img = (ImageView) rowView.findViewById(R.id.imageViewCrown);
-        holder.tv.setText(salonAll.get(position));
+        View row = convertView;
+        SalonHolder holder = null;
 
-        if (position < salon.size()) {
-            holder.img.setImageResource(imageId[0]);
+        if (row == null) {
+
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            row = inflater.inflate(layoutResourceId, parent, false);
+
+            holder = new SalonHolder();
+            holder.tv = (TextView) row.findViewById(R.id.nomSalon);
+
+            row.setTag(holder);
         } else {
-            holder.img.setImageResource(imageId[1]);
+
+            FirebaseSalon salonAdmin = this.salon.get(position);
+            holder.tv.setText(salonAdmin.getSalon());
         }
-        return rowView;
+
+        return row;
     }
 
-    public class Holder {
+    public class SalonHolder {
         TextView tv;
         ImageView img;
     }
