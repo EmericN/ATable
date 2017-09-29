@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,7 +51,7 @@ public class SalonContentFragment extends Fragment {
     public ArrayList<FirebaseSalon> salon;
     ListView LV;
     String mail;
-    ListAdapter adapter;
+    CustomAdapterSalon adapter;
     JSONParser jsonParser = new JSONParser();
     JSONArray salonArray = null;
     JSONArray salonArray2 = null;
@@ -63,8 +62,7 @@ public class SalonContentFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase database;
-    private DatabaseReference myRefRelationship, myRefMessage, myRefChat, myRefRelationshipUser, myRefGetChat, myRefGetChatTs;
-    private QueryFirebase mQueryFirebase;
+    private DatabaseReference myRefRelationship, myRefMessage, myRefChat, myRefGetChat, myRefGetChatTs;
     private String userId, ts;
     private Long tsLong;
 
@@ -82,27 +80,70 @@ public class SalonContentFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
-        FloatingActionButton floatRefresh = (FloatingActionButton) v.findViewById(R.id.FloatButtonRefresh);
         LV = (ListView) v.findViewById(R.id.ListView1);
+
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             userId = user.getUid();
 
-            adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon);
-            LV.setAdapter(adapter);
-            loadSalon();
         } else {
-
             Intent i = new Intent(v.getContext(), LoginActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
             // closing this screen
             getActivity().finish();
-
         }
 
+        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon);
+        LV.setAdapter(adapter);
+//        loadSalon();
+        /////////////////////////////////////////////////////
+
+        myRefGetChatTs = database.getReference().child("relationship");
+        myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    final String salonAdminTs = postSnapshot.getKey();
+
+                    myRefGetChat = database.getReference("chats/" + salonAdminTs + "/");
+                    myRefGetChat.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+
+                                String salonAdmin = postSnapshot.getKey();
+                                FirebaseSalon addedsalon = new FirebaseSalon(salonAdmin);
+
+                                salon.add(addedsalon);
+                                Log.d("list1", salon.toString());
+                                adapter.notifyDataSetChanged();
+
+                            }
+                            //adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        ////////////////////////////////////////////////////////////////////////////
 
 
       /*  myRefRelationshipUser = database.getReference("relationship/"+userId+"/user/");
@@ -171,7 +212,7 @@ public class SalonContentFragment extends Fragment {
                                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                                                 FirebaseSalon salonAdd = new FirebaseSalon(nomsalon);
                                                 salon.add(salonAdd);
-
+                                                adapter.notifyDataSetChanged();
                                             }
                                         });
                                     }
@@ -198,7 +239,7 @@ public class SalonContentFragment extends Fragment {
                 final AlertDialog dialog = alert.create();
                 dialog.show();
 
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                         .setEnabled(false);
 
                 edittext.addTextChangedListener(new TextWatcher() {
@@ -212,10 +253,10 @@ public class SalonContentFragment extends Fragment {
 
                     public void afterTextChanged(Editable s) {
                         if (TextUtils.isEmpty(s)) {
-                            ((AlertDialog) dialog).getButton(
+                            dialog.getButton(
                                     AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         } else {
-                            ((AlertDialog) dialog).getButton(
+                            dialog.getButton(
                                     AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                         }
                     }
@@ -223,13 +264,6 @@ public class SalonContentFragment extends Fragment {
             }
         });
 
-        floatRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // new GetSalon().execute(GetSalon, mail);
-
-            }
-        });
         return v;
     }
 

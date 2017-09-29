@@ -20,8 +20,8 @@
         </activity>
 
          <activity android:name=".InscriptionActivity"
-                   android:parentActivityName=".LoginActivity"
-                   android:label="Inscription">
+                   android:label="Inscription"
+                   android:parentActivityName=".LoginActivity">
 
          </activity>
 
@@ -30,7 +30,6 @@
        <activity android:name=".Salon">
        </activity>
    </application>
-
 
      <uses-permission android:name="android.permission.INTERNET" />
  </manifest>

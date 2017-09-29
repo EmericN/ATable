@@ -2,11 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
-                                             android:orientation="vertical"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
-                                             tools:layout_editor_absoluteY="81dp"
-                                             tools:layout_editor_absoluteX="0dp">
+                                             android:orientation="vertical"
+                                             tools:layout_editor_absoluteX="0dp"
+                                             tools:layout_editor_absoluteY="81dp">
 
     <Button
         android:id="@+id/buttonEnvoyer"
@@ -14,86 +14,86 @@
         android:layout_height="50dp"
         android:layout_marginTop="36dp"
         android:text="S'INSCRIRE"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextMDP"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintTop_creator="1"
-        tools:layout_editor_absoluteX="82dp"
-        app:layout_constraintHorizontal_bias="0.502"/>
+        tools:layout_editor_absoluteX="82dp"/>
 
     <EditText
         android:id="@+id/editTextNom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Nom"
-        tools:layout_constraintTop_creator="1"
         android:layout_marginTop="46dp"
+        android:ems="10"
+        android:hint="Nom"
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toLeftOf="@+id/editTextPrenom"
         app:layout_constraintTop_toBottomOf="@+id/textView5"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/editTextPrenom"/>
+        tools:layout_constraintTop_creator="1"/>
 
     <EditText
         android:id="@+id/editTextPrenom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Prenom"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="Prenom"
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextNom"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
     <EditText
         android:id="@+id/editTextMail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Adresse mail"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="@+id/editTextPrenom"
         android:layout_marginTop="13dp"
+        android:ems="10"
+        android:hint="Adresse mail"
+        android:inputType="textEmailAddress"
+        app:layout_constraintLeft_toLeftOf="@+id/editTextPrenom"
+        app:layout_constraintRight_toRightOf="@+id/editTextPrenom"
         app:layout_constraintTop_toBottomOf="@+id/editTextPrenom"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/editTextPrenom"/>
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
     <EditText
         android:id="@+id/editTextMDP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPassword|textVisiblePassword"
-        android:text="Mot de passe"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="@+id/editTextMail"
         android:layout_marginTop="19dp"
+        android:ems="10"
+        android:hint="Mot de passe"
+        android:inputType="textPassword"
+        app:layout_constraintLeft_toLeftOf="@+id/editTextMail"
+        app:layout_constraintRight_toRightOf="@+id/editTextMail"
         app:layout_constraintTop_toBottomOf="@+id/editTextMail"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/editTextMail"/>
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
         android:text="INSCRIPTION"
         android:textAlignment="center"
         android:textSize="24sp"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="27dp"
-        tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
 </android.support.constraint.ConstraintLayout>
