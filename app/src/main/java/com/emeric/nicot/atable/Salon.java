@@ -3,7 +3,6 @@ package com.emeric.nicot.atable;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,15 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 
 /**
@@ -40,7 +34,6 @@ public class Salon extends Activity {
 
     private static final String TAG_SUCCESS = "success";
     private static String url_invitation = "http://192.168.1.24:80/DB/db_invitation.php";
-    JSONParser jsonParser = new JSONParser();
     private RecyclerView mRecyclerView, mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter, mAdapter2;
@@ -96,7 +89,7 @@ public class Salon extends Activity {
                 alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String friend = edittext.getText().toString();
-                        new AddFriend().execute(friend, mail, NomSalon);
+                        // new AddFriend().execute(friend, mail, NomSalon);
                     }
                 });
 
@@ -114,7 +107,7 @@ public class Salon extends Activity {
                 final AlertDialog dialog = alert.create();
                 dialog.show();
 
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                         .setEnabled(false);
 
                 edittext.addTextChangedListener(new TextWatcher() {
@@ -128,10 +121,10 @@ public class Salon extends Activity {
 
                     public void afterTextChanged(Editable s) {
                         if (TextUtils.isEmpty(s)) {
-                            ((AlertDialog) dialog).getButton(
+                            dialog.getButton(
                                     AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                         } else {
-                            ((AlertDialog) dialog).getButton(
+                            dialog.getButton(
                                     AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                         }
                     }
@@ -158,172 +151,7 @@ public class Salon extends Activity {
             floatAddFriend.setVisibility(View.INVISIBLE);
             floatAddFriend.hide();
         }
-
-       /* Chat chat = new Chat();
-        chat.execute();*/
-
-
     }
-
-    class AddFriend extends AsyncTask<String, String, String> {
-        /**
-         * Before starting background thread Show Progress Dialog
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(Salon.this);
-            pDialog.setMessage("Invitation en cours...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        /**
-         * Creating user in background thread
-         */
-        protected String doInBackground(String... args) {
-            // Building Parameters
-            HashMap<String, String> params = new HashMap<>();
-            params.put("friend", args[0]);
-            params.put("mail", args[1]);
-            params.put("NomSalon", args[2]);
-
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_invitation,
-                    "POST", params);
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-            // check for success tag
-            try {
-                int success = json.getInt(TAG_SUCCESS);
-                if (success == 1) {
-                    // successfully created user
-                    return "success";
-                } else {
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         **/
-        protected void onPostExecute(String result) {
-            pDialog.dismiss();
-        }
-    }
-/*
-    class Chat extends AsyncTask<Void, Void, Void> {
-        private String message;
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                client = new Socket(IP_SERVER, PORT);
-
-                if (client != null) {
-                    printwriter = new PrintWriter(client.getOutputStream(), true);
-                    InputStreamReader inputStreamReader = new InputStreamReader(client.getInputStream());
-                    bufferedReader = new BufferedReader(inputStreamReader);
-                } else {
-                    System.out.println("Server non up on 4111");
-                }
-
-            } catch (IOException e) {
-                System.out.println("Failed to connect server " + IP_SERVER);
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        protected void onPostExecute(Void result) {
-            buttonSend.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    message = editTextSend.getText().toString();
-                    final Sender messageSender = new Sender();// Initialize chat sender AsyncTask.
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        messageSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else {
-                        messageSender.execute();
-                    }
-
-                }
-            });
-
-            Receiver receiver = new Receiver(); // Initialize chat receiver AsyncTask.
-            receiver.execute();
-
-        }
-
-    }
-
-   class Receiver extends AsyncTask<Void, Void, Void> {
-
-        private String message;
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            while (true) {
-                try {
-
-                    if (bufferedReader.ready()) {
-                        message = bufferedReader.readLine();
-                        publishProgress(null);
-                    } else {
-                        return null;
-                    }
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ie) {
-                }
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            ListMessage.add(new MessageChat("Server: " + message + "\n", 2));
-            mRecyclerViewChat.smoothScrollToPosition(mAdapter2.getItemCount() -1);
-            mAdapter2.notifyDataSetChanged();
-        }
-
-    }
-
-    class Sender extends AsyncTask<Void, Void, Void> {
-
-        private String message;
-
-        protected void onPreExecute() {
-            message = editTextSend.getText().toString();
-        }
-
-        @Override
-        protected Void doInBackground(Void... args) {
-
-            printwriter.write(message + "\n");
-            printwriter.flush();
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void file_url) {
-            editTextSend.setText(""); // Clear the chat box
-            ListMessage.add(new MessageChat("Client: " + message + "\n", 0));
-            mRecyclerViewChat.smoothScrollToPosition(mAdapter2.getItemCount() -1);
-            mAdapter2.notifyDataSetChanged();
-        }
-    }*/
 }
 
 

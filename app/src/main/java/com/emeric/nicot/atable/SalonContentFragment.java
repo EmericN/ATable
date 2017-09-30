@@ -1,7 +1,6 @@
 package com.emeric.nicot.atable;
 
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,8 +27,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-
 import java.util.ArrayList;
 
 /**
@@ -37,28 +34,11 @@ import java.util.ArrayList;
  */
 
 public class SalonContentFragment extends Fragment {
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_RESULT = "result";
-    private static final String TAG_RESULT_2 = "result2";
-    private static final String TAG_SALON = "nom_salon";
-    private static final String TAG_SALON_2 = "nom_salon_2";
-    private static final String GetSalon = "GetSalon";
-    public static ArrayList<String> salon2 = new ArrayList<>();
-    public static ArrayList<String> salonTest = new ArrayList<>();
     public static int[] imageId = {R.drawable.ic_crown, R.drawable.ic_checked};
-    private static String url_creation_salon = "http://192.168.1.24:80/DB/db_creation_salon.php";
-    private static String url_recuperation_salon = "http://192.168.1.24:80/DB/db_recuperation_salon.php";
     public ArrayList<FirebaseSalon> salon;
     ListView LV;
     String mail;
     CustomAdapterSalon adapter;
-    JSONParser jsonParser = new JSONParser();
-    JSONArray salonArray = null;
-    JSONArray salonArray2 = null;
-    SessionManagement session;
-    private String TAG = "Check authent", valueId2;
-    private ProgressDialog pDialog;
-    private ProgressDialog pDialog2;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase database;
@@ -89,18 +69,13 @@ public class SalonContentFragment extends Fragment {
             userId = user.getUid();
 
         } else {
-            Intent i = new Intent(v.getContext(), LoginActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            // closing this screen
-            getActivity().finish();
+
         }
 
         adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon);
         LV.setAdapter(adapter);
-//        loadSalon();
-        /////////////////////////////////////////////////////
 
+        //Charge tous les salons proprietaire firebase
         myRefGetChatTs = database.getReference().child("relationship");
         myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -143,37 +118,13 @@ public class SalonContentFragment extends Fragment {
         });
 
 
-        ////////////////////////////////////////////////////////////////////////////
-
-
-      /*  myRefRelationshipUser = database.getReference("relationship/"+userId+"/user/");
-        myRefRelationshipUser.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                salon2.clear();
-                for(DataSnapshot postSnapshot: dataSnapshot.getChildren()){
-                    SalonContentFragment.UserSalon salonUserSalon = postSnapshot.getValue(SalonContentFragment.UserSalon.class);
-                    System.out.println("SALON USER ! :" + salonUserSalon.getSalonUser());
-                    salon2.add(salonUserSalon.getSalonUser());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
         LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
                 Intent i = new Intent(getContext(), Salon.class);
-                Object obj = adapter.getItem(position);
-                Integer objCount = adapter.getCount();
-
-                String NomSalon = obj.toString();
-                i.putExtra("NomSalon", NomSalon);
+                FirebaseSalon salonAdmin = salon.get(position);
+                i.putExtra("NomSalon", salonAdmin.getSalon());
                 i.putExtra("mail", mail);
                 if (position < salon.size()) {
                     i.putExtra("tag", 1);
@@ -195,9 +146,6 @@ public class SalonContentFragment extends Fragment {
                 alert.setPositiveButton("Créer", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         final String nomsalon = edittext.getText().toString();
-
-                        // new CreateSalon().execute(nomsalon, mail);
-                        // new GetSalon().execute(GetSalon, mail);
 
                         //myRefChat = /chats/
 
@@ -266,173 +214,4 @@ public class SalonContentFragment extends Fragment {
 
         return v;
     }
-
-
-    public void loadSalon() {
-
-        myRefGetChatTs = database.getReference().child("relationship");
-        myRefGetChatTs.orderByChild(userId).equalTo("admin").addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    final String salonAdminTs = postSnapshot.getKey();
-
-                    myRefGetChat = database.getReference("chats/" + salonAdminTs + "/");
-                    myRefGetChat.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-
-                                String salonAdmin = postSnapshot.getKey();
-                                FirebaseSalon addedsalon = new FirebaseSalon(salonAdmin);
-                                salon.add(addedsalon);
-                                Log.d("list1", salon.toString());
-
-                            }
-                           /* adapter.notifyDataSetChanged();*/
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
-   /* class CreateSalon extends AsyncTask<String, String, String> {
-        *//**
-     * Before starting background thread Show Progress Dialog
-     *//*
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Création du salon...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        *//**
-     * Creating user in background thread
-     *//*
-        protected String doInBackground(String... args) {
-            // Building Parameters
-            HashMap<String, String> params = new HashMap<>();
-            params.put("nomsalon", args[0]);
-            params.put("mail", args[1]);
-
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_creation_salon,
-                    "POST", params);
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-            // check for success tag
-            try {
-                int success = json.getInt(TAG_SUCCESS);
-                if (success == 1) {
-                    // successfully created user
-                    return "success";
-                } else {
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        *//**
-     * After completing background task Dismiss the progress dialog
-     **//*
-        protected void onPostExecute(String result) {
-            pDialog.dismiss();
-        }
-    }
-
-    class GetSalon extends AsyncTask<String, String, String> {
-
-        *//**
-     * Before starting background thread Show Progress Dialog
-     *//*
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog2 = new ProgressDialog(getActivity());
-            pDialog2.setMessage("Récupération des données...");
-            pDialog2.setIndeterminate(false);
-            pDialog2.setCancelable(true);
-            pDialog2.show();
-        }
-
-        *//**
-     * Creating user in background thread
-     *//*
-        protected String doInBackground(String... args) {
-            // Building Parameters
-            HashMap<String, String> params = new HashMap<>();
-            params.put("GetSalon", args[0]);
-            params.put("mail", args[1]);
-            System.out.println(params.get("mail"));
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_recuperation_salon,
-                    "POST", params);
-
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-
-            // check for success tag
-
-            try {
-                salonArray = json.getJSONArray(TAG_RESULT);
-                salonArray2 = json.getJSONArray(TAG_RESULT_2);
-
-                salon.clear();
-                salon2.clear();
-
-                for (int i = 0; i < salonArray.length(); i++) {
-                    JSONObject c = salonArray.getJSONObject(i);
-                    String nom_salon = c.getString(TAG_SALON);
-                    salon.add(nom_salon);
-                }
-                for (int i = 0; i < salonArray2.length(); i++) {
-                    JSONObject c = salonArray2.getJSONObject(i);
-                    String nom_salon_2 = c.getString(TAG_SALON_2);
-                    salon2.add(nom_salon_2);
-                }
-
-                adapter = new CustomAdapterSalon(getContext(), salon, salon2, imageId);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                System.out.println("test erreur n");
-            }
-
-            return null;
-
-        }
-
-        *//**
-     * After completing background task Dismiss the progress dialog
-     **//*
-        protected void onPostExecute(String file_url) {
-            pDialog2.dismiss();
-            LV.setAdapter(adapter);
-        }
-
-    }*/
-
 }

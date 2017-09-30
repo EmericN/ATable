@@ -28,14 +28,12 @@ public class MainActivity extends FragmentActivity {
     ViewPager viewPager;
     TextView textView;
     Button button;
-    SessionManagement session;
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_salon);
 
-        //session = new SessionManagement(getApplicationContext());
         textView = (TextView) findViewById(R.id.textViewUser);
 
 
@@ -47,10 +45,6 @@ public class MainActivity extends FragmentActivity {
             startActivity(i);
             finish();
         }
-
-
-
-
 
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -65,8 +59,6 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
 
-                /*session.logoutUser();
-                session.checkLogin();*/
                 FirebaseAuth.getInstance().signOut();
                 Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(i);

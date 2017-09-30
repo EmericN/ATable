@@ -36,9 +36,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalon> {
             row.setTag(holder);
 
             FirebaseSalon salonAdmin = this.salon.get(position);
-        System.out.println("Salon ADMIN CUSTOM ADAPTER" + salonAdmin.getSalon());
             holder.tv.setText(salonAdmin.getSalon());
-
 
         return row;
     }
