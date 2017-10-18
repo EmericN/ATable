@@ -1,4 +1,4 @@
-package com.example.emericnicot.atabledevtest.fragment;
+package com.emeric.nicot.atable.fragment;
 
 
 import android.content.DialogInterface;

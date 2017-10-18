@@ -50,11 +50,11 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         if (position <= salonAdmin.size()) {
             holder.iv.setImageResource(imageId[0]);
         }
-        FirebaseSalonMembre salonMembre = this.salonMembre.get(position);
+/*        FirebaseSalonMembre salonMembre = this.salonMembre.get(position);
         holder.tv.setText(salonMembre.getSalon());
         if (position <= salonMembre.size()) {
             holder.iv.setImageResource(imageId[1]);
-        }
+        }*/
 
         return row;
     }
