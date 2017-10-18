@@ -24,7 +24,6 @@ import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
-import com.emeric.nicot.atable.models.FirebaseSalonMembre;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,7 +45,7 @@ import java.util.Map;
 
 public class SalonContentFragment extends Fragment {
     public ArrayList<FirebaseSalonAdmin> salonAdmin;
-    public ArrayList<FirebaseSalonMembre> salonMembre;
+    public ArrayList<FirebaseSalonAdmin> salonMembre;
     ListView LV;
     String mail;
     CustomAdapterSalon adapter;
@@ -70,12 +69,12 @@ public class SalonContentFragment extends Fragment {
         tsLong = System.currentTimeMillis();
         ts = tsLong.toString();
         salonAdmin = new ArrayList<FirebaseSalonAdmin>();
-        salonMembre = new ArrayList<FirebaseSalonMembre>();
+        salonMembre = new ArrayList<FirebaseSalonAdmin>();
         CollectionReference docRef = mFirestore.collection("chats");
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
-        LV = (ListView) v.findViewById(R.id.ListView1);
+        LV = (ListView) v.findViewById(R.id.ListView);
 
 
         final FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -117,7 +116,8 @@ public class SalonContentFragment extends Fragment {
 
                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
                         String salonMemb = (String) document.get("nom");
-                        FirebaseSalonMembre addedSalonMembre = new FirebaseSalonMembre(salonMemb);
+                        FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb);
+                        //  FirebaseSalonMembre addedSalonMembre = new FirebaseSalonMembre(salonMemb);
                         salonMembre.add(addedSalonMembre);
                         adapter.notifyDataSetChanged();
                     }

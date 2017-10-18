@@ -10,25 +10,27 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
-import com.emeric.nicot.atable.models.FirebaseSalonMembre;
 
 import java.util.ArrayList;
 
 public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
+    private static final String TAG = "debug array";
     public static int[] imageId = {R.drawable.ic_crown, R.drawable.ic_checked};
     private final int layoutResourceId;
     ArrayList<FirebaseSalonAdmin> salonAdmin;
-    ArrayList<FirebaseSalonMembre> salonMembre;
+    ArrayList<FirebaseSalonAdmin> salonMembre;
+    ArrayList<FirebaseSalonAdmin> salonAll;
     Context context;
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
                               ArrayList<FirebaseSalonAdmin> salonAdmin,
-                              ArrayList<FirebaseSalonMembre> salonMembre) {
+                              ArrayList<FirebaseSalonAdmin> salonMembre) {
 
         super(context, layoutResourceId, salonAdmin);
         this.salonAdmin = salonAdmin;
         this.salonMembre = salonMembre;
+
         this.context = context;
         this.layoutResourceId = layoutResourceId;
     }
@@ -44,17 +46,18 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
 
         row.setTag(holder);
+        salonAll = new ArrayList<FirebaseSalonAdmin>();
+        salonAll.addAll(salonAdmin);
+        salonAll.addAll(salonMembre);
+        FirebaseSalonAdmin salonAll = this.salonAll.get(position);
 
-        FirebaseSalonAdmin salonAdmin = this.salonAdmin.get(position);
-        holder.tv.setText(salonAdmin.getSalon());
         if (position <= salonAdmin.size()) {
+            holder.tv.setText(salonAll.getSalon());
+            holder.iv.setImageResource(imageId[0]);
+        } else {
+            holder.tv.setText(salonAll.getSalon());
             holder.iv.setImageResource(imageId[0]);
         }
-/*        FirebaseSalonMembre salonMembre = this.salonMembre.get(position);
-        holder.tv.setText(salonMembre.getSalon());
-        if (position <= salonMembre.size()) {
-            holder.iv.setImageResource(imageId[1]);
-        }*/
 
         return row;
     }

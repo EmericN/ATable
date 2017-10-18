@@ -19,4 +19,5 @@ public class FirebaseSalonAdmin {
     public int size() {
         return salonAdmin.length();
     }
+
 }

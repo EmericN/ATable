@@ -24,12 +24,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="100dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="1">
 
             <ListView
-                android:id="@+id/ListView1"
+                android:id="@+id/ListView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
+
 
         </LinearLayout>
 

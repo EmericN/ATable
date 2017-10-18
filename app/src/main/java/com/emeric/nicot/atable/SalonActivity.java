@@ -101,6 +101,7 @@ public class SalonActivity extends Activity {
                         String friend = edittext.getText().toString();
                         String[] separate = friend.split(" ");
 
+
                         // new AddFriend().execute(friend, mail, NomSalon);
                         myRefChats.orderByChild("title").equalTo(nomSalon).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
