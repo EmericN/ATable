@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.adapter;
 
 
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.emeric.nicot.atable.R;
+import com.emeric.nicot.atable.models.MessageChat;
 
 import java.util.ArrayList;
 

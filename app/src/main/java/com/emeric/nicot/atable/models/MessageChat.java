@@ -1,6 +1,6 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.models;
 
-class MessageChat {
+public class MessageChat {
 
     private String content;
     private int side;

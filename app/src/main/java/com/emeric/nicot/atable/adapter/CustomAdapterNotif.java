@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.emeric.nicot.atable.R;
+import com.emeric.nicot.atable.fragment.AdapterCallback;
 
 import java.util.ArrayList;
 

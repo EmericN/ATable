@@ -28,7 +28,7 @@ public class InscriptionActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
-    private String nom, prenom, mail, password;
+    private String nom, prenom, nomPrenom, mail, password;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +55,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
                 nom = inputNom.getText().toString();
                 prenom = inputPrenom.getText().toString();
+                nomPrenom = nom + "_" + prenom;
                 mail = inputMail.getText().toString();
                 password = inputPassword.getText().toString();
 
@@ -94,7 +95,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
     private void onAuthSuccess(FirebaseUser user) {
 
-        writeNewUser(user.getUid(), nom, prenom, user.getEmail());
+        writeNewUser(user.getUid(), nom, prenom, nomPrenom, user.getEmail());
 
         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                             /*i.putExtra("Nom",nom);
@@ -126,9 +127,9 @@ public class InscriptionActivity extends AppCompatActivity {
         return valid;
     }
 
-    public void writeNewUser(String userId, String nom, String prenom, String mail) {
+    public void writeNewUser(String userId, String nom, String prenom, String nomPrenom, String mail) {
 
-        User user = new User(nom, prenom, mail);
+        User user = new User(nom, prenom, nomPrenom, mail);
         mDatabase.child("users").child(userId).setValue(user);
     }
 
@@ -136,14 +137,16 @@ public class InscriptionActivity extends AppCompatActivity {
 
         public String nom;
         public String prenom;
+        public String nomPrenom;
         public String mail;
 
         public User() {
         }
 
-        public User(String nom, String prenom, String mail) {
+        public User(String nom, String prenom, String nomPrenom, String mail) {
             this.nom = nom;
             this.mail = mail;
+            this.nomPrenom = nomPrenom;
             this.prenom = prenom;
         }
 

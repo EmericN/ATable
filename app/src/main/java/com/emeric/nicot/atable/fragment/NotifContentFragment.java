@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.fragment;
 
 
 import android.app.ProgressDialog;
@@ -10,10 +10,11 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.emeric.nicot.atable.R;
+
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class NotifContentFragment extends Fragment implements AdapterCallback {
@@ -31,7 +32,6 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
     public static ArrayList<String> invitation2 = new ArrayList<>();
     public static ArrayList<String> nomsalon = new ArrayList<>();
     ListView LV;
-    SessionManagement session;
     String mail;
     JSONArray InvitArray = null;
     JSONArray NomSalonArray = null;
@@ -50,9 +50,6 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
 
         LV = (ListView) v.findViewById(R.id.ListView1);
 
-        session = new SessionManagement(getActivity());
-        HashMap<String, String> user = session.getUserDetails();
-        mail = user.get(SessionManagement.KEY_EMAIL);
 
         if (mail != null) {
 

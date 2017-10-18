@@ -1,10 +1,10 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.fragment;
 
 /**
  * Created by Nicot Emeric on 30/07/2017.
  */
 
-interface AdapterCallback {
+public interface AdapterCallback {
     void onMethodCallback(String NomSalon);
 
 }

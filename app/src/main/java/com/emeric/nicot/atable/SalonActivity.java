@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,9 +20,16 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import com.emeric.nicot.atable.adapter.CustomAdapter;
+import com.emeric.nicot.atable.adapter.CustomAdapterChat;
+import com.emeric.nicot.atable.models.MessageChat;
+import com.emeric.nicot.atable.models.SalonIdModel;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -30,16 +38,16 @@ import java.util.Arrays;
  * Created by Nicot Emeric on 05/07/2017.
  */
 
-public class Salon extends Activity {
+public class SalonActivity extends Activity {
 
     private static final String TAG_SUCCESS = "success";
     private static String url_invitation = "http://192.168.1.24:80/DB/db_invitation.php";
     private RecyclerView mRecyclerView, mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter, mAdapter2;
-    private ArrayList<String> Ordre;
+    private ArrayList<String> Ordre, listtest;
     private ArrayList<Integer> Image;
-    private String mail, NomSalon;
+    private String mail, nomSalon, ts, userId;
     private Integer tag;
     private ArrayAdapter<String> adapter;
     private ArrayList<MessageChat> ListMessage = new ArrayList<>();
@@ -48,19 +56,21 @@ public class Salon extends Activity {
     private Button buttonSend;
     private ListView listViewChat;
     private ProgressDialog pDialog;
-    private Socket client;
-    private PrintWriter printwriter;
-    private BufferedReader bufferedReader;
-    private String IP_SERVER = "192.168.1.24";
-    private Integer PORT = 4111;
+    private FirebaseDatabase database;
+    private DatabaseReference myRefRelationship, myRefUserId, myRefChats;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.salon);
 
+        database = FirebaseDatabase.getInstance();
+        myRefRelationship = database.getReference("relationship");
+        myRefUserId = database.getReference("users");
+        myRefChats = database.getReference("chats");
+
         Bundle extras = getIntent().getExtras();
-        NomSalon = extras.getString("NomSalon");
-        mail = extras.getString("mail");
+        nomSalon = extras.getString("NomSalon");
+        userId = extras.getString("userId");
         tag = extras.getInt("tag");
 
         textV1 = (TextView) findViewById(R.id.textViewSalon);
@@ -74,7 +84,7 @@ public class Salon extends Activity {
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
 
-        textV1.setText(NomSalon);
+        textV1.setText(nomSalon);
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);
 
@@ -89,7 +99,47 @@ public class Salon extends Activity {
                 alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String friend = edittext.getText().toString();
+                        String[] separate = friend.split(" ");
+
                         // new AddFriend().execute(friend, mail, NomSalon);
+                        myRefChats.orderByChild("title").equalTo(nomSalon).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                    String idSalon = postSnapshot.getKey();
+
+                                    SalonIdModel salonIdModel2 = new SalonIdModel(idSalon);
+                                    listtest.add(salonIdModel2.GetSalonId());
+                                    Log.d("idSalon : ", salonIdModel2.GetSalonId());
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        myRefUserId.orderByChild("nomPrenom").equalTo(separate[0] + "_" +
+                                                                      separate[1]).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                    String userIdInvite = postSnapshot.getKey();
+                                    Log.d("USERIDINVITE : ", userIdInvite);
+                                    myRefRelationship.child(listtest.get(0)).child(userIdInvite).setValue("membre");
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+                        //myRefRelationship.child(ts).child(userId).setValue("membre");
                     }
                 });
 
@@ -144,7 +194,7 @@ public class Salon extends Activity {
             // The number of Columns
             mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new CustomAdapter(Salon.this, Ordre, Image);
+            mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
             mRecyclerView.setAdapter(mAdapter);
         } else {
 
