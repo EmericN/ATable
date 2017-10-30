@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,8 +24,12 @@ import android.widget.TextView;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.MessageChat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +54,7 @@ public class SalonActivity extends Activity {
     private ListView listViewChat;
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
-
+    private String TAG = "debug add friend";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +78,8 @@ public class SalonActivity extends Activity {
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
-        final CollectionReference docRef = mFirestore.collection("chats");
+        final CollectionReference docRefChat = mFirestore.collection("chats");
+        final CollectionReference docRefFriend = mFirestore.collection("users");
         textV1.setText(nomSalon);
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);
@@ -89,14 +96,22 @@ public class SalonActivity extends Activity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String friend = edittext.getText().toString();
                         String[] separate = friend.split(" ");
+                        Log.d(TAG, separate[0] + "_" + separate[1]);
 
-
-                        //docRef.document()
-
-
-
-
-
+                        docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" +
+                                                                separate[1]).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.get("nom"));
+                                        docRefChat.document(nomSalon).update("pending", document.getId());
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting friend id : ", task.getException());
+                                }
+                            }
+                        });
 
 
                     }

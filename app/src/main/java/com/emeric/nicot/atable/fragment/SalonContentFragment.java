@@ -123,6 +123,7 @@ public class SalonContentFragment extends Fragment {
                 Intent i = new Intent(getContext(), SalonActivity.class);
                 FirebaseSalonAdmin PossalonAdmin = salonAdmin.get(position);
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
+                //  i.putExtra("SalonId", ); //TODO récupérer l'iD du salon !!
                 i.putExtra("userId", userId);
                 if (position < salonAdmin.size()) {
                     i.putExtra("tag", 1);
@@ -145,16 +146,13 @@ public class SalonContentFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         final String nomsalon = edittext.getText().toString();
 
-                        //myRefChat = /chats/
-                        Map<String, Object> roomsMap = new HashMap<>();
-                        roomsMap.put("admin", nomsalon);
                         Map<String, Object> chatsMap = new HashMap<>();
                         chatsMap.put("nom", nomsalon);
                         chatsMap.put("admin", userId);
                         chatsMap.put("membres", "");
+                        chatsMap.put("pending", "");
 
                         mFirestore.collection("chats").document().set(chatsMap);
-                        mFirestore.collection("users").document(userId).update(roomsMap);
                         FirebaseSalonAdmin salonAdd = new FirebaseSalonAdmin(nomsalon);
                         salonAdmin.add(salonAdd);
                         adapter.notifyDataSetChanged();

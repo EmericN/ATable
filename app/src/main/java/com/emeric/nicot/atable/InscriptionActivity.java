@@ -105,6 +105,7 @@ public class InscriptionActivity extends AppCompatActivity {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("nom", nom);
         userMap.put("prenom", prenom);
+        userMap.put("nom_prenom", nomPrenom);
         userMap.put("mail", user.getEmail());
 
         mFirestore.collection("users").document(user.getUid())
