@@ -12,9 +12,6 @@ import com.emeric.nicot.atable.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by Nicot Emeric on 07/07/2017.
- */
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 

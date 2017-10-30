@@ -20,9 +20,6 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Nicot Emeric on 05/06/2017.
- */
 
 public class MainActivity extends FragmentActivity {
 

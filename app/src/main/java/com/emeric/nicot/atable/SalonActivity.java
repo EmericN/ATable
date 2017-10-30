@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,20 +22,12 @@ import android.widget.TextView;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.MessageChat;
-import com.emeric.nicot.atable.models.SalonIdModel;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
-/**
- * Created by Nicot Emeric on 05/07/2017.
- */
 
 public class SalonActivity extends Activity {
 
@@ -56,17 +47,14 @@ public class SalonActivity extends Activity {
     private Button buttonSend;
     private ListView listViewChat;
     private ProgressDialog pDialog;
-    private FirebaseDatabase database;
-    private DatabaseReference myRefRelationship, myRefUserId, myRefChats;
+    private FirebaseFirestore mFirestore;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.salon);
 
-        database = FirebaseDatabase.getInstance();
-        myRefRelationship = database.getReference("relationship");
-        myRefUserId = database.getReference("users");
-        myRefChats = database.getReference("chats");
+
 
         Bundle extras = getIntent().getExtras();
         nomSalon = extras.getString("NomSalon");
@@ -83,7 +71,8 @@ public class SalonActivity extends Activity {
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
-
+        mFirestore = FirebaseFirestore.getInstance();
+        final CollectionReference docRef = mFirestore.collection("chats");
         textV1.setText(nomSalon);
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);
@@ -102,45 +91,14 @@ public class SalonActivity extends Activity {
                         String[] separate = friend.split(" ");
 
 
-                        // new AddFriend().execute(friend, mail, NomSalon);
-                        myRefChats.orderByChild("title").equalTo(nomSalon).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                    String idSalon = postSnapshot.getKey();
-
-                                    SalonIdModel salonIdModel2 = new SalonIdModel(idSalon);
-                                    listtest.add(salonIdModel2.GetSalonId());
-                                    Log.d("idSalon : ", salonIdModel2.GetSalonId());
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                        myRefUserId.orderByChild("nomPrenom").equalTo(separate[0] + "_" +
-                                                                      separate[1]).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                    String userIdInvite = postSnapshot.getKey();
-                                    Log.d("USERIDINVITE : ", userIdInvite);
-                                    myRefRelationship.child(listtest.get(0)).child(userIdInvite).setValue("membre");
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+                        //docRef.document()
 
 
-                        //myRefRelationship.child(ts).child(userId).setValue("membre");
+
+
+
+
+
                     }
                 });
 

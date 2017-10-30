@@ -20,4 +20,7 @@ public class FirebaseSalonAdmin {
         return salonAdmin.length();
     }
 
+    public int get(int position) {
+        return position;
+    }
 }

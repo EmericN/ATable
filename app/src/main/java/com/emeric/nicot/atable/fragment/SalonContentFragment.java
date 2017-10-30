@@ -28,8 +28,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,10 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Nicot Emeric on 27/06/2017.
- */
-
 public class SalonContentFragment extends Fragment {
     public ArrayList<FirebaseSalonAdmin> salonAdmin;
     public ArrayList<FirebaseSalonAdmin> salonMembre;
@@ -50,9 +44,6 @@ public class SalonContentFragment extends Fragment {
     String mail;
     CustomAdapterSalon adapter;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseDatabase database;
-    private DatabaseReference myRefRelationship, myRefMessage, myRefChat, myRefGetChat, myRefGetChatTs;
     private String userId, ts, TAG = "debug firestore";
     private Long tsLong;
     private FirebaseFirestore mFirestore;
@@ -61,11 +52,7 @@ public class SalonContentFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         mAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
-        myRefRelationship = database.getReference("relationship");
-        myRefChat = database.getReference("chats");
-        myRefMessage = database.getReference("messages");
         tsLong = System.currentTimeMillis();
         ts = tsLong.toString();
         salonAdmin = new ArrayList<FirebaseSalonAdmin>();
@@ -108,7 +95,7 @@ public class SalonContentFragment extends Fragment {
             }
         });
 // GET all membre rooms
-        docRef.whereEqualTo("membre", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        docRef.whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -117,8 +104,8 @@ public class SalonContentFragment extends Fragment {
                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
                         String salonMemb = (String) document.get("nom");
                         FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb);
-                        //  FirebaseSalonMembre addedSalonMembre = new FirebaseSalonMembre(salonMemb);
                         salonMembre.add(addedSalonMembre);
+                        salonAdmin.addAll(salonMembre);
                         adapter.notifyDataSetChanged();
                     }
                 } else {

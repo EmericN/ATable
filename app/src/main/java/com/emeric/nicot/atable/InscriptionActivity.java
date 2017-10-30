@@ -20,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,7 +92,8 @@ public class InscriptionActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(InscriptionActivity.this, "Registration failed.",
+                            Toast.makeText(InscriptionActivity.this, "Registration failed : "
+                                                                     + task.getException(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -106,7 +108,7 @@ public class InscriptionActivity extends AppCompatActivity {
         userMap.put("mail", user.getEmail());
 
         mFirestore.collection("users").document(user.getUid())
-                .set(userMap)
+                .set(userMap, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

@@ -14,9 +14,6 @@ import com.emeric.nicot.atable.fragment.AdapterCallback;
 
 import java.util.ArrayList;
 
-/**
- * Created by Nicot Emeric on 27/07/2017.
- */
 
 public class CustomAdapterNotif extends BaseAdapter {
 

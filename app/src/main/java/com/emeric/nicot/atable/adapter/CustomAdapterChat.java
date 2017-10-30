@@ -13,9 +13,6 @@ import com.emeric.nicot.atable.models.MessageChat;
 
 import java.util.ArrayList;
 
-/**
- * Created by Nicot Emeric on 13/08/2017.
- */
 
 public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

@@ -25,16 +25,25 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
                               ArrayList<FirebaseSalonAdmin> salonAdmin,
-                              ArrayList<FirebaseSalonAdmin> salonMembre) {
+                              ArrayList<FirebaseSalonAdmin> salonMembre
+    ) {
 
         super(context, layoutResourceId, salonAdmin);
         this.salonAdmin = salonAdmin;
         this.salonMembre = salonMembre;
-
         this.context = context;
         this.layoutResourceId = layoutResourceId;
     }
 
+    /*   @Override
+       public FirebaseSalonAdmin getItem(int position) {
+           return null;
+       }
+
+       @Override
+       public long getItemId(int position) {
+           return position;
+       }*/
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
@@ -46,17 +55,18 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
 
         row.setTag(holder);
-        salonAll = new ArrayList<FirebaseSalonAdmin>();
-        salonAll.addAll(salonAdmin);
-        salonAll.addAll(salonMembre);
-        FirebaseSalonAdmin salonAll = this.salonAll.get(position);
 
-        if (position <= salonAdmin.size()) {
-            holder.tv.setText(salonAll.getSalon());
+        FirebaseSalonAdmin salon11 = salonAdmin.get(position);
+
+       /* holder.tv.setText(salon11.getSalon());
+        holder.iv.setImageResource(imageId[0]);*/
+
+        if (position < salonAdmin.size() - salonMembre.size()) {
+            holder.tv.setText(salon11.getSalon());
             holder.iv.setImageResource(imageId[0]);
         } else {
-            holder.tv.setText(salonAll.getSalon());
-            holder.iv.setImageResource(imageId[0]);
+            holder.tv.setText(salon11.getSalon());
+            holder.iv.setImageResource(imageId[1]);
         }
 
         return row;
