@@ -44,7 +44,7 @@ public class SalonActivity extends Activity {
     private RecyclerView.Adapter mAdapter, mAdapter2;
     private ArrayList<String> Ordre, listtest;
     private ArrayList<Integer> Image;
-    private String mail, nomSalon, ts, userId;
+    private String mail, nomSalon, ts, userId, salonId;
     private Integer tag;
     private ArrayAdapter<String> adapter;
     private ArrayList<MessageChat> ListMessage = new ArrayList<>();
@@ -66,6 +66,7 @@ public class SalonActivity extends Activity {
         nomSalon = extras.getString("NomSalon");
         userId = extras.getString("userId");
         tag = extras.getInt("tag");
+        salonId = extras.getString("SalonId");
 
         textV1 = (TextView) findViewById(R.id.textViewSalon);
         buttonSend = (Button) findViewById(R.id.buttonSend);
@@ -105,7 +106,7 @@ public class SalonActivity extends Activity {
                                 if (task.isSuccessful()) {
                                     for (DocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
-                                        docRefChat.document(nomSalon).update("pending", document.getId());
+                                        docRefChat.document(salonId).update("pending", document.getId());
                                     }
                                 } else {
                                     Log.d(TAG, "Error getting friend id : ", task.getException());

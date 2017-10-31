@@ -39,7 +39,9 @@ import java.util.Map;
 
 public class SalonContentFragment extends Fragment {
     public ArrayList<FirebaseSalonAdmin> salonAdmin;
+    public ArrayList<FirebaseSalonAdmin> salonIdAdmin;
     public ArrayList<FirebaseSalonAdmin> salonMembre;
+    public ArrayList<FirebaseSalonAdmin> salonIdMembre;
     ListView LV;
     String mail;
     CustomAdapterSalon adapter;
@@ -55,8 +57,9 @@ public class SalonContentFragment extends Fragment {
         mFirestore = FirebaseFirestore.getInstance();
         tsLong = System.currentTimeMillis();
         ts = tsLong.toString();
-        salonAdmin = new ArrayList<FirebaseSalonAdmin>();
-        salonMembre = new ArrayList<FirebaseSalonAdmin>();
+        salonAdmin = new ArrayList<>();
+        salonIdAdmin = new ArrayList<>();
+        salonMembre = new ArrayList<>();
         CollectionReference docRef = mFirestore.collection("chats");
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
@@ -85,8 +88,13 @@ public class SalonContentFragment extends Fragment {
 
                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
                         String salonAdm = (String) document.get("nom");
-                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm);
+                        String salonIdAdm = document.getId();
+
+                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
+                        // FirebaseSalonAdmin addedSalonIdAdmin = new FirebaseSalonAdmin(salonIdAdm);
+
                         salonAdmin.add(addedSalonAdmin);
+                        //  salonIdAdmin.add(addedSalonIdAdmin);
                         adapter.notifyDataSetChanged();
                     }
                 } else {
@@ -103,7 +111,8 @@ public class SalonContentFragment extends Fragment {
 
                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
                         String salonMemb = (String) document.get("nom");
-                        FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb);
+                        String salonIdMemb = document.getId();
+                        FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
                         salonMembre.add(addedSalonMembre);
                         salonAdmin.addAll(salonMembre);
                         adapter.notifyDataSetChanged();
@@ -123,7 +132,7 @@ public class SalonContentFragment extends Fragment {
                 Intent i = new Intent(getContext(), SalonActivity.class);
                 FirebaseSalonAdmin PossalonAdmin = salonAdmin.get(position);
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
-                //  i.putExtra("SalonId", ); //TODO récupérer l'iD du salon !!
+                i.putExtra("SalonId", PossalonAdmin.getSalonId());
                 i.putExtra("userId", userId);
                 if (position < salonAdmin.size()) {
                     i.putExtra("tag", 1);
@@ -153,7 +162,7 @@ public class SalonContentFragment extends Fragment {
                         chatsMap.put("pending", "");
 
                         mFirestore.collection("chats").document().set(chatsMap);
-                        FirebaseSalonAdmin salonAdd = new FirebaseSalonAdmin(nomsalon);
+                        FirebaseSalonAdmin salonAdd = new FirebaseSalonAdmin(nomsalon, "");
                         salonAdmin.add(salonAdd);
                         adapter.notifyDataSetChanged();
                         dialog.dismiss();

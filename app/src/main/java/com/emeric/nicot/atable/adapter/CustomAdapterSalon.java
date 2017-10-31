@@ -20,7 +20,6 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     private final int layoutResourceId;
     ArrayList<FirebaseSalonAdmin> salonAdmin;
     ArrayList<FirebaseSalonAdmin> salonMembre;
-    ArrayList<FirebaseSalonAdmin> salonAll;
     Context context;
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
@@ -35,15 +34,6 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         this.layoutResourceId = layoutResourceId;
     }
 
-    /*   @Override
-       public FirebaseSalonAdmin getItem(int position) {
-           return null;
-       }
-
-       @Override
-       public long getItemId(int position) {
-           return position;
-       }*/
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
@@ -56,16 +46,13 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
         row.setTag(holder);
 
-        FirebaseSalonAdmin salon11 = salonAdmin.get(position);
-
-       /* holder.tv.setText(salon11.getSalon());
-        holder.iv.setImageResource(imageId[0]);*/
+        FirebaseSalonAdmin salonAll = salonAdmin.get(position);
 
         if (position < salonAdmin.size() - salonMembre.size()) {
-            holder.tv.setText(salon11.getSalon());
+            holder.tv.setText(salonAll.getSalon());
             holder.iv.setImageResource(imageId[0]);
         } else {
-            holder.tv.setText(salon11.getSalon());
+            holder.tv.setText(salonAll.getSalon());
             holder.iv.setImageResource(imageId[1]);
         }
 
