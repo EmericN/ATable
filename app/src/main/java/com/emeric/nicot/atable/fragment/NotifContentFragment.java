@@ -3,43 +3,61 @@ package com.emeric.nicot.atable.fragment;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.emeric.nicot.atable.R;
+import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
+import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NotifContentFragment extends Fragment implements AdapterCallback {
-
-    private static final String TAG_RESULT = "result";
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_RESULT_2 = "result2";
-    private static final String TAG_INVITATION = "invitation";
-    private static final String TAG_INVITATION_2 = "invitation2";
-    private static final String TAG_SALON = "nom_salon";
-    private static final String GetSalon2 = "GetSalon";
-    private static final String AcceptInvitation = "AcceptInvitation";
-    private static final String GetInvitation = "GetInvitation";
-    public static ArrayList<String> invitation = new ArrayList<>();
-    public static ArrayList<String> invitation2 = new ArrayList<>();
-    public static ArrayList<String> nomsalon = new ArrayList<>();
     ListView LV;
-    String mail;
+    String mail, userId;
     JSONArray InvitArray = null;
     JSONArray NomSalonArray = null;
-    ListAdapter adapter;
+    CustomAdapterNotif adapter;
+    ArrayList<FirebaseSalonAdmin> salonAdmin;
+    private String TAG = "debug Notif";
     private ProgressDialog pDialog;
+    private FirebaseFirestore mFirestore;
+    private FirebaseAuth mAuth;
 
-    public void onMethodCallback(String NomSalon) {
 
+    public void onMethodCallback(String NomSalon, String salonId) {
+        Log.d(TAG, "Salon accepté : " + NomSalon);
+        //supprime le pending dans la db
+        CollectionReference docRef = mFirestore.collection("chats");
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("pending", "");
+        updates.put("membres", userId);
+        docRef.document(salonId).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG, "invitation supprimé");
+            }
+        });
+        RefreshRequest();
+        adapter.notifyDataSetChanged();
 
     }
 
@@ -47,14 +65,47 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tab_notification_list, null);
 
-
+        mAuth = FirebaseAuth.getInstance();
+        mFirestore = FirebaseFirestore.getInstance();
+        salonAdmin = new ArrayList<>();
         LV = (ListView) v.findViewById(R.id.ListView1);
+        adapter = new CustomAdapterNotif(getContext(), R.layout.list_item_notif, salonAdmin,
+                NotifContentFragment.this);
+        LV.setAdapter(adapter);
 
-
-        if (mail != null) {
-
+        final FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            Log.d(TAG, "test 1");
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            userId = user.getUid();
+            RefreshRequest();
         }
-
         return v;
     }
+
+    public void RefreshRequest() {
+
+        CollectionReference docRef = mFirestore.collection("chats");
+        docRef.whereEqualTo("pending", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, "test 2");
+                        Log.d(TAG, document.getId() + " => " + document.get("nom"));
+                        String salonAdm = (String) document.get("nom");
+                        String salonIdAdm = document.getId();
+
+                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
+
+                        salonAdmin.add(addedSalonAdmin);
+                        adapter.notifyDataSetChanged();
+                    }
+                } else {
+                    Log.d(TAG, "Error getting friend request rooms : ", task.getException());
+                }
+            }
+        });
+        }
+
 }

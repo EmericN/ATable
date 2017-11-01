@@ -6,61 +6,48 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.fragment.AdapterCallback;
+import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 
 import java.util.ArrayList;
 
 
-public class CustomAdapterNotif extends BaseAdapter {
+public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
 
     private static final String AcceptInvitation = "AcceptInvitation";
     private static final String GetInvitation = "GetInvitation";
     private static LayoutInflater inflater = null;
+    private final int layoutResourceId;
     ArrayList<String> invitation, invitation2, NomSalon;
+    ArrayList<FirebaseSalonAdmin> salonAdmin;
     Context context;
+    private String TAG = "debug notif";
     private AdapterCallback mAdapterCallback;
 
-    public CustomAdapterNotif(Context context, ArrayList<String> NomSalon, AdapterCallback callback) {
-        // TODO Auto-generated constructor stub
-        this.invitation = invitation;
-        this.invitation2 = invitation2;
-        this.NomSalon = NomSalon;
+    public CustomAdapterNotif(Context context,
+                              int layoutResourceId, ArrayList<FirebaseSalonAdmin> salonAdmin,
+                              AdapterCallback callback) {
+        super(context, layoutResourceId, salonAdmin);
+        this.salonAdmin = salonAdmin;
         this.context = context;
         this.mAdapterCallback = callback;
-        inflater = (LayoutInflater) context.
-                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layoutResourceId = layoutResourceId;
     }
 
-
-    @Override
-    public int getCount() {
-        return NomSalon.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return NomSalon.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
-        View rowView;
+        View row;
 
-        rowView = inflater.inflate(R.layout.list_item_notif, null);
-        holder.tv = (TextView) rowView.findViewById(R.id.nomSalonInv);
-        holder.tv.setText(NomSalon.get(position));
-
-        FloatingActionButton floatAddFriend = (FloatingActionButton) rowView.findViewById(R.id.floatingActionButtonAccept);
+        row = LayoutInflater.from(getContext()).inflate(layoutResourceId, parent, false);
+        holder.tv = (TextView) row.findViewById(R.id.nomSalonInv);
+        final FirebaseSalonAdmin salonFriendRequest = salonAdmin.get(position);
+        row.setTag(holder);
+        holder.tv.setText(salonFriendRequest.getSalon());
+        FloatingActionButton floatAddFriend = (FloatingActionButton) row.findViewById(R.id.floatingActionButtonAccept);
 
         floatAddFriend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,12 +57,12 @@ public class CustomAdapterNotif extends BaseAdapter {
                 TextView tv = (TextView) cl.findViewById(R.id.nomSalonInv);
                 String NomSalon = tv.getText().toString();
 
-                mAdapterCallback.onMethodCallback(NomSalon);
+                mAdapterCallback.onMethodCallback(NomSalon, salonFriendRequest.getSalonId());
             }
         });
 
 
-        return rowView;
+        return row;
     }
 
     public class Holder {

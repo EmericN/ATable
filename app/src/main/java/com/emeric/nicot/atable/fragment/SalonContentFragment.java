@@ -50,6 +50,7 @@ public class SalonContentFragment extends Fragment {
     private Long tsLong;
     private FirebaseFirestore mFirestore;
 
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -60,14 +61,13 @@ public class SalonContentFragment extends Fragment {
         salonAdmin = new ArrayList<>();
         salonIdAdmin = new ArrayList<>();
         salonMembre = new ArrayList<>();
+        final FirebaseUser currentUser = mAuth.getCurrentUser();
         CollectionReference docRef = mFirestore.collection("chats");
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
         LV = (ListView) v.findViewById(R.id.ListView);
 
-
-        final FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             userId = user.getUid();
