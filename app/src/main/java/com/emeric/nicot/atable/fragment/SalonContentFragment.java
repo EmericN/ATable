@@ -23,7 +23,6 @@ import android.widget.ListView;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
-import com.emeric.nicot.atable.models.FirebaseSalon;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,7 +34,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,9 +132,6 @@ public class SalonContentFragment extends Fragment {
 
                 Intent i = new Intent(getContext(), SalonActivity.class);
                 FirebaseSalonAdmin PossalonAdmin = salon.get(position);
-                Log.d(TAG, "salon size : "+salon.size());
-                Log.d(TAG, "salon admin size : "+salonAdmin.size());
-                Log.d(TAG, "salon membre size : "+salonMembre.size());
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
                 i.putExtra("SalonId", PossalonAdmin.getSalonId());
                 i.putExtra("userId", userId);
