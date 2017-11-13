@@ -23,6 +23,7 @@ import android.widget.ListView;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
+import com.emeric.nicot.atable.models.FirebaseSalon;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,14 +35,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SalonContentFragment extends Fragment {
-    public ArrayList<FirebaseSalonAdmin> salonAdmin;
-    public ArrayList<FirebaseSalonAdmin> salonIdAdmin;
-    public ArrayList<FirebaseSalonAdmin> salonMembre;
-    public ArrayList<FirebaseSalonAdmin> salonIdMembre;
+    public ArrayList<FirebaseSalonAdmin> salon,salonAdmin,salonMembre,salonIdAdmin,salonIdMembre;
     ListView LV;
     String mail;
     CustomAdapterSalon adapter;
@@ -58,6 +57,7 @@ public class SalonContentFragment extends Fragment {
         mFirestore = FirebaseFirestore.getInstance();
         tsLong = System.currentTimeMillis();
         ts = tsLong.toString();
+        salon = new ArrayList<>();
         salonAdmin = new ArrayList<>();
         salonIdAdmin = new ArrayList<>();
         salonMembre = new ArrayList<>();
@@ -76,32 +76,35 @@ public class SalonContentFragment extends Fragment {
 
         }
 
-        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salonAdmin, salonMembre);
-        LV.setAdapter(adapter);
-// GET all admin rooms
 
+        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon, salonAdmin, salonMembre);
+        LV.setAdapter(adapter);
+
+
+// GET all admin rooms
+        salon.clear();
+        salonMembre.clear();
+        salonAdmin.clear();
         docRef.whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
 
-                        Log.d(TAG, document.getId() + " => " + document.get("nom"));
+                        Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
                         String salonAdm = (String) document.get("nom");
                         String salonIdAdm = document.getId();
 
                         FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
-                        // FirebaseSalonAdmin addedSalonIdAdmin = new FirebaseSalonAdmin(salonIdAdm);
-
                         salonAdmin.add(addedSalonAdmin);
-                        //  salonIdAdmin.add(addedSalonIdAdmin);
                         adapter.notifyDataSetChanged();
-                    }
+                    } salon.addAll(salonAdmin);
                 } else {
                     Log.d(TAG, "Error getting admin rooms : ", task.getException());
                 }
             }
         });
+
 // GET all membre rooms
         docRef.whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -109,14 +112,15 @@ public class SalonContentFragment extends Fragment {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
 
-                        Log.d(TAG, document.getId() + " => " + document.get("nom"));
+                        Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
                         String salonMemb = (String) document.get("nom");
                         String salonIdMemb = document.getId();
                         FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
                         salonMembre.add(addedSalonMembre);
-                        salonAdmin.addAll(salonMembre);
+                        //salonAdmin.addAll(salonMembre);
+                        Log.d(TAG, "taille salon membre : "+salonMembre.size());
                         adapter.notifyDataSetChanged();
-                    }
+                    } salon.addAll(salonMembre);
                 } else {
                     Log.d(TAG, "Error getting membre rooms : ", task.getException());
                 }
@@ -124,17 +128,20 @@ public class SalonContentFragment extends Fragment {
         });
 
 
-
         LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
                 Intent i = new Intent(getContext(), SalonActivity.class);
-                FirebaseSalonAdmin PossalonAdmin = salonAdmin.get(position);
+                FirebaseSalonAdmin PossalonAdmin = salon.get(position);
+                Log.d(TAG, "salon size : "+salon.size());
+                Log.d(TAG, "salon admin size : "+salonAdmin.size());
+                Log.d(TAG, "salon membre size : "+salonMembre.size());
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
                 i.putExtra("SalonId", PossalonAdmin.getSalonId());
                 i.putExtra("userId", userId);
-                if (position < salonAdmin.size()) {
+
+                if (position < salon.size()-salonMembre.size()) {
                     i.putExtra("tag", 1);
                 } else {
                     i.putExtra("tag", 2);
@@ -162,11 +169,58 @@ public class SalonContentFragment extends Fragment {
                         chatsMap.put("pending", "");
 
                         mFirestore.collection("chats").document().set(chatsMap);
-                        FirebaseSalonAdmin salonAdd = new FirebaseSalonAdmin(nomsalon, "");
+                        /*FirebaseSalonAdmin salonAdd = new FirebaseSalonAdmin(nomsalon, "");
                         salonAdmin.add(salonAdd);
-                        adapter.notifyDataSetChanged();
-                        dialog.dismiss();
+                        adapter.notifyDataSetChanged();*/
 
+                        salon.clear();
+
+                        mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+
+                                        Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
+                                        String salonAdm = (String) document.get("nom");
+                                        String salonIdAdm = document.getId();
+
+                                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
+                                        // FirebaseSalonAdmin addedSalonIdAdmin = new FirebaseSalonAdmin(salonIdAdm);
+                                        salonAdmin.clear();
+                                        salonAdmin.add(addedSalonAdmin);
+                                        salon.addAll(salonAdmin);
+                                        //  salonIdAdmin.add(addedSalonIdAdmin);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting admin rooms : ", task.getException());
+                                }
+                            }
+                        });
+
+                        mFirestore.collection("chats").whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+
+                                        Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
+                                        String salonMemb = (String) document.get("nom");
+                                        String salonIdMemb = document.getId();
+                                        FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
+                                        salonMembre.add(addedSalonMembre);
+                                        //salonAdmin.addAll(salonMembre);
+                                        salon.addAll(salonMembre);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting membre rooms : ", task.getException());
+                                }
+                            }
+                        });
+
+                        dialog.dismiss();
                     }
                 });
 

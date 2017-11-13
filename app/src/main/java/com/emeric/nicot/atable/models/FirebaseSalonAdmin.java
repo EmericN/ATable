@@ -3,19 +3,19 @@ package com.emeric.nicot.atable.models;
 
 public class FirebaseSalonAdmin {
 
-    private String salonAdmin;
+    private String salon;
     private String id;
 
     public FirebaseSalonAdmin() {
     }
 
-    public FirebaseSalonAdmin(String salonAdmin, String id) {
-        this.salonAdmin = salonAdmin;
+    public FirebaseSalonAdmin(String salon, String id) {
+        this.salon = salon;
         this.id = id;
     }
 
     public String getSalon() {
-        return salonAdmin;
+        return salon;
     }
 
     public String getSalonId() {
@@ -23,7 +23,7 @@ public class FirebaseSalonAdmin {
     }
 
     public int size() {
-        return salonAdmin.length();
+        return salon.length();
     }
 
 
