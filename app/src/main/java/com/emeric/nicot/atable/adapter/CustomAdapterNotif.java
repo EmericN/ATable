@@ -1,8 +1,10 @@
 package com.emeric.nicot.atable.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +24,7 @@ public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
     private static final String GetInvitation = "GetInvitation";
     private static LayoutInflater inflater = null;
     private final int layoutResourceId;
-    ArrayList<String> invitation, invitation2, NomSalon;
-    ArrayList<FirebaseSalonAdmin> salonAdmin;
-    Context context;
-    private String TAG = "debug notif";
+    private ArrayList<FirebaseSalonAdmin> salonAdmin;
     private AdapterCallback mAdapterCallback;
 
     public CustomAdapterNotif(Context context,
@@ -33,11 +32,12 @@ public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
                               AdapterCallback callback) {
         super(context, layoutResourceId, salonAdmin);
         this.salonAdmin = salonAdmin;
-        this.context = context;
+        Context context1 = context;
         this.mAdapterCallback = callback;
         this.layoutResourceId = layoutResourceId;
     }
 
+    @SuppressLint("ViewHolder")
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
         View row;
@@ -46,7 +46,10 @@ public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.tv = (TextView) row.findViewById(R.id.nomSalonInv);
         final FirebaseSalonAdmin salonFriendRequest = salonAdmin.get(position);
         row.setTag(holder);
+        String TAG = "debug notif";
+        Log.d(TAG, "Tableau de friend request : " + salonAdmin.size());
         holder.tv.setText(salonFriendRequest.getSalon());
+
         FloatingActionButton floatAddFriend = (FloatingActionButton) row.findViewById(R.id.floatingActionButtonAccept);
 
         floatAddFriend.setOnClickListener(new View.OnClickListener() {

@@ -44,8 +44,7 @@ public class SalonActivity extends Activity {
     private RecyclerView.Adapter mAdapter, mAdapter2;
     private ArrayList<String> Ordre, listtest;
     private ArrayList<Integer> Image;
-    private String mail, nomSalon, ts, userId, salonId;
-    private Integer tag;
+    private String mail, nomSalon, ts, userId, salonId, tag;
     private ArrayAdapter<String> adapter;
     private ArrayList<MessageChat> ListMessage = new ArrayList<>();
     private EditText editTextSend;
@@ -65,7 +64,7 @@ public class SalonActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         nomSalon = extras.getString("NomSalon");
         userId = extras.getString("userId");
-        tag = extras.getInt("tag");
+        tag = extras.getString("tag");
         salonId = extras.getString("SalonId");
 
         textV1 = (TextView) findViewById(R.id.textViewSalon);
@@ -99,8 +98,8 @@ public class SalonActivity extends Activity {
                         String[] separate = friend.split(" ");
                         Log.d(TAG, separate[0] + "_" + separate[1]);
 
-                        docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" +
-                                                                separate[1]).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
+                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -158,7 +157,7 @@ public class SalonActivity extends Activity {
         });
 
 
-        if (tag == 1) {
+        if (tag.equals("admin")) {
 
 
             Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));

@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
-    TabLayout tabs;
+    TabLayout tabLayout;
     ViewPager viewPager;
     TextView textView;
     Button button;
@@ -34,7 +34,6 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_list_salon);
 
         textView = (TextView) findViewById(R.id.textViewUser);
-
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -48,10 +47,11 @@ public class MainActivity extends FragmentActivity {
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
-        // Set Tabs inside toolbar
-        tabs = (TabLayout) findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
-        tabs.getTabAt(1).setIcon(R.drawable.ic_notifications);
+        // Set TabLayout inside toolbar
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_notifications);
+
         button = (Button) findViewById(R.id.buttonLogOut);
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -65,13 +65,14 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        Adapter2 adapter2 = new Adapter2(getSupportFragmentManager());
-        adapter2.addFragment(new SalonContentFragment(), "Mes Salons");
-        adapter2.addFragment(new NotifContentFragment(), "");
-        viewPager.setAdapter(adapter2);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new SalonContentFragment(), "Mes Salons");
+        adapter.addFragment(new NotifContentFragment(), "");
+        viewPager.setAdapter(adapter);
 
        /* android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(adapter2.getItem(0),"tabsSalon").commit();
@@ -80,11 +81,11 @@ public class MainActivity extends FragmentActivity {
     }
 
 
-    class Adapter2 extends FragmentPagerAdapter {
+    class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public Adapter2(FragmentManager manager) {
+        public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
         }
 

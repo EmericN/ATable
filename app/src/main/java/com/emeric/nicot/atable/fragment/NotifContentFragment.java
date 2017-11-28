@@ -5,11 +5,13 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
@@ -36,11 +38,13 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
     JSONArray InvitArray = null;
     JSONArray NomSalonArray = null;
     CustomAdapterNotif adapter;
+    TextView textNotif;
     ArrayList<FirebaseSalonAdmin> salonAdmin;
     private String TAG = "debug Notif";
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private FirebaseAuth mAuth;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     public void onMethodCallback(String NomSalon, String salonId) {
@@ -56,8 +60,10 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
                 Log.d(TAG, "invitation supprimé");
             }
         });
-        RefreshRequest();
+
+        salonAdmin.clear();
         adapter.notifyDataSetChanged();
+        RefreshRequest();
 
     }
 
@@ -65,6 +71,8 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tab_notification_list, null);
 
+        textNotif = (TextView) v.findViewById(R.id.textViewNotif);
+        swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefreshNotif);
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         salonAdmin = new ArrayList<>();
@@ -75,11 +83,19 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
 
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            Log.d(TAG, "test 1");
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             userId = user.getUid();
-            RefreshRequest();
+
         }
+        textNotif.setText("Invitation en attente");
+        RefreshRequest();
+        // Refresh list of rooms
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                RefreshRequest();
+            }
+        });
         return v;
     }
 
@@ -91,7 +107,6 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
-                        Log.d(TAG, "test 2");
                         Log.d(TAG, document.getId() + " => " + document.get("nom"));
                         String salonAdm = (String) document.get("nom");
                         String salonIdAdm = document.getId();
@@ -106,6 +121,8 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
                 }
             }
         });
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
         }
-
+        }
 }

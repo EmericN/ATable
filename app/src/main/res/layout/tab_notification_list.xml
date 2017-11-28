@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:id="@+id/textViewNotif"
+        android:layout_width="341dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
-        android:text="Invitation en attente :"
         android:textColor="@android:color/holo_orange_dark"
         android:textSize="24sp"/>
 
@@ -20,11 +19,18 @@
         android:layout_marginTop="30dp"
         android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/ListView1"
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swiperefreshNotif"
             android:layout_width="match_parent"
-            android:layout_height="487dp"/>
+            android:layout_height="match_parent">
 
+            <ListView
+                android:id="@+id/ListView1"
+                android:layout_width="match_parent"
+                android:layout_height="487dp"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 
 </LinearLayout>
