@@ -62,7 +62,6 @@ public class SalonActivity extends AppCompatActivity {
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        // getActionBar().setHomeButtonEnabled(true);
 
         Bundle extras = getIntent().getExtras();
         nomSalon = extras.getString("NomSalon");
@@ -70,7 +69,6 @@ public class SalonActivity extends AppCompatActivity {
         tag = extras.getString("tag");
         salonId = extras.getString("SalonId");
 
-        textV1 = (TextView) findViewById(R.id.textViewSalon);
         buttonSend = (Button) findViewById(R.id.buttonSend);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
@@ -83,7 +81,8 @@ public class SalonActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         final CollectionReference docRefChat = mFirestore.collection("chats");
         final CollectionReference docRefFriend = mFirestore.collection("users");
-        textV1.setText(nomSalon);
+        actionBar.setTitle(nomSalon);
+        // actionBar.setIcon(R.drawable.ic_crown); TODO à regarder
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);
 
