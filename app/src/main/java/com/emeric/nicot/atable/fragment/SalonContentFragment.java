@@ -78,6 +78,7 @@ public class SalonContentFragment extends Fragment {
         } else {
         }
 
+
         // Refresh list of rooms
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

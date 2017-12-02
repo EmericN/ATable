@@ -1,12 +1,14 @@
 package com.emeric.nicot.atable;
 
-import android.app.Activity;
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -35,10 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class SalonActivity extends Activity {
+public class SalonActivity extends AppCompatActivity {
 
-    private static final String TAG_SUCCESS = "success";
-    private static String url_invitation = "http://192.168.1.24:80/DB/db_invitation.php";
     private RecyclerView mRecyclerView, mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter, mAdapter2;
@@ -60,6 +60,9 @@ public class SalonActivity extends Activity {
         setContentView(R.layout.salon);
 
 
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        // getActionBar().setHomeButtonEnabled(true);
 
         Bundle extras = getIntent().getExtras();
         nomSalon = extras.getString("NomSalon");
