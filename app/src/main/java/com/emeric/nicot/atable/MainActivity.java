@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.emeric.nicot.atable.fragment.NotifContentFragment;
 import com.emeric.nicot.atable.fragment.SalonContentFragment;
@@ -21,28 +22,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     ViewPager viewPager;
-    TextView textView;
-    Button button;
-
+    Toolbar mToolbar;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_salon);
 
-        textView = (TextView) findViewById(R.id.textViewUser);
+        mToolbar = (Toolbar) findViewById(R.id.toolbarMain);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            textView.setText(user.getEmail());
         } else {
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(i);
             finish();
         }
+
+        setSupportActionBar(mToolbar);
 
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -52,20 +52,43 @@ public class MainActivity extends FragmentActivity {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_notifications);
 
-        button = (Button) findViewById(R.id.buttonLogOut);
-        button.setOnClickListener(new View.OnClickListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String tabSelected = tab.getText().toString();
+                mToolbar.setTitle(tabSelected);
+            }
 
             @Override
-            public void onClick(View v) {
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
-                FirebaseAuth.getInstance().signOut();
-                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(i);
-                finish();
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
             }
         });
 
+    }
 
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.picture:
+                // do some code
+                return true;
+            case R.id.option:
+                // do some code
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {
