@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -59,15 +60,17 @@ public class SalonActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.salon);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
-        setSupportActionBar(mToolbar);
-
-
         Bundle extras = getIntent().getExtras();
         nomSalon = extras.getString("NomSalon");
         userId = extras.getString("userId");
         tag = extras.getString("tag");
         salonId = extras.getString("SalonId");
+
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(nomSalon);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
         buttonSend = (Button) findViewById(R.id.buttonSend);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
@@ -81,7 +84,6 @@ public class SalonActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         final CollectionReference docRefChat = mFirestore.collection("chats");
         final CollectionReference docRefFriend = mFirestore.collection("users");
-        mToolbar.setTitle(nomSalon);
         // actionBar.setIcon(R.drawable.ic_crown); TODO à regarder
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);

@@ -2,11 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/picture"
+        android:id="@+id/action_picture"
         android:icon="@drawable/ic_crown"
         android:title=""
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/option"
-        android:title="@string/deconnexion"/>
+        android:id="@+id/action_settings"
+        android:title="@string/deconnexion"
+        app:showAsAction="never"/>
 </menu>

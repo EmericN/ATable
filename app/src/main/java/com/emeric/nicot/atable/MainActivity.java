@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("SALON");
 
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -50,13 +51,18 @@ public class MainActivity extends AppCompatActivity {
         // Set TabLayout inside toolbar
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_group);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_notifications);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String tabSelected = tab.getText().toString();
-                mToolbar.setTitle(tabSelected);
+                Integer position = tab.getPosition();
+                if (position == 0) {
+                    getSupportActionBar().setTitle("SALON");
+                } else {
+                    getSupportActionBar().setTitle("NOTIFICATION");
+                }
             }
 
             @Override
@@ -80,10 +86,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.picture:
+            case R.id.action_picture:
                 // do some code
                 return true;
-            case R.id.option:
+            case R.id.action_settings:
                 // do some code
                 return true;
             default:
@@ -93,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new SalonContentFragment(), "Mes Salons");
+        adapter.addFragment(new SalonContentFragment(), "");
         adapter.addFragment(new NotifContentFragment(), "");
         viewPager.setAdapter(adapter);
 
