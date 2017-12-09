@@ -27,14 +27,17 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     Toolbar mToolbar;
+    FirebaseUser user;
+    FirebaseAuth mAuth;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_salon);
 
+        mAuth = FirebaseAuth.getInstance();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         mToolbar = (Toolbar) findViewById(R.id.toolbarMain);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
         } else {
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
@@ -86,11 +89,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_picture:
+          /*  case R.id.action_picture:
                 // do some code
-                return true;
+                return true;*/
             case R.id.action_settings:
-                // do some code
+
+                mAuth.signOut();
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(i);
+                finish();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
