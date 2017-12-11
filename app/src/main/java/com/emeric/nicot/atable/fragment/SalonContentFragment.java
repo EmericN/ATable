@@ -32,6 +32,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,6 +51,7 @@ public class SalonContentFragment extends Fragment {
     private Long tsLong;
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private DocumentReference docRef2;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,6 +67,8 @@ public class SalonContentFragment extends Fragment {
         salonMembre = new ArrayList<>();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         CollectionReference docRef = mFirestore.collection("chats");
+        docRef2 = mFirestore.collection("chats").document();
+
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
@@ -126,7 +130,8 @@ public class SalonContentFragment extends Fragment {
                         chatsMap.put("membres", "");
                         chatsMap.put("pending", "");
 
-                        mFirestore.collection("chats").document().set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                        docRef2.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 salon.clear();
@@ -183,6 +188,8 @@ public class SalonContentFragment extends Fragment {
                                         Log.d(TAG, "Error getting admin rooms after create one : ", e.getCause());
                                     }
                                 });
+
+
                         dialog.dismiss();
                     }
                 });

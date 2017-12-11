@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -51,7 +52,7 @@ public class SalonActivity extends AppCompatActivity {
     private ArrayList<MessageChat> ListMessage = new ArrayList<>();
     private EditText editTextSend;
     private TextView textV1;
-    private Button buttonSend;
+    private FloatingActionButton buttonSend;
     private ListView listViewChat;
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
@@ -73,7 +74,7 @@ public class SalonActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        buttonSend = (Button) findViewById(R.id.buttonSend);
+        buttonSend = (FloatingActionButton) findViewById(R.id.floatingActionButtonSender);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
         LinearLayoutManager mLayloutManager2 = new LinearLayoutManager(this);
@@ -83,6 +84,15 @@ public class SalonActivity extends AppCompatActivity {
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
+
+        displayChatMessages();
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
 
         // actionBar.setIcon(R.drawable.ic_crown); TODO à regarder
 
@@ -105,6 +115,10 @@ public class SalonActivity extends AppCompatActivity {
             invalidateOptionsMenu();
 
         }
+    }
+
+    private void displayChatMessages() {
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

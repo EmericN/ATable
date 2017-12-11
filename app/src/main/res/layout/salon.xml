@@ -18,27 +18,50 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-       >
+        android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/buttonSend"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButtonSender"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="250dp"
+            android:layout_alignParentRight="true"
             android:layout_marginTop="350dp"
-            android:text="envoyer"/>
+            android:clickable="true"
+            app:srcCompat="@color/colorPrimaryDark"/>
 
-        <EditText
-            android:id="@+id/editTextSend"
+        <TextView
+            android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/message_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textStyle="normal|bold"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="350dp"
-            android:ems="10"
-            android:hint="message"
-            android:inputType="textPersonName"
-            />
+            >
+
+            <EditText
+                android:id="@+id/editTextSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="350dp"
+                android:ems="10"
+                android:hint="message"
+                android:inputType="textPersonName"/>
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_chat"
