@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +15,9 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -65,8 +66,8 @@ public class SalonActivity extends AppCompatActivity {
         userId = extras.getString("userId");
         tag = extras.getString("tag");
         salonId = extras.getString("SalonId");
-
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
+
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(nomSalon);
         ActionBar ab = getSupportActionBar();
@@ -82,87 +83,13 @@ public class SalonActivity extends AppCompatActivity {
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
-        final CollectionReference docRefChat = mFirestore.collection("chats");
-        final CollectionReference docRefFriend = mFirestore.collection("users");
+
         // actionBar.setIcon(R.drawable.ic_crown); TODO à regarder
-
-        FloatingActionButton floatAddFriend = (FloatingActionButton) findViewById(R.id.floatingActionButtonFriend);
-
-        floatAddFriend.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-                final EditText edittext = new EditText(v.getContext());
-                alert.setTitle("Ajouter une personne :");
-                alert.setView(edittext);
-                alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String friend = edittext.getText().toString();
-                        String[] separate = friend.split(" ");
-                        Log.d(TAG, separate[0] + "_" + separate[1]);
-
-                        docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
-                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (DocumentSnapshot document : task.getResult()) {
-                                        Log.d(TAG, document.getId() + " => " + document.get("nom"));
-                                        docRefChat.document(salonId).update("pending", document.getId());
-                                    }
-                                } else {
-                                    Log.d(TAG, "Error getting friend id : ", task.getException());
-                                }
-                            }
-                        });
-
-
-                    }
-                });
-
-                alert.setNegativeButton("Quitter", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                });
-
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
-                edittext.setLayoutParams(lp);
-                alert.setView(edittext);
-                final AlertDialog dialog = alert.create();
-                dialog.show();
-
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setEnabled(false);
-
-                edittext.addTextChangedListener(new TextWatcher() {
-                    public void onTextChanged(CharSequence s, int start, int before,
-                                              int count) {
-                    }
-
-                    public void beforeTextChanged(CharSequence s, int start, int count,
-                                                  int after) {
-                    }
-
-                    public void afterTextChanged(Editable s) {
-                        if (TextUtils.isEmpty(s)) {
-                            dialog.getButton(
-                                    AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                        } else {
-                            dialog.getButton(
-                                    AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                        }
-                    }
-                });
-            }
-        });
-
 
         if (tag.equals("admin")) {
 
+      /*     Drawable person_add = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_person_add);
+            mToolbar.setOverflowIcon(person_add);*/
 
             Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
             Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
@@ -175,11 +102,113 @@ public class SalonActivity extends AppCompatActivity {
             mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
             mRecyclerView.setAdapter(mAdapter);
         } else {
+            invalidateOptionsMenu();
 
-            floatAddFriend.setVisibility(View.INVISIBLE);
-            floatAddFriend.hide();
         }
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_salon, menu);
+
+        if (tag.equals("member")) {
+            menu.findItem(R.id.action_addFriend).setVisible(false);
+        }
+
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+
+            case R.id.action_addFriend:
+                addFriend();
+                return true;
+
+            case R.id.action_settings:
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void addFriend() {
+        final CollectionReference docRefChat = mFirestore.collection("chats");
+        final CollectionReference docRefFriend = mFirestore.collection("users");
+
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText edittext = new EditText(this);
+        alert.setTitle("Ajouter une personne :");
+        alert.setView(edittext);
+        alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String friend = edittext.getText().toString();
+                String[] separate = friend.split(" ");
+                Log.d(TAG, separate[0] + "_" + separate[1]);
+
+                docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
+                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.get("nom"));
+                                docRefChat.document(salonId).update("pending", document.getId());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting friend id : ", task.getException());
+                        }
+                    }
+                });
+
+
+            }
+        });
+
+        alert.setNegativeButton("Quitter", new AlertDialog.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        edittext.setLayoutParams(lp);
+        alert.setView(edittext);
+        final AlertDialog dialog = alert.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setEnabled(false);
+
+        edittext.addTextChangedListener(new TextWatcher() {
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s)) {
+                    dialog.getButton(
+                            AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                } else {
+                    dialog.getButton(
+                            AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            }
+        });
+
+
+    }
+
+
 }
 
 

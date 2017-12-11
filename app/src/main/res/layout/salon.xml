@@ -15,14 +15,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButtonFriend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:clickable="true"
-        app:fabSize="normal"
-        app:srcCompat="@drawable/ic_person_add"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"

@@ -24,7 +24,8 @@
                android:value="com.emeric.nicot.atable.LoginActivity" />
        </activity>
 
-       <activity android:name=".LoginActivity"></activity>
+       <activity android:name=".LoginActivity">
+       </activity>
 
        <activity
            android:name=".SalonActivity"
