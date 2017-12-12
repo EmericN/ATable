@@ -68,7 +68,6 @@ public class SalonContentFragment extends Fragment {
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         docRef = mFirestore.collection("chats").document();
 
-
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
         LV = (ListView) v.findViewById(R.id.ListView);
@@ -132,8 +131,7 @@ public class SalonContentFragment extends Fragment {
                         docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-
-                                docRef.collection("messages");
+                                //docRef.collection("messages").document();
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();

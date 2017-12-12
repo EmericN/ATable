@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
+import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.MessageChat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +39,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 
 public class SalonActivity extends AppCompatActivity {
@@ -94,17 +96,15 @@ public class SalonActivity extends AppCompatActivity {
                 String content = editTextSend.getText().toString();
                 if (content.length() > 0) {
                     editTextSend.setText("");
-                    ChatMessage newMessage = new ChatMessage
-
-
-                    collectionRef.document().set()
-
+                    ChatMessage newMessage = new ChatMessage();
+                    newMessage.setMessageText(content);
+                    newMessage.setMessageUser(userId);
+                    newMessage.setMessageTime(new Date().getTime());
+                    collectionRef.document().set(newMessage);
                 }
             }
         });
-
-
-        // actionBar.setIcon(R.drawable.ic_crown); TODO à regarder
+        
 
         if (tag.equals("admin")) {
 
