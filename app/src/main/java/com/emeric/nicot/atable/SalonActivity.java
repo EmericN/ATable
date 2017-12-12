@@ -29,29 +29,32 @@ import android.widget.TextView;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
-import com.emeric.nicot.atable.models.MessageChat;
+import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 
 public class SalonActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView, mRecyclerViewChat;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
     private RecyclerView.Adapter mAdapter, mAdapter2;
     private ArrayList<String> Ordre, listtest;
     private ArrayList<Integer> Image;
     private String mail, nomSalon, ts, userId, salonId, tag;
     private ArrayAdapter<String> adapter;
-    private ArrayList<MessageChat> ListMessage = new ArrayList<>();
     private EditText editTextSend;
     private TextView textV1;
     private FloatingActionButton buttonSend;
@@ -60,6 +63,7 @@ public class SalonActivity extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
     private CollectionReference collectionRef;
+    private Message message;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,19 +81,56 @@ public class SalonActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
+        message = new Message();
         buttonSend = (FloatingActionButton) findViewById(R.id.floatingActionButtonSender);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
-        LinearLayoutManager mLayloutManager2 = new LinearLayoutManager(this);
-        mLayloutManager2.setStackFromEnd(true);
+        mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
-        mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
+        mAdapter2 = new CustomAdapterChat(this, message, userId);
         mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
 
         displayChatMessages();
+
+        mFirestore.collection("chats").document(salonId).collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot value, FirebaseFirestoreException e) {
+                        ChatMessage newMessage = new ChatMessage();
+                        List<String> listMessage = new ArrayList<>();
+
+                        for (DocumentSnapshot doc : value) {
+                            if (doc.get("text") != null) {
+                                String textReceive = doc.getString("text");
+                                Log.d(TAG, "messsage text : " + textReceive);
+                                newMessage.text = textReceive;
+                            }
+                            if (doc.get("idSender") != null) {
+                                String idSender = doc.getString("idSender");
+                                newMessage.idSender = idSender;
+                            }
+                            if (doc.get("timestamp") != null) {
+                                long timestamp = doc.getLong("timestamp");
+                                newMessage.timestamp = timestamp;
+                            }
+
+                            message.getListMessageData().add(newMessage);
+                            mAdapter2.notifyDataSetChanged();
+                            mLayloutManager2.scrollToPosition(
+                                    message.getListMessageData().size() - 1);
+                        }
+
+                    }
+                });
+
+
+
+
+
+
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,14 +138,14 @@ public class SalonActivity extends AppCompatActivity {
                 if (content.length() > 0) {
                     editTextSend.setText("");
                     ChatMessage newMessage = new ChatMessage();
-                    newMessage.setMessageText(content);
-                    newMessage.setMessageUser(userId);
-                    newMessage.setMessageTime(new Date().getTime());
+                    newMessage.text = content;
+                    newMessage.idSender = userId;
+                    newMessage.timestamp = new Date().getTime();
                     collectionRef.document().set(newMessage);
                 }
             }
         });
-        
+
 
         if (tag.equals("admin")) {
 
