@@ -51,7 +51,7 @@ public class SalonContentFragment extends Fragment {
     private Long tsLong;
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private DocumentReference docRef2;
+    private DocumentReference docRef;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,8 +66,7 @@ public class SalonContentFragment extends Fragment {
         salonIdAdmin = new ArrayList<>();
         salonMembre = new ArrayList<>();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
-        CollectionReference docRef = mFirestore.collection("chats");
-        docRef2 = mFirestore.collection("chats").document();
+        docRef = mFirestore.collection("chats").document();
 
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
@@ -130,10 +129,11 @@ public class SalonContentFragment extends Fragment {
                         chatsMap.put("membres", "");
                         chatsMap.put("pending", "");
 
-
-                        docRef2.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+
+                                docRef.collection("messages");
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();

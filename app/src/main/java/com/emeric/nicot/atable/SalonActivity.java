@@ -57,6 +57,7 @@ public class SalonActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
+    private CollectionReference collectionRef;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,12 +85,21 @@ public class SalonActivity extends AppCompatActivity {
         mAdapter2 = new CustomAdapterChat(getApplicationContext(), ListMessage);
         mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
+        collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
 
         displayChatMessages();
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String content = editTextSend.getText().toString();
+                if (content.length() > 0) {
+                    editTextSend.setText("");
+                    ChatMessage newMessage = new ChatMessage
 
+
+                    collectionRef.document().set()
+
+                }
             }
         });
 
