@@ -16,6 +16,7 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private static final int MESSAGE_SENDER = 0;
     private static final int MESSAGE_RECEIVER = 2;
+    private static final String TAG = "debug adapter chat";
     private Context context;
     private Message message;
     private String userId;

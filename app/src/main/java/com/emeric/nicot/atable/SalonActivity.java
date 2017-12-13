@@ -33,6 +33,7 @@ import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -95,39 +96,62 @@ public class SalonActivity extends AppCompatActivity {
 
         displayChatMessages();
 
-        mFirestore.collection("chats").document(salonId).collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+        mFirestore.collection("chats").document(salonId).collection("messages")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(QuerySnapshot value, FirebaseFirestoreException e) {
+                    public void onEvent(QuerySnapshot snapshots, FirebaseFirestoreException e) {
                         ChatMessage newMessage = new ChatMessage();
                         List<String> listMessage = new ArrayList<>();
 
-                        for (DocumentSnapshot doc : value) {
-                            if (doc.get("text") != null) {
-                                String textReceive = doc.getString("text");
-                                Log.d(TAG, "messsage text : " + textReceive);
-                                newMessage.text = textReceive;
-                            }
-                            if (doc.get("idSender") != null) {
-                                String idSender = doc.getString("idSender");
-                                newMessage.idSender = idSender;
-                            }
-                            if (doc.get("timestamp") != null) {
-                                long timestamp = doc.getLong("timestamp");
-                                newMessage.timestamp = timestamp;
+                        for (DocumentChange doc : snapshots.getDocumentChanges()) {
+                            switch (doc.getType()) {
+                                case ADDED:
+                                    Log.d(TAG, "text : " + doc.getDocument().getString("text"));
+                                    listMessage.add(doc.getDocument().getString("text"));
+                                    listMessage.add(doc.getDocument().getString("idSender"));
+                                    newMessage.text = listMessage.get(0);
+                                    newMessage.idSender = listMessage.get(1);
+                                    message.getListMessageData().add(newMessage);
+                                    mAdapter2.notifyDataSetChanged();
+                                    mLayloutManager2.scrollToPosition(
+                                            message.getListMessageData().size() - 1);
+                                    break;
+                                case MODIFIED:
+                                    Log.d(TAG, "Modified city: " + doc.getDocument().getData());
+                                    break;
+                                case REMOVED:
+                                    Log.d(TAG, "Removed city: " + doc.getDocument().getData());
+                                    break;
                             }
 
-                            message.getListMessageData().add(newMessage);
-                            mAdapter2.notifyDataSetChanged();
-                            mLayloutManager2.scrollToPosition(
-                                    message.getListMessageData().size() - 1);
+
+
+                           /* if (doc.get("text") != null) {
+                                String textReceive = doc.getString("text");
+                                String idSender = doc.getString("idSender");
+                                long timestamp = doc.getLong("timestamp");
+                                listMessage.add(doc.getString("text"));
+                                listMessage.add(doc.getString("idSender"));
+                                //listMessage.add(doc.getString("timestamp"));
+
+
+                                newMessage.text = listMessage.get(0);
+                                newMessage.idSender = listMessage.get(1);
+                               // newMessage.timestamp = listMessage.get(2);
+                                Log.d(TAG, "messsage text : " + textReceive);
+                                message.getListMessageData().add(newMessage);
+
+                            }*/
                         }
+
+                        /*mAdapter2.notifyDataSetChanged();
+                        mLayloutManager2.scrollToPosition(
+                                message.getListMessageData().size() - 1);*/
+
 
                     }
                 });
-
-
-
 
 
 
