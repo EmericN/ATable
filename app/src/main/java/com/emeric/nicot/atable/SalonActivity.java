@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,11 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
@@ -42,9 +41,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 
 public class SalonActivity extends AppCompatActivity {
@@ -58,7 +55,7 @@ public class SalonActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private EditText editTextSend;
     private TextView textV1;
-    private FloatingActionButton buttonSend;
+    private ImageButton buttonSend;
     private ListView listViewChat;
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
@@ -71,26 +68,27 @@ public class SalonActivity extends AppCompatActivity {
         setContentView(R.layout.salon);
 
         Bundle extras = getIntent().getExtras();
-        nomSalon = extras.getString("NomSalon");
-        userId = extras.getString("userId");
-        tag = extras.getString("tag");
-        salonId = extras.getString("SalonId");
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
+        if (extras != null) {
+            nomSalon = extras.getString("NomSalon");
+            userId = extras.getString("userId");
+            tag = extras.getString("tag");
+            salonId = extras.getString("SalonId");
+        }
 
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(nomSalon);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
         message = new Message();
-        buttonSend = (FloatingActionButton) findViewById(R.id.floatingActionButtonSender);
+        buttonSend = (ImageButton) findViewById(R.id.buttonSend);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
         mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapter2 = new CustomAdapterChat(this, message, userId);
-        mRecyclerViewChat.setAdapter(mAdapter2);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
 
@@ -101,59 +99,29 @@ public class SalonActivity extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot snapshots, FirebaseFirestoreException e) {
-                        ChatMessage newMessage = new ChatMessage();
-                        List<String> listMessage = new ArrayList<>();
-
                         for (DocumentChange doc : snapshots.getDocumentChanges()) {
+                            ChatMessage newMessage = new ChatMessage();
                             switch (doc.getType()) {
                                 case ADDED:
                                     Log.d(TAG, "text : " + doc.getDocument().getString("text"));
-                                    listMessage.add(doc.getDocument().getString("text"));
-                                    listMessage.add(doc.getDocument().getString("idSender"));
-                                    newMessage.text = listMessage.get(0);
-                                    newMessage.idSender = listMessage.get(1);
+                                    newMessage.text = doc.getDocument().getString("text");
+                                    newMessage.idSender = doc.getDocument().getString("idSender");
                                     message.getListMessageData().add(newMessage);
                                     mAdapter2.notifyDataSetChanged();
                                     mLayloutManager2.scrollToPosition(
                                             message.getListMessageData().size() - 1);
                                     break;
                                 case MODIFIED:
-                                    Log.d(TAG, "Modified city: " + doc.getDocument().getData());
+                                    Log.d(TAG, "" + doc.getDocument().getData());
                                     break;
                                 case REMOVED:
-                                    Log.d(TAG, "Removed city: " + doc.getDocument().getData());
+                                    Log.d(TAG, "" + doc.getDocument().getData());
                                     break;
                             }
-
-
-
-                           /* if (doc.get("text") != null) {
-                                String textReceive = doc.getString("text");
-                                String idSender = doc.getString("idSender");
-                                long timestamp = doc.getLong("timestamp");
-                                listMessage.add(doc.getString("text"));
-                                listMessage.add(doc.getString("idSender"));
-                                //listMessage.add(doc.getString("timestamp"));
-
-
-                                newMessage.text = listMessage.get(0);
-                                newMessage.idSender = listMessage.get(1);
-                               // newMessage.timestamp = listMessage.get(2);
-                                Log.d(TAG, "messsage text : " + textReceive);
-                                message.getListMessageData().add(newMessage);
-
-                            }*/
                         }
-
-                        /*mAdapter2.notifyDataSetChanged();
-                        mLayloutManager2.scrollToPosition(
-                                message.getListMessageData().size() - 1);*/
-
-
+                        mRecyclerViewChat.setAdapter(mAdapter2);
                     }
                 });
-
-
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,7 +144,7 @@ public class SalonActivity extends AppCompatActivity {
       /*     Drawable person_add = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_person_add);
             mToolbar.setOverflowIcon(person_add);*/
 
-            Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
+            /*Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
             Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
             // Calling the RecyclerView
             mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -185,7 +153,7 @@ public class SalonActivity extends AppCompatActivity {
             mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             mRecyclerView.setLayoutManager(mLayoutManager);
             mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
-            mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.setAdapter(mAdapter);*/
         } else {
             invalidateOptionsMenu();
 

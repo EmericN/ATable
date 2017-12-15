@@ -37,10 +37,10 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         if (viewType == MESSAGE_SENDER) {
-            View v0 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_send, null);
+            View v0 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_send, viewGroup, false);
             return new ViewHolder0(v0);
         } else if (viewType == MESSAGE_RECEIVER) {
-            View v2 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_receive, null);
+            View v2 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_receive, viewGroup, false);
             return new ViewHolder2(v2);
         }
         return null;
