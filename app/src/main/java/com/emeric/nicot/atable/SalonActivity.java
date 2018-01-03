@@ -31,6 +31,8 @@ import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,8 +42,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 
 public class SalonActivity extends AppCompatActivity {
@@ -62,6 +65,10 @@ public class SalonActivity extends AppCompatActivity {
     private String TAG = "debug add friend";
     private CollectionReference collectionRef;
     private Message message;
+    private Calendar calander;
+    private SimpleDateFormat simpledateformat;
+    private String Date, userName;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,18 +88,23 @@ public class SalonActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        userName = user.getDisplayName();
+        Log.d(TAG, "displayed name : " + userName);
         message = new Message();
+        calander = Calendar.getInstance();
+        simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Date = simpledateformat.format(calander.getTime());
         buttonSend = (ImageButton) findViewById(R.id.buttonSend);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
         mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
-        mAdapter2 = new CustomAdapterChat(this, message, userId);
+        mAdapter2 = new CustomAdapterChat(this, message, userId, userName);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
 
-        displayChatMessages();
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -105,7 +117,9 @@ public class SalonActivity extends AppCompatActivity {
                                 case ADDED:
                                     Log.d(TAG, "text : " + doc.getDocument().getString("text"));
                                     newMessage.text = doc.getDocument().getString("text");
+                                    newMessage.timestamp = doc.getDocument().getString("timestamp");
                                     newMessage.idSender = doc.getDocument().getString("idSender");
+                                    newMessage.idSender = doc.getDocument().getString("name");
                                     message.getListMessageData().add(newMessage);
                                     mAdapter2.notifyDataSetChanged();
                                     mLayloutManager2.scrollToPosition(
@@ -132,7 +146,8 @@ public class SalonActivity extends AppCompatActivity {
                     ChatMessage newMessage = new ChatMessage();
                     newMessage.text = content;
                     newMessage.idSender = userId;
-                    newMessage.timestamp = new Date().getTime();
+                    newMessage.timestamp = Date;
+                    newMessage.name = userName;
                     collectionRef.document().set(newMessage);
                 }
             }
@@ -158,10 +173,6 @@ public class SalonActivity extends AppCompatActivity {
             invalidateOptionsMenu();
 
         }
-    }
-
-    private void displayChatMessages() {
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

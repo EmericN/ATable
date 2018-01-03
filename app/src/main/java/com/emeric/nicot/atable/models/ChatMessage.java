@@ -4,5 +4,6 @@ public class ChatMessage {
 
     public String idSender;
     public String text;
-    public long timestamp;
+    public String timestamp;
+    public String name;
 }

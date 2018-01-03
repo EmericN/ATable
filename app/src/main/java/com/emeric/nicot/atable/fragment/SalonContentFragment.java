@@ -131,7 +131,7 @@ public class SalonContentFragment extends Fragment {
                         docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                //docRef.collection("messages").document();
+                                docRef.collection("messages").document();
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();

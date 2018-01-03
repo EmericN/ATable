@@ -19,12 +19,13 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final String TAG = "debug adapter chat";
     private Context context;
     private Message message;
-    private String userId;
+    private String userId, userName;
 
-    public CustomAdapterChat(Context context, Message message, String userId) {
+    public CustomAdapterChat(Context context, Message message, String userId, String userName) {
         this.context = context;
         this.message = message;
         this.userId = userId;
+        this.userId = userName;
 
     }
 
@@ -51,10 +52,13 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
         switch (holder.getItemViewType()) {
             case 0:
                 ((ViewHolder0) holder).SenderMessage.setText(message.getListMessageData().get(position).text);
+                ((ViewHolder0) holder).SenderTimestamp.setText(message.getListMessageData().get(position).timestamp);
                 break;
 
             case 2:
                 ((ViewHolder2) holder).ReceiverMessage.setText(message.getListMessageData().get(position).text);
+                ((ViewHolder2) holder).ReceiverTimestamp.setText(message.getListMessageData().get(position).timestamp);
+                ((ViewHolder2) holder).ReceiverName.setText(message.getListMessageData().get(position).name);
                 break;
         }
     }
@@ -67,20 +71,26 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     private class ViewHolder0 extends RecyclerView.ViewHolder {
 
         private TextView SenderMessage;
+        private TextView SenderTimestamp;
 
         private ViewHolder0(View itemView) {
             super(itemView);
             SenderMessage = (TextView) itemView.findViewById(R.id.msgr);
+            SenderTimestamp = (TextView) itemView.findViewById(R.id.timerSender);
         }
     }
 
     private class ViewHolder2 extends RecyclerView.ViewHolder {
 
         private TextView ReceiverMessage;
+        private TextView ReceiverTimestamp;
+        private TextView ReceiverName;
 
         private ViewHolder2(View itemView) {
             super(itemView);
             ReceiverMessage = (TextView) itemView.findViewById(R.id.msgr2);
+            ReceiverTimestamp = (TextView) itemView.findViewById(R.id.timerReceiver);
+            ReceiverName = (TextView) itemView.findViewById(R.id.nameReceiver);
         }
     }
 

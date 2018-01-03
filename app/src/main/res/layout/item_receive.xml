@@ -3,21 +3,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp">
+    >
+
+    <TextView
+        android:id="@+id/nameReceiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/timerReceiver"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:textColor="#000"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/timerReceiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:textColor="#000"
+        android:textSize="12sp"/>
 
 <TextView
     android:id="@+id/msgr2"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
+    android:layout_below="@id/timerReceiver"
     android:layout_marginEnd="50dp"
     android:layout_marginStart="5dp"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="50dp"
     android:background="@drawable/message_chat"
     android:paddingBottom="8dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:paddingTop="5dp"
-    android:textColor="#000" />
+    android:textColor="#000"
+    android:textSize="15sp"/>
 
 </RelativeLayout>
