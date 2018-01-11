@@ -46,7 +46,7 @@ public class SalonContentFragment extends Fragment {
     String mail;
     CustomAdapterSalon adapter;
     private FirebaseAuth mAuth;
-    private String userId, ts, TAG = "debug firestore";
+    private String userId, ts, userName, TAG = "debug firestore";
     private Long tsLong;
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -99,6 +99,7 @@ public class SalonContentFragment extends Fragment {
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
                 i.putExtra("SalonId", PossalonAdmin.getSalonId());
                 i.putExtra("userId", userId);
+                i.putExtra("userName", userName);
 
                 if (position < salon.size()-salonMembre.size()) {
                     i.putExtra("tag", "admin");
@@ -198,6 +199,22 @@ public class SalonContentFragment extends Fragment {
         salonAdmin.clear();
         adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon, salonAdmin, salonMembre);
         LV.setAdapter(adapter);
+
+        mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        userName = document.getString("prenom");
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
 
         mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

@@ -19,17 +19,16 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final String TAG = "debug adapter chat";
     private Context context;
     private Message message;
-    private String userId, userName;
+    private String userId;
 
-    public CustomAdapterChat(Context context, Message message, String userId, String userName) {
+    public CustomAdapterChat(Context context, Message message, String userId) {
         this.context = context;
         this.message = message;
         this.userId = userId;
-        this.userId = userName;
-
     }
 
     public int getItemViewType(int position) {
+
         return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER
                                                                                   : MESSAGE_RECEIVER;
     }

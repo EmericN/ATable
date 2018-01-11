@@ -1,6 +1,7 @@
 package com.emeric.nicot.atable;
 
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -31,8 +32,6 @@ import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -70,6 +69,7 @@ public class SalonActivity extends AppCompatActivity {
     private String Date, userName;
 
 
+    @SuppressLint("SimpleDateFormat")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.salon);
@@ -80,6 +80,7 @@ public class SalonActivity extends AppCompatActivity {
             userId = extras.getString("userId");
             tag = extras.getString("tag");
             salonId = extras.getString("SalonId");
+            userName = extras.getString("userName");
         }
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
@@ -88,12 +89,9 @@ public class SalonActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        userName = user.getDisplayName();
-        Log.d(TAG, "displayed name : " + userName);
         message = new Message();
         calander = Calendar.getInstance();
-        simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        simpledateformat = new SimpleDateFormat("HH:mm");
         Date = simpledateformat.format(calander.getTime());
         buttonSend = (ImageButton) findViewById(R.id.buttonSend);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
@@ -101,7 +99,7 @@ public class SalonActivity extends AppCompatActivity {
         mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
-        mAdapter2 = new CustomAdapterChat(this, message, userId, userName);
+        mAdapter2 = new CustomAdapterChat(this, message, userId);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
 
@@ -119,7 +117,7 @@ public class SalonActivity extends AppCompatActivity {
                                     newMessage.text = doc.getDocument().getString("text");
                                     newMessage.timestamp = doc.getDocument().getString("timestamp");
                                     newMessage.idSender = doc.getDocument().getString("idSender");
-                                    newMessage.idSender = doc.getDocument().getString("name");
+                                    newMessage.name = doc.getDocument().getString("name");
                                     message.getListMessageData().add(newMessage);
                                     mAdapter2.notifyDataSetChanged();
                                     mLayloutManager2.scrollToPosition(

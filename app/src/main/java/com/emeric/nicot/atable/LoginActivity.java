@@ -107,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent i = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(i);
-                            //TODO requete firestore pour récupérer le nom du user connecté pour le display sur le chat
                             // closing this screen
                             finish();
 
