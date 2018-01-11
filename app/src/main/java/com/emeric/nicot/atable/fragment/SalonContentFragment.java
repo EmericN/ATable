@@ -31,7 +31,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -135,55 +134,13 @@ public class SalonContentFragment extends Fragment {
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();
-                                mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (DocumentSnapshot document : task.getResult()) {
-
-                                                Log.d(TAG, document.getId() + " => Admin : " +
-                                                           document.get("nom"));
-                                                String salonAdm = (String) document.get("nom");
-                                                String salonIdAdm = document.getId();
-
-                                                FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
-                                                salonAdmin.add(addedSalonAdmin);
-                                                adapter.notifyDataSetChanged();
-                                            }
-                                            salon.addAll(salonAdmin);
-                                        } else {
-                                            Log.d(TAG, "Error getting admin rooms : ", task.getException());
-                                        }
-                                    }
-                                });
-
-                                mFirestore.collection("chats").whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (DocumentSnapshot document : task.getResult()) {
-
-                                                Log.d(TAG, document.getId() + " => Membre : " +
-                                                           document.get("nom"));
-                                                String salonMemb = (String) document.get("nom");
-                                                String salonIdMemb = document.getId();
-
-                                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
-                                                salonMembre.add(addedSalonMembre);
-                                                adapter.notifyDataSetChanged();
-                                            }
-                                            salon.addAll(salonMembre);
-                                        } else {
-                                            Log.d(TAG, "Error getting membre rooms : ", task.getException());
-                                        }
-                                    }
-                                });
+                                refreshRooms();
                             }
                         })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "Error getting admin rooms after create one : ", e.getCause());
+                                        Log.d(TAG, "Error getting rooms after create one : ", e.getCause());
                                     }
                                 });
 
@@ -236,14 +193,13 @@ public class SalonContentFragment extends Fragment {
 
     public void refreshRooms() {
 
-        CollectionReference docRef = mFirestore.collection("chats");
         salon.clear();
         salonMembre.clear();
         salonAdmin.clear();
         adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon, salonAdmin, salonMembre);
         LV.setAdapter(adapter);
 
-        docRef.whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -262,29 +218,36 @@ public class SalonContentFragment extends Fragment {
                     Log.d(TAG, "Error getting admin rooms : ", task.getException());
                 }
             }
-        });
-
-// GET all membre rooms
-        docRef.whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        }).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult()) {
+            public void onSuccess(QuerySnapshot snapshots) {
+                // GET all membre rooms
+                mFirestore.collection("chats").whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot document : task.getResult()) {
 
-                        Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
-                        String salonMemb = (String) document.get("nom");
-                        String salonIdMemb = document.getId();
+                                Log.d(TAG,
+                                        document.getId() + " => Membre : " + document.get("nom"));
+                                String salonMemb = (String) document.get("nom");
+                                String salonIdMemb = document.getId();
 
-                        FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
-                        salonMembre.add(addedSalonMembre);
-                        adapter.notifyDataSetChanged();
+                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
+                                salonMembre.add(addedSalonMembre);
+                                adapter.notifyDataSetChanged();
+                            }
+                            salon.addAll(salonMembre);
+                        } else {
+                            Log.d(TAG, "Error getting membre rooms : ", task.getException());
+                        }
                     }
-                    salon.addAll(salonMembre);
-                } else {
-                    Log.d(TAG, "Error getting membre rooms : ", task.getException());
-                }
+                });
             }
         });
+
+
+
 
         if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);

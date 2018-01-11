@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.models.FirebaseSalon;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 
 import java.util.ArrayList;
@@ -48,8 +47,9 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
         row.setTag(holder);
 
-        Log.d(TAG, "tailel salon : "+ salon.size());
+        Log.d(TAG, "taille salon : " + salon.size());
         FirebaseSalonAdmin salonAll = salon.get(position);
+
 
         if (position < salon.size()-salonMembre.size()) {
             holder.tv.setText(salonAll.getSalon());
