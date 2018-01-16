@@ -24,6 +24,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 
@@ -61,6 +62,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
             }
         });
 
+        FirebaseMessaging.getInstance().subscribeToTopic(salonId);
         salonAdmin.clear();
         adapter.notifyDataSetChanged();
         RefreshRequest();

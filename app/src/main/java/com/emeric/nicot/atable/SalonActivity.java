@@ -44,6 +44,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SalonActivity extends AppCompatActivity {
@@ -62,7 +64,7 @@ public class SalonActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
-    private CollectionReference collectionRef;
+    private CollectionReference collectionRefMessage, collectionRefNotification;
     private Message message;
     private Calendar calander;
     private SimpleDateFormat simpledateformat;
@@ -101,7 +103,8 @@ public class SalonActivity extends AppCompatActivity {
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapter2 = new CustomAdapterChat(this, message, userId);
         mFirestore = FirebaseFirestore.getInstance();
-        collectionRef = mFirestore.collection("chats").document(salonId).collection("messages");
+        collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
+        collectionRefNotification = mFirestore.collection("notifications");
 
 
         mFirestore.collection("chats").document(salonId).collection("messages")
@@ -142,11 +145,19 @@ public class SalonActivity extends AppCompatActivity {
                 if (content.length() > 0) {
                     editTextSend.setText("");
                     ChatMessage newMessage = new ChatMessage();
+
+                    Map notification = new HashMap<>();
+                    notification.put("roomID", salonId);
+                    notification.put("roomName", nomSalon);
+                    notification.put("userName", userName);
+                    notification.put("message", newMessage.text = content);
+
                     newMessage.text = content;
                     newMessage.idSender = userId;
                     newMessage.timestamp = Date;
                     newMessage.name = userName;
-                    collectionRef.document().set(newMessage);
+                    collectionRefMessage.document().set(newMessage);
+                    collectionRefNotification.document().set(notification);
                 }
             }
         });
