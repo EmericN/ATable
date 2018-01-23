@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:padding="10dp"
-              android:paddingLeft="10dp"
-              android:paddingRight="10dp">
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
 
     <ImageView
         android:id="@+id/imageViewCrown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        />      <!-- app:srcCompat="@drawable/ic_crown"-->
+        android:paddingLeft="15dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"/>
 
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginStart="40dp"
+                  android:layout_marginStart="50dp"
                   android:orientation="vertical"
                   android:paddingLeft="10dp"
-                  android:paddingRight="10dp">
+                  android:paddingRight="10dp"
+                  android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/nomSalon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
             android:textStyle="bold"/>
@@ -42,4 +42,4 @@
             android:textColor="@color/colorPrimary"/>
 
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
