@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
-import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
+import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,8 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import org.json.JSONArray;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,12 +33,10 @@ import java.util.Map;
 
 public class NotifContentFragment extends Fragment implements AdapterCallback {
     ListView LV;
-    String mail, userId;
-    JSONArray InvitArray = null;
-    JSONArray NomSalonArray = null;
+    String userId;
     CustomAdapterNotif adapter;
     TextView textNotif;
-    ArrayList<FirebaseSalonAdmin> salonAdmin;
+    ArrayList<FirebaseSalonRequest> salonRequest;
     private String TAG = "debug Notif";
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
@@ -63,7 +59,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
         });
 
         FirebaseMessaging.getInstance().subscribeToTopic(salonId);
-        salonAdmin.clear();
+        salonRequest.clear();
         adapter.notifyDataSetChanged();
         RefreshRequest();
 
@@ -77,9 +73,9 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefreshNotif);
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
-        salonAdmin = new ArrayList<>();
+        salonRequest = new ArrayList<>();
         LV = (ListView) v.findViewById(R.id.ListView1);
-        adapter = new CustomAdapterNotif(getContext(), R.layout.list_item_notif, salonAdmin,
+        adapter = new CustomAdapterNotif(getContext(), R.layout.list_item_notif, salonRequest,
                 NotifContentFragment.this);
         LV.setAdapter(adapter);
 
@@ -113,9 +109,9 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
                         String salonAdm = (String) document.get("nom");
                         String salonIdAdm = document.getId();
 
-                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
+                        FirebaseSalonRequest addedSalonAdmin = new FirebaseSalonRequest(salonAdm, salonIdAdm);
 
-                        salonAdmin.add(addedSalonAdmin);
+                        salonRequest.add(addedSalonAdmin);
                         adapter.notifyDataSetChanged();
                     }
                 } else {

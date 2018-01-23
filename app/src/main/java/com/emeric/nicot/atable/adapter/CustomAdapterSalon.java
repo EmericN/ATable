@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
     private static final String TAG = "debug array";
-    public static int[] imageId = {R.drawable.ic_crown, R.drawable.ic_checked};
+    public static int[] imageId = {R.drawable.ic_crown};
     private final int layoutResourceId;
     ArrayList<FirebaseSalonAdmin> salon,salonAdmin, salonMembre;
     Context context;
@@ -40,10 +40,11 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
         SalonHolder holder;
-
+//TODO check for smoother scrolling view : https://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
         row = LayoutInflater.from(getContext()).inflate(layoutResourceId, parent, false);
         holder = new SalonHolder();
-        holder.tv = (TextView) row.findViewById(R.id.nomSalon);
+        holder.tvRoomName = (TextView) row.findViewById(R.id.nomSalon);
+        holder.tvLastMessage = (TextView) row.findViewById(R.id.lastMessage);
         holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
         row.setTag(holder);
 
@@ -52,18 +53,20 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
 
         if (position < salon.size()-salonMembre.size()) {
-            holder.tv.setText(salonAll.getSalon());
+            holder.tvRoomName.setText(salonAll.getSalon());
+            holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
             holder.iv.setImageResource(imageId[0]);
         } else {
-            holder.tv.setText(salonAll.getSalon());
-            holder.iv.setImageResource(imageId[1]);
+            holder.tvRoomName.setText(salonAll.getSalon());
+            holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
         }
 
         return row;
     }
 
     class SalonHolder {
-        TextView tv;
+        TextView tvRoomName;
+        TextView tvLastMessage;
         ImageView iv;
     }
 }

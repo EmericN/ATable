@@ -197,7 +197,7 @@ public class SalonContentFragment extends Fragment {
         salon.clear();
         salonMembre.clear();
         salonAdmin.clear();
-        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item, salon, salonAdmin, salonMembre);
+        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item_salon, salon, salonAdmin, salonMembre);
         LV.setAdapter(adapter);
 
         mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -225,8 +225,8 @@ public class SalonContentFragment extends Fragment {
                         Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
                         String salonAdm = (String) document.get("nom");
                         String salonIdAdm = document.getId();
-
-                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm);
+                        String salonLastMessageAdm = (String) document.get("last_message");
+                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
                         salonAdmin.add(addedSalonAdmin);
                         adapter.notifyDataSetChanged();
                     }
@@ -249,8 +249,8 @@ public class SalonContentFragment extends Fragment {
                                         document.getId() + " => Membre : " + document.get("nom"));
                                 String salonMemb = (String) document.get("nom");
                                 String salonIdMemb = document.getId();
-
-                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb);
+                                String salonLastMessageMemb = (String) document.get("last_message");
+                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
                                 salonMembre.add(addedSalonMembre);
                                 adapter.notifyDataSetChanged();
                             }

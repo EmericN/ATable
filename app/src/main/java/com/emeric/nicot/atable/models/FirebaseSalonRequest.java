@@ -1,19 +1,21 @@
 package com.emeric.nicot.atable.models;
 
+/**
+ * Created by Nicot Emeric on 23/01/2018.
+ */
 
-public class FirebaseSalonAdmin {
+public class FirebaseSalonRequest {
 
     private String salon;
-    private String lastMessage;
     private String id;
 
-    public FirebaseSalonAdmin() {
+    public FirebaseSalonRequest() {
     }
 
-    public FirebaseSalonAdmin(String salon, String id, String lastMessage) {
+    public FirebaseSalonRequest(String salon, String id) {
         this.salon = salon;
         this.id = id;
-        this.lastMessage = lastMessage;
+
     }
 
     public String getSalon() {
@@ -22,10 +24,6 @@ public class FirebaseSalonAdmin {
 
     public String getSalonId() {
         return id;
-    }
-
-    public String getSalonLastMessage() {
-        return lastMessage;
     }
 
     public int size() {

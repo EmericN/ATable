@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:padding="10dp"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp">
+
+
+    <ImageView
+        android:id="@+id/imageViewCrown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        />      <!-- app:srcCompat="@drawable/ic_crown"-->
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginStart="40dp"
+                  android:orientation="vertical"
+                  android:paddingLeft="10dp"
+                  android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/nomSalon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/lastMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="2dip"
+            android:paddingTop="4dip"
+            android:textColor="@color/colorPrimary"/>
+
+    </LinearLayout>
+</LinearLayout>

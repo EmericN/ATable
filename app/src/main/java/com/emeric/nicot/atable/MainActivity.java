@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("SALON");
+        getSupportActionBar().setTitle("Salon");
 
         // Set ViewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -62,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 Integer position = tab.getPosition();
                 if (position == 0) {
-                    getSupportActionBar().setTitle("SALON");
+                    getSupportActionBar().setTitle("Salon");
                 } else {
-                    getSupportActionBar().setTitle("NOTIFICATION");
+                    getSupportActionBar().setTitle("Notification");
                 }
             }
 

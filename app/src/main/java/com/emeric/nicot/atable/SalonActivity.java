@@ -33,7 +33,6 @@ import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -64,7 +63,7 @@ public class SalonActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
-    private CollectionReference collectionRefMessage, collectionRefNotification;
+    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat;
     private Message message;
     private Calendar calander;
     private SimpleDateFormat simpledateformat;
@@ -105,9 +104,46 @@ public class SalonActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
+        collectionRefChat = mFirestore.collection("chats");
 
 
         mFirestore.collection("chats").document(salonId).collection("messages")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .limit(20)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot value, FirebaseFirestoreException e) {
+
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        for (DocumentSnapshot doc : value) {
+                            ChatMessage newMessage = new ChatMessage();
+                            Log.d(TAG, "Message : " + doc.getString("text"));
+                            newMessage.text = doc.getString("text");
+                            newMessage.timestamp = doc.getString("timestamp");
+                            newMessage.idSender = doc.getString("idSender");
+                            newMessage.name = doc.getString("name");
+                            message.getListMessageData().add(newMessage);
+                            mAdapter2.notifyDataSetChanged();
+                            mLayloutManager2.scrollToPosition(
+                                    message.getListMessageData().size() - 1);
+                        }
+                        mRecyclerViewChat.setAdapter(mAdapter2);
+                    }
+                });
+
+
+
+
+
+
+
+
+
+        /*mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -127,16 +163,14 @@ public class SalonActivity extends AppCompatActivity {
                                             message.getListMessageData().size() - 1);
                                     break;
                                 case MODIFIED:
-                                    Log.d(TAG, "" + doc.getDocument().getData());
                                     break;
                                 case REMOVED:
-                                    Log.d(TAG, "" + doc.getDocument().getData());
                                     break;
                             }
                         }
                         mRecyclerViewChat.setAdapter(mAdapter2);
                     }
-                });
+                });*/
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,11 +180,14 @@ public class SalonActivity extends AppCompatActivity {
                     editTextSend.setText("");
                     ChatMessage newMessage = new ChatMessage();
 
-                    Map notification = new HashMap<>();
+                    Map<String, Object> notification = new HashMap<>();
                     notification.put("roomID", salonId);
                     notification.put("roomName", nomSalon);
                     notification.put("userName", userName);
                     notification.put("message", newMessage.text = content);
+
+                    Map<String, Object> last_message = new HashMap<>();
+                    last_message.put("last_message", newMessage.text = content);
 
                     newMessage.text = content;
                     newMessage.idSender = userId;
@@ -158,6 +195,7 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.name = userName;
                     collectionRefMessage.document().set(newMessage);
                     collectionRefNotification.document().set(notification);
+                    collectionRefChat.document(salonId).update(last_message);
                 }
             }
         });

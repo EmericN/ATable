@@ -13,25 +13,25 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.fragment.AdapterCallback;
-import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
+import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 
 import java.util.ArrayList;
 
 
-public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
+public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonRequest> {
 
     private static final String AcceptInvitation = "AcceptInvitation";
     private static final String GetInvitation = "GetInvitation";
     private static LayoutInflater inflater = null;
     private final int layoutResourceId;
-    private ArrayList<FirebaseSalonAdmin> salonAdmin;
+    private ArrayList<FirebaseSalonRequest> salonRequest;
     private AdapterCallback mAdapterCallback;
 
     public CustomAdapterNotif(Context context,
-                              int layoutResourceId, ArrayList<FirebaseSalonAdmin> salonAdmin,
+                              int layoutResourceId, ArrayList<FirebaseSalonRequest> salonRequest,
                               AdapterCallback callback) {
-        super(context, layoutResourceId, salonAdmin);
-        this.salonAdmin = salonAdmin;
+        super(context, layoutResourceId, salonRequest);
+        this.salonRequest = salonRequest;
         Context context1 = context;
         this.mAdapterCallback = callback;
         this.layoutResourceId = layoutResourceId;
@@ -44,10 +44,10 @@ public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonAdmin> {
 
         row = LayoutInflater.from(getContext()).inflate(layoutResourceId, parent, false);
         holder.tv = (TextView) row.findViewById(R.id.nomSalonInv);
-        final FirebaseSalonAdmin salonFriendRequest = salonAdmin.get(position);
+        final FirebaseSalonRequest salonFriendRequest = salonRequest.get(position);
         row.setTag(holder);
         String TAG = "debug notif";
-        Log.d(TAG, "Tableau de friend request : " + salonAdmin.size());
+        Log.d(TAG, "Tableau de friend request : " + salonRequest.size());
         holder.tv.setText(salonFriendRequest.getSalon());
 
         FloatingActionButton floatAddFriend = (FloatingActionButton) row.findViewById(R.id.floatingActionButtonAccept);
