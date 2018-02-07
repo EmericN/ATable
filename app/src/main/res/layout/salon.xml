@@ -24,8 +24,21 @@
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_above="@id/editTextSend"
+            android:layout_above="@id/buttonEmot"
             android:background="@color/colorGrey"/>
+
+        <ImageButton
+            android:id="@+id/buttonEmot"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:background="#00000000"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_crown"/>
 
         <ImageButton
             android:id="@+id/buttonSend"
@@ -34,6 +47,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
             android:background="#00000000"
             android:padding="10dp"
             android:scaleType="centerInside"
@@ -52,13 +66,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_marginBottom="7dp"
+            android:layout_toEndOf="@+id/buttonEmot"
             android:layout_toStartOf="@+id/buttonSend"
+            android:background="@drawable/layout_rounded"
             android:ems="10"
             android:hint="message"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLength="20000"
-            android:paddingLeft="7dp"
-            android:paddingRight="7dp"/>
+            android:padding="3dp"/>
 
         <!--  <RelativeLayout
               android:layout_width="match_parent"
