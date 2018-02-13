@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
@@ -42,6 +44,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +52,7 @@ import java.util.Map;
 
 public class SalonActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView, mRecyclerViewChat;
+    private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
     private RecyclerView.Adapter mAdapter, mAdapter2;
     private ArrayList<String> Ordre, listtest;
@@ -58,7 +61,7 @@ public class SalonActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private EditText editTextSend;
     private TextView textV1;
-    private ImageButton buttonSend;
+    private ImageButton buttonSend, buttonEmot;
     private ListView listViewChat;
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
@@ -68,6 +71,7 @@ public class SalonActivity extends AppCompatActivity {
     private Calendar calander;
     private SimpleDateFormat simpledateformat;
     private String Date, userName;
+    private BottomSheetDialog mBottomSheetDialog;
 
 
     @SuppressLint("SimpleDateFormat")
@@ -95,6 +99,7 @@ public class SalonActivity extends AppCompatActivity {
         simpledateformat = new SimpleDateFormat("HH:mm");
         Date = simpledateformat.format(calander.getTime());
         buttonSend = (ImageButton) findViewById(R.id.buttonSend);
+        buttonEmot = (ImageButton) findViewById(R.id.buttonEmot);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
         mLayloutManager2 = new LinearLayoutManager(this);
@@ -172,6 +177,36 @@ public class SalonActivity extends AppCompatActivity {
                     }
                 });*/
 
+        if (tag.equals("admin")) {
+
+            buttonEmot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    showBottomEmotLayout();
+
+                    /*Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
+                    Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
+
+                    mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_emot);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mRecyclerView.setHasFixedSize(true);
+                    mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
+                    mRecyclerView.setLayoutManager(mLayoutManager);
+                    mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
+                    mRecyclerView.setAdapter(mAdapter);*/
+
+                    /*final Dialog fbDialogue = new Dialog(SalonActivity.this, android.R.style.Theme_Black_NoTitleBar);
+                    fbDialogue.getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(100, 0, 0, 0)));
+                    fbDialogue.setContentView(R.layout.emot_layout);
+                    fbDialogue.setCancelable(true);
+                    fbDialogue.show();*/
+                }
+            });
+        } else {
+            invalidateOptionsMenu();
+        }
+
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,27 +234,29 @@ public class SalonActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private void showBottomEmotLayout() {
 
-        if (tag.equals("admin")) {
+        Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
+        Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
 
-      /*     Drawable person_add = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_person_add);
-            mToolbar.setOverflowIcon(person_add);*/
-
-            /*Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
-            Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
-            // Calling the RecyclerView
-            mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            mRecyclerView.setHasFixedSize(true);
-            // The number of Columns
-            mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
-            mRecyclerView.setAdapter(mAdapter);*/
-        } else {
-            invalidateOptionsMenu();
-
-        }
+        mBottomSheetDialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);
+        recyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
+        recyclerView.setAdapter(mAdapter);
+        mBottomSheetDialog.setContentView(view);
+        mBottomSheetDialog.show();
+        mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mBottomSheetDialog = null;
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

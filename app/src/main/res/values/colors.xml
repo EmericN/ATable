@@ -6,4 +6,8 @@
     <color name="colorGrey">#70b6b6b6</color>
     <color name="colorChat">#e7e7e7</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorTransparent">#00ffffff</color>
+
+
 </resources>
