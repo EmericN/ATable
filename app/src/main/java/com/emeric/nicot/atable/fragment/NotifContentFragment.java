@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
+import com.emeric.nicot.atable.models.AdapterCallback;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

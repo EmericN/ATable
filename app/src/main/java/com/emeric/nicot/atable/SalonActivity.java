@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -182,25 +183,7 @@ public class SalonActivity extends AppCompatActivity {
             buttonEmot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     showBottomEmotLayout();
-
-                    /*Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
-                    Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
-
-                    mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_emot);
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                    mRecyclerView.setHasFixedSize(true);
-                    mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
-                    mRecyclerView.setLayoutManager(mLayoutManager);
-                    mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
-                    mRecyclerView.setAdapter(mAdapter);*/
-
-                    /*final Dialog fbDialogue = new Dialog(SalonActivity.this, android.R.style.Theme_Black_NoTitleBar);
-                    fbDialogue.getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(100, 0, 0, 0)));
-                    fbDialogue.setContentView(R.layout.emot_layout);
-                    fbDialogue.setCancelable(true);
-                    fbDialogue.show();*/
                 }
             });
         } else {
@@ -238,8 +221,7 @@ public class SalonActivity extends AppCompatActivity {
 
     private void showBottomEmotLayout() {
 
-        Ordre = new ArrayList<>(Arrays.asList("A Table !", "Range ta chambre !", "Réveil toi !", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3", "Test3"));
-        Image = new ArrayList<>(Arrays.asList(R.drawable.ic_bubble, R.drawable.ic_checked));
+        Image = new ArrayList<>(Arrays.asList(R.drawable.sticker1, R.drawable.sticker2));
 
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
@@ -247,8 +229,8 @@ public class SalonActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new CustomAdapter(SalonActivity.this, Ordre, Image);
-        recyclerView.setAdapter(mAdapter);
+        mAdapter = new CustomAdapter(SalonActivity.this, Image);
+        recyclerView.setAdapter(new CustomAdapter(SalonActivity.this, Image), new AdapterView.OnItemClickListener());
         mBottomSheetDialog.setContentView(view);
         mBottomSheetDialog.show();
         mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

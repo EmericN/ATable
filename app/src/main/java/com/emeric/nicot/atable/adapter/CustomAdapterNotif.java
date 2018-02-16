@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.fragment.AdapterCallback;
+import com.emeric.nicot.atable.models.AdapterCallback;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 
 import java.util.ArrayList;
