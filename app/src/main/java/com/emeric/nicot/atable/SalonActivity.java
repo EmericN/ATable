@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -234,7 +233,7 @@ public class SalonActivity extends AppCompatActivity {
 
     private void showBottomEmotLayout() {
 
-        image = new ArrayList<>(R.drawable.sticker1);
+        image = new ArrayList<>(Arrays.asList(R.drawable.sticker1, R.drawable.sticker2));
 
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
@@ -247,7 +246,9 @@ public class SalonActivity extends AppCompatActivity {
             public void onItemClick(Integer item) {
 
                 ChatMessage newMessage = new ChatMessage();
-
+                Log.d(TAG, "item  !!!!! : " + item);
+                Log.d(TAG, "item  !!!!! : " + item.toString());
+                Log.d(TAG, "item  !!!!! : " + item.intValue());
                 Map<String, Object> notification = new HashMap<>();
                 notification.put("roomID", salonId);
                 notification.put("roomName", nomSalon);

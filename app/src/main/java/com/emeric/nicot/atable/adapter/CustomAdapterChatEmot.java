@@ -51,14 +51,14 @@ public class CustomAdapterChatEmot extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case 0:
-                if(message.getListMessageData().get(position).emot == 0) {
+                if (message.getListMessageData().get(position).emot == 2131165330) {
                     ((ViewHolder0) holder).SenderEmot.setImageResource(R.drawable.sticker1);
                 }
                 ((ViewHolder0) holder).SenderTimestamp.setText(message.getListMessageData().get(position).timestamp);
                 break;
 
             case 2:
-                if(message.getListMessageData().get(position).emot == 0) {
+                if (message.getListMessageData().get(position).emot == 2131165330) {
                     ((ViewHolder2) holder).ReceiverEmot.setImageResource(R.drawable.sticker1);
                 }
                 ((ViewHolder2) holder).ReceiverTimestamp.setText(message.getListMessageData().get(position).timestamp);
