@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "543915413647",
+    "firebase_url": "https://a-table-1e0b7.firebaseio.com",
+    "project_id": "a-table-1e0b7",
+    "storage_bucket": "a-table-1e0b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543915413647:android:fdb577377bf1f543",
+        "android_client_info": {
+          "package_name": "com.emeric.nicot.atable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "543915413647-3bu8i16p0o2arhmuaami74bbmcs7jbd2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emeric.nicot.atable",
+            "certificate_hash": "f207cc6dddf6b88de043f666a14beb12c97b81c8"
+          }
+        },
+        {
+          "client_id": "543915413647-fcfdhs13brb3fmrssaujmit2sbru80ap.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emeric.nicot.atable",
+            "certificate_hash": "6e9b51665366f53c4eed152432cfc3ff39c75662"
+          }
+        },
+        {
+          "client_id": "543915413647-jfduoav5tf7a1s3lvm3o28euk9lvas7h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh_s4Mmt66EgMCiAQnuAB9xIMccw6Bv1w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "543915413647-jfduoav5tf7a1s3lvm3o28euk9lvas7h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

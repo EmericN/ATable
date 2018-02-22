@@ -4,8 +4,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp">
 
+
     <TextView
-        android:id="@+id/timerSender"
+        android:id="@+id/timerSenderEmot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -20,22 +21,14 @@
         android:textColor="#6c6c6c"
         android:textSize="12sp"/>
 
-    <TextView
-        android:id="@+id/msgr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/emotSend"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_below="@id/timerSender"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/message_chat_send"
-        android:paddingBottom="5dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:textColor="#ffffff"
-        android:textSize="15sp"/>
+        android:layout_below="@id/timerSenderEmot"/>
 
 </RelativeLayout>

@@ -14,38 +14,54 @@ import java.util.ArrayList;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-    ArrayList<Integer> Image;
-    Context context;
+    private ArrayList<Integer> image;
+    private Context context;
+    private final OnItemClickListener listener;
 
-    public CustomAdapter(Context context, ArrayList<Integer> Image) {
+
+    public interface OnItemClickListener{
+        void onItemClick(Integer item);
+    }
+
+    public CustomAdapter(Context context, ArrayList<Integer> image, OnItemClickListener listener) {
         super();
         this.context = context;
-        this.Image = Image;
+        this.image = image;
+        this.listener = listener;
     }
 
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.bubble, viewGroup, false);
-        ViewHolder viewHolder = new ViewHolder(v);
-        return viewHolder;
+                .inflate(R.layout.emot, viewGroup, false);
+        return new ViewHolder(v);
     }
 
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        viewHolder.flag.setImageResource(Image.get(i));
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        viewHolder.emot.setImageResource(image.get(position));
+        viewHolder.bind(image.get(position), listener);
     }
 
     public int getItemCount() {
-        return Image.size();
+        return image.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView flag;
+        private ImageView emot;
 
-        public ViewHolder(View itemView) {
+         private ViewHolder(View itemView) {
             super(itemView);
+            emot = (ImageView) itemView.findViewById(R.id.emot);
+        }
+         private void bind(final Integer item, final OnItemClickListener listener) {
 
-            flag = (ImageView) itemView.findViewById(R.id.flag);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    listener.onItemClick(item);
+                }
+            });
         }
     }
 }

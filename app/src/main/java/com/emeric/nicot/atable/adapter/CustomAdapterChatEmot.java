@@ -6,24 +6,23 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.models.Message;
 
 
-public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CustomAdapterChatEmot extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int MESSAGE_SENDER = 0;
     private static final int MESSAGE_RECEIVER = 2;
-    private static final int MESSAGE_SENDER_EMOT = 1;
-    private static final int MESSAGE_RECEIVER_EMOT = 3;
-    private static final String TAG = "debug adapter chat";
+    private static final String TAG = "debug adapter chat emot";
     private Context context;
     private Message message;
     private String userId;
 
-    public CustomAdapterChat(Context context, Message message, String userId) {
+    public CustomAdapterChatEmot(Context context, Message message, String userId) {
         this.context = context;
         this.message = message;
         this.userId = userId;
@@ -33,17 +32,16 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER
                                                                                   : MESSAGE_RECEIVER;
-
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         if (viewType == MESSAGE_SENDER) {
-            View v0 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_send, viewGroup, false);
+            View v0 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.emot_send, viewGroup, false);
             return new ViewHolder0(v0);
         } else if (viewType == MESSAGE_RECEIVER) {
-            View v2 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_receive, viewGroup, false);
+            View v2 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.emot_receive, viewGroup, false);
             return new ViewHolder2(v2);
         }
         return null;
@@ -53,12 +51,16 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case 0:
-                ((ViewHolder0) holder).SenderMessage.setText(message.getListMessageData().get(position).text);
+                if(message.getListMessageData().get(position).emot == 0) {
+                    ((ViewHolder0) holder).SenderEmot.setImageResource(R.drawable.sticker1);
+                }
                 ((ViewHolder0) holder).SenderTimestamp.setText(message.getListMessageData().get(position).timestamp);
                 break;
 
             case 2:
-                ((ViewHolder2) holder).ReceiverMessage.setText(message.getListMessageData().get(position).text);
+                if(message.getListMessageData().get(position).emot == 0) {
+                    ((ViewHolder2) holder).ReceiverEmot.setImageResource(R.drawable.sticker1);
+                }
                 ((ViewHolder2) holder).ReceiverTimestamp.setText(message.getListMessageData().get(position).timestamp);
                 ((ViewHolder2) holder).ReceiverName.setText(message.getListMessageData().get(position).name);
                 break;
@@ -72,25 +74,25 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private class ViewHolder0 extends RecyclerView.ViewHolder {
 
-        private TextView SenderMessage;
         private TextView SenderTimestamp;
+        private ImageView SenderEmot;
 
         private ViewHolder0(View itemView) {
             super(itemView);
-            SenderMessage = (TextView) itemView.findViewById(R.id.msgr);
+            SenderEmot = (ImageView) itemView.findViewById(R.id.emotSend);
             SenderTimestamp = (TextView) itemView.findViewById(R.id.timerSender);
         }
     }
 
     private class ViewHolder2 extends RecyclerView.ViewHolder {
 
-        private TextView ReceiverMessage;
+        private ImageView ReceiverEmot;
         private TextView ReceiverTimestamp;
         private TextView ReceiverName;
 
         private ViewHolder2(View itemView) {
             super(itemView);
-            ReceiverMessage = (TextView) itemView.findViewById(R.id.msgr2);
+            ReceiverEmot = (ImageView) itemView.findViewById(R.id.emotReceiver);
             ReceiverTimestamp = (TextView) itemView.findViewById(R.id.timerReceiver);
             ReceiverName = (TextView) itemView.findViewById(R.id.nameReceiver);
         }

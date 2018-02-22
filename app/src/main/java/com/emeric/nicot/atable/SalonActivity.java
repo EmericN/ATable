@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
+import com.emeric.nicot.atable.adapter.CustomAdapterChatEmot;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,9 +56,9 @@ public class SalonActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
-    private RecyclerView.Adapter mAdapter, mAdapter2;
+    private RecyclerView.Adapter mAdapterChat, mAdapterChatEmot;
     private ArrayList<String> Ordre, listtest;
-    private ArrayList<Integer> Image;
+    private ArrayList<Integer> image;
     private String mail, nomSalon, ts, userId, salonId, tag;
     private ArrayAdapter<String> adapter;
     private EditText editTextSend;
@@ -106,7 +107,8 @@ public class SalonActivity extends AppCompatActivity {
         mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
-        mAdapter2 = new CustomAdapterChat(this, message, userId);
+        mAdapterChat = new CustomAdapterChat(this, message, userId);
+        mAdapterChatEmot = new CustomAdapterChatEmot(this, message, userId);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
@@ -132,12 +134,22 @@ public class SalonActivity extends AppCompatActivity {
                             newMessage.timestamp = doc.getString("timestamp");
                             newMessage.idSender = doc.getString("idSender");
                             newMessage.name = doc.getString("name");
-                            message.getListMessageData().add(newMessage);
-                            mAdapter2.notifyDataSetChanged();
-                            mLayloutManager2.scrollToPosition(
-                                    message.getListMessageData().size() - 1);
+                            if(newMessage.emot != null){
+                                message.getListMessageData().add(newMessage);
+                                mAdapterChatEmot.notifyDataSetChanged();
+                                mLayloutManager2.scrollToPosition(
+                                message.getListMessageData().size() - 1);
+                                mRecyclerViewChat.setAdapter(mAdapterChatEmot);
+                            }else {
+                                message.getListMessageData().add(newMessage);
+                                mAdapterChat.notifyDataSetChanged();
+                                mLayloutManager2.scrollToPosition(
+                                        message.getListMessageData().size() - 1);
+                                mRecyclerViewChat.setAdapter(mAdapterChat);
+                            }
                         }
-                        mRecyclerViewChat.setAdapter(mAdapter2);
+
+
                     }
                 });
 
@@ -211,6 +223,7 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.idSender = userId;
                     newMessage.timestamp = Date;
                     newMessage.name = userName;
+                    newMessage.emot = null;
                     collectionRefMessage.document().set(newMessage);
                     collectionRefNotification.document().set(notification);
                     collectionRefChat.document(salonId).update(last_message);
@@ -221,7 +234,7 @@ public class SalonActivity extends AppCompatActivity {
 
     private void showBottomEmotLayout() {
 
-        Image = new ArrayList<>(Arrays.asList(R.drawable.sticker1, R.drawable.sticker2));
+        image = new ArrayList<>(R.drawable.sticker1);
 
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
@@ -229,8 +242,31 @@ public class SalonActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new CustomAdapter(SalonActivity.this, Image);
-        recyclerView.setAdapter(new CustomAdapter(SalonActivity.this, Image), new AdapterView.OnItemClickListener());
+        recyclerView.setAdapter(new CustomAdapter(SalonActivity.this, image, new CustomAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(Integer item) {
+
+                ChatMessage newMessage = new ChatMessage();
+
+                Map<String, Object> notification = new HashMap<>();
+                notification.put("roomID", salonId);
+                notification.put("roomName", nomSalon);
+                notification.put("userName", userName);
+                notification.put("message", userName+" a envoyé un sticker.");
+                notification.put("emot", item);
+
+                Map<String, Object> last_message = new HashMap<>();
+                last_message.put("last_message", userName+" a envoyé un sticker.");
+
+                newMessage.idSender = userId;
+                newMessage.timestamp = Date;
+                newMessage.name = userName;
+                newMessage.emot = item;
+                collectionRefMessage.document().set(newMessage);
+                collectionRefNotification.document().set(notification);
+                collectionRefChat.document(salonId).update(last_message);
+            }
+        }));
         mBottomSheetDialog.setContentView(view);
         mBottomSheetDialog.show();
         mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

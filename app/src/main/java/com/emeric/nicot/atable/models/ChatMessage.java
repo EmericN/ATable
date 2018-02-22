@@ -6,4 +6,5 @@ public class ChatMessage {
     public String text;
     public String timestamp;
     public String name;
+    public Integer emot;
 }
