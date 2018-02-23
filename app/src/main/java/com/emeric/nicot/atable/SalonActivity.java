@@ -194,6 +194,7 @@ public class SalonActivity extends AppCompatActivity {
             });
         } else {
             invalidateOptionsMenu();
+            buttonEmot.setVisibility(View.INVISIBLE);
         }
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
