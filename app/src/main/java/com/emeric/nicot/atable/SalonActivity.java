@@ -45,7 +45,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class SalonActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
     private RecyclerView.Adapter mAdapterChat;
     private ArrayList<String> Ordre, listtest;
-    private ArrayList<Integer> image;
+    private ArrayList<String> image;
     private String mail, nomSalon, ts, userId, salonId, tag;
     private ArrayAdapter<String> adapter;
     private EditText editTextSend;
@@ -229,10 +228,8 @@ public class SalonActivity extends AppCompatActivity {
 
     private void showBottomEmotLayout() {
 
-        image = new ArrayList<>(Arrays.asList(R.drawable.sticker1, R.drawable.sticker2));
+        Integer [] image = {R.drawable.emotatable, R.drawable.sticker2};
 
-        //int drawableResourceId = this.getResources().getIdentifier("nameOfDrawable", "drawable", this.getPackageName());
-        Log.d(TAG, "sticker value int : "+R.drawable.sticker1);
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);

@@ -3,7 +3,6 @@ package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,11 +79,11 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             case 4:
                 ((ViewHolder4) holder).SenderTimestampEmot.setText(message.getListMessageData().get(position).timestamp);
-                ((ViewHolder4) holder).SenderEmot.setImageResource(R.drawable.sticker1);
+                ((ViewHolder4) holder).SenderEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
                 break;
 
             case 6:
-                ((ViewHolder6) holder).ReceiverEmot.setImageResource(R.drawable.sticker1);
+                ((ViewHolder6) holder).ReceiverEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
                 ((ViewHolder6) holder).ReceiverTimestampEmot.setText(message.getListMessageData().get(position).timestamp);
                 ((ViewHolder6) holder).ReceiverNameEmot.setText(message.getListMessageData().get(position).name);
                 break;
