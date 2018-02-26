@@ -162,11 +162,7 @@ public class SalonActivity extends AppCompatActivity {
                     }
                 });
 
-
-
         
-
-
 
         /*mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
