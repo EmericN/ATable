@@ -30,12 +30,12 @@ import android.widget.TextView;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
-import com.emeric.nicot.atable.adapter.CustomAdapterChatEmot;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,7 +45,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,9 +54,9 @@ public class SalonActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
-    private RecyclerView.Adapter mAdapterChat, mAdapterChatEmot;
+    private RecyclerView.Adapter mAdapterChat;
     private ArrayList<String> Ordre, listtest;
-    private ArrayList<Integer> image;
+    private ArrayList<String> image;
     private String mail, nomSalon, ts, userId, salonId, tag;
     private ArrayAdapter<String> adapter;
     private EditText editTextSend;
@@ -107,7 +106,6 @@ public class SalonActivity extends AppCompatActivity {
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapterChat = new CustomAdapterChat(this, message, userId);
-        mAdapterChatEmot = new CustomAdapterChatEmot(this, message, userId);
         mFirestore = FirebaseFirestore.getInstance();
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
@@ -126,29 +124,25 @@ public class SalonActivity extends AppCompatActivity {
                             return;
                         }
 
-                        for (DocumentSnapshot doc : value) {
+                        for (DocumentChange doc : value.getDocumentChanges()) {
+
                             ChatMessage newMessage = new ChatMessage();
-                            Log.d(TAG, "Message : " + doc.getString("text"));
-                            newMessage.text = doc.getString("text");
-                            newMessage.timestamp = doc.getString("timestamp");
-                            newMessage.idSender = doc.getString("idSender");
-                            newMessage.name = doc.getString("name");
-                            if(newMessage.emot != null){
-                                message.getListMessageData().add(newMessage);
-                                mAdapterChatEmot.notifyDataSetChanged();
-                                mLayloutManager2.scrollToPosition(
-                                message.getListMessageData().size() - 1);
-                                mRecyclerViewChat.setAdapter(mAdapterChatEmot);
-                            }else {
-                                message.getListMessageData().add(newMessage);
-                                mAdapterChat.notifyDataSetChanged();
-                                mLayloutManager2.scrollToPosition(
-                                        message.getListMessageData().size() - 1);
-                                mRecyclerViewChat.setAdapter(mAdapterChat);
-                            }
+                            Log.d(TAG, "Message : " + doc.getDocument().getString("text"));
+                            Log.d(TAG, "Timestamp : " + doc.getDocument().getString("timestamp"));
+                            newMessage.text = doc.getDocument().getString("text");
+                            newMessage.timestamp = doc.getDocument().getString("timestamp");
+                            newMessage.idSender = doc.getDocument().getString("idSender");
+                            newMessage.name = doc.getDocument().getString("name");
+                            newMessage.emot = doc.getDocument().getString("emot");
+
+                            message.getListMessageData().add(newMessage);
+
+                            mLayloutManager2.scrollToPosition(
+                                    message.getListMessageData().size() - 1);
+
                         }
-
-
+                        mAdapterChat.notifyDataSetChanged();
+                        mRecyclerViewChat.setAdapter(mAdapterChat);
                     }
                 });
 
@@ -199,6 +193,7 @@ public class SalonActivity extends AppCompatActivity {
             });
         } else {
             invalidateOptionsMenu();
+            buttonEmot.setVisibility(View.INVISIBLE);
         }
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -233,7 +228,7 @@ public class SalonActivity extends AppCompatActivity {
 
     private void showBottomEmotLayout() {
 
-        image = new ArrayList<>(Arrays.asList(R.drawable.sticker1, R.drawable.sticker2));
+        Integer [] image = {R.drawable.emotatable, R.drawable.sticker2};
 
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
@@ -246,15 +241,13 @@ public class SalonActivity extends AppCompatActivity {
             public void onItemClick(Integer item) {
 
                 ChatMessage newMessage = new ChatMessage();
-                Log.d(TAG, "item  !!!!! : " + item);
-                Log.d(TAG, "item  !!!!! : " + item.toString());
-                Log.d(TAG, "item  !!!!! : " + item.intValue());
+
                 Map<String, Object> notification = new HashMap<>();
                 notification.put("roomID", salonId);
                 notification.put("roomName", nomSalon);
                 notification.put("userName", userName);
                 notification.put("message", userName+" a envoyé un sticker.");
-                notification.put("emot", item);
+                notification.put("emot", item.toString());
 
                 Map<String, Object> last_message = new HashMap<>();
                 last_message.put("last_message", userName+" a envoyé un sticker.");
@@ -262,10 +255,11 @@ public class SalonActivity extends AppCompatActivity {
                 newMessage.idSender = userId;
                 newMessage.timestamp = Date;
                 newMessage.name = userName;
-                newMessage.emot = item;
+                newMessage.emot = item.toString();
                 collectionRefMessage.document().set(newMessage);
                 collectionRefNotification.document().set(notification);
                 collectionRefChat.document(salonId).update(last_message);
+                mBottomSheetDialog.dismiss();
             }
         }));
         mBottomSheetDialog.setContentView(view);

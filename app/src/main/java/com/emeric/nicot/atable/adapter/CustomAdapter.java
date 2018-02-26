@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-    private ArrayList<Integer> image;
+    private Integer [] image;
     private Context context;
     private final OnItemClickListener listener;
 
@@ -23,7 +23,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         void onItemClick(Integer item);
     }
 
-    public CustomAdapter(Context context, ArrayList<Integer> image, OnItemClickListener listener) {
+    public CustomAdapter(Context context, Integer [] image, OnItemClickListener listener) {
         super();
         this.context = context;
         this.image = image;
@@ -37,12 +37,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     }
 
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        viewHolder.emot.setImageResource(image.get(position));
-        viewHolder.bind(image.get(position), listener);
+        viewHolder.emot.setImageResource(image[position]);
+        viewHolder.bind(image[position], listener);
     }
 
     public int getItemCount() {
-        return image.size();
+        return image.length;
     }
 
      static class ViewHolder extends RecyclerView.ViewHolder {

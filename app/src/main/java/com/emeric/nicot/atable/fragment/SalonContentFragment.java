@@ -222,6 +222,7 @@ public class SalonContentFragment extends Fragment {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
 
+                        if(document != null){
                         Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
                         String salonAdm = (String) document.get("nom");
                         String salonIdAdm = document.getId();
@@ -229,6 +230,15 @@ public class SalonContentFragment extends Fragment {
                         FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
                         salonAdmin.add(addedSalonAdmin);
                         adapter.notifyDataSetChanged();
+                        }else{
+                            Log.d(TAG, "aucun salon creer");
+                            String salonAdm = "";
+                            String salonIdAdm = "";
+                            String salonLastMessageAdm = "Créer ou rejoins un salon ! ";
+                            FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
+                            salonAdmin.add(addedSalonAdmin);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                     salon.addAll(salonAdmin);
                 } else {
@@ -245,14 +255,17 @@ public class SalonContentFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
 
-                                Log.d(TAG,
-                                        document.getId() + " => Membre : " + document.get("nom"));
-                                String salonMemb = (String) document.get("nom");
-                                String salonIdMemb = document.getId();
-                                String salonLastMessageMemb = (String) document.get("last_message");
-                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
-                                salonMembre.add(addedSalonMembre);
-                                adapter.notifyDataSetChanged();
+                                if(document != null) {
+                                    Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
+                                    String salonMemb = (String) document.get("nom");
+                                    String salonIdMemb = document.getId();
+                                    String salonLastMessageMemb = (String) document.get("last_message");
+                                    FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
+                                    salonMembre.add(addedSalonMembre);
+                                    adapter.notifyDataSetChanged();
+                                }else{
+                                    Log.d(TAG, "aucun doc");
+                                }
                             }
                             salon.addAll(salonMembre);
                         } else {
