@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
@@ -66,7 +67,7 @@ public class SalonActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
-    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat;
+    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat, collectionRefUser;
     private Message message;
     private Calendar calander;
     private SimpleDateFormat simpledateformat;
@@ -110,6 +111,7 @@ public class SalonActivity extends AppCompatActivity {
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
         collectionRefChat = mFirestore.collection("chats");
+        collectionRefUser = mFirestore.collection("user");
 
         mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -162,7 +164,7 @@ public class SalonActivity extends AppCompatActivity {
                     }
                 });
 
-        
+
 
         /*mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -302,7 +304,7 @@ public class SalonActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_settings:
-
+                friendlist();
                 return true;
 
             default:
@@ -311,8 +313,6 @@ public class SalonActivity extends AppCompatActivity {
     }
 
     public void addFriend() {
-        final CollectionReference docRefChat = mFirestore.collection("chats");
-        final CollectionReference docRefFriend = mFirestore.collection("users");
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         final EditText edittext = new EditText(this);
@@ -320,26 +320,28 @@ public class SalonActivity extends AppCompatActivity {
         alert.setView(edittext);
         alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                String friend = edittext.getText().toString();
+                final String friend = edittext.getText().toString();
                 String[] separate = friend.split(" ");
                 Log.d(TAG, separate[0] + "_" + separate[1]);
 
-                docRefFriend.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
+                collectionRefUser.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
                         .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.get("nom"));
-                                docRefChat.document(salonId).update("pending", document.getId());
+                                collectionRefChat.document(salonId).update("pending", document.getId());
+                                Toast.makeText(getApplicationContext(), friend + " a été ajouté",
+                                        Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Log.d(TAG, "Error getting friend id : ", task.getException());
                         }
                     }
+
+
                 });
-
-
             }
         });
 
@@ -379,10 +381,12 @@ public class SalonActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
+    private void friendlist() {
+        //collectionRefChat
+        //TODO dialog return friend list
+    }
 
 }
 

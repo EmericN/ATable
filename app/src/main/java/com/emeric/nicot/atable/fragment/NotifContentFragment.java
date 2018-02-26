@@ -52,6 +52,7 @@ public class NotifContentFragment extends Fragment implements AdapterCallback {
         Map<String, Object> updates = new HashMap<>();
         updates.put("pending", "");
         updates.put("membres", userId);
+        //TODO refaire une collection membre pour store les membres (avoid nested data)
         docRef.document(salonId).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
