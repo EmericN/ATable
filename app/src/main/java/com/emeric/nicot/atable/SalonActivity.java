@@ -111,6 +111,22 @@ public class SalonActivity extends AppCompatActivity {
         collectionRefNotification = mFirestore.collection("notifications");
         collectionRefChat = mFirestore.collection("chats");
 
+        mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+                                       int oldTop, int oldRight, int oldBottom) {
+                if (bottom < oldBottom) {
+                    mRecyclerViewChat.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerViewChat.smoothScrollToPosition(
+                                    mRecyclerViewChat.getAdapter().getItemCount() - 1);
+                        }
+                    }, 100);
+                }
+            }
+        });
+
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
