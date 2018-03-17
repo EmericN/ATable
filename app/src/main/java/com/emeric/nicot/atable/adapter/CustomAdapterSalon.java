@@ -1,6 +1,10 @@
 package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,17 +14,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
+import com.emeric.nicot.atable.SalonActivity;
+import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
     private static final String TAG = "debug array";
     public static int[] imageId = {R.drawable.ic_crown};
     private final int layoutResourceId;
-    ArrayList<FirebaseSalonAdmin> salon,salonAdmin, salonMembre;
-    Context context;
+    private ArrayList<FirebaseSalonAdmin> salon,salonAdmin, salonMembre;
+    private Context context;
+    private BottomSheetDialog mBottomSheetDialog;
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
                               ArrayList<FirebaseSalonAdmin> salon,
@@ -46,6 +55,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.tvRoomName = (TextView) row.findViewById(R.id.nomSalon);
         holder.tvLastMessage = (TextView) row.findViewById(R.id.lastMessage);
         holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
+        holder.civ = (ImageView) row.findViewById(R.id.clickableImageViewCrown);
         row.setTag(holder);
 
         Log.d(TAG, "taille salon : " + salon.size());
@@ -56,10 +66,23 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
             holder.tvRoomName.setText(salonAll.getSalon());
             holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
             holder.iv.setImageResource(imageId[0]);
+            holder.civ.setImageResource(imageId[0]);
         } else {
             holder.tvRoomName.setText(salonAll.getSalon());
             holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
         }
+
+        holder.civ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //TODO call interface to show up bottomdialogbox
+
+            }
+        });
+
+
+
 
         return row;
     }
@@ -67,7 +90,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     class SalonHolder {
         TextView tvRoomName;
         TextView tvLastMessage;
-        ImageView iv;
+        ImageView iv,civ;
     }
 }
 

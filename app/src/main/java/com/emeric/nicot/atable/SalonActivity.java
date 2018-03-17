@@ -393,6 +393,7 @@ public class SalonActivity extends AppCompatActivity {
     private void friendlist() {
         //collectionRefChat
         //TODO dialog return friend list
+
     }
 
 }

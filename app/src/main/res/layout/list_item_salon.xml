@@ -18,6 +18,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_marginStart="50dp"
+                  android:layout_marginEnd="50dp"
                   android:orientation="vertical"
                   android:paddingLeft="10dp"
                   android:paddingRight="10dp"
@@ -27,7 +28,6 @@
             android:id="@+id/nomSalon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/colorBlack"
@@ -46,6 +46,16 @@
             android:textSize="15sp"/>
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/clickableImageViewCrown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="340dp"
+        android:layout_marginEnd="10dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="20dp"/>
 
     <View
         android:id="@+id/line"

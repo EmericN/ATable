@@ -5,10 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -18,12 +21,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
+import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
+import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -44,10 +51,12 @@ import java.util.Map;
 public class SalonContentFragment extends Fragment {
 
     public ArrayList<FirebaseSalonAdmin> salon,salonAdmin,salonMembre,salonIdAdmin,salonIdMembre;
-    ListView LV;
     CustomAdapterSalon adapter;
+    private ListView LV;
     private FirebaseAuth mAuth;
-    private String userId, ts, userName, TAG = "debug firestore";
+    private String userId;
+    private String userName;
+    private String TAG = "debug firestore";
     private Long tsLong;
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -60,7 +69,7 @@ public class SalonContentFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         tsLong = System.currentTimeMillis();
-        ts = tsLong.toString();
+        String ts = tsLong.toString();
         salon = new ArrayList<>();
         salonAdmin = new ArrayList<>();
         salonIdAdmin = new ArrayList<>();
@@ -80,7 +89,6 @@ public class SalonContentFragment extends Fragment {
 
         } else {
         }
-
 
         // Refresh list of rooms
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
