@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,9 +42,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SalonContentFragment extends Fragment {
+
     public ArrayList<FirebaseSalonAdmin> salon,salonAdmin,salonMembre,salonIdAdmin,salonIdMembre;
     ListView LV;
-    String mail;
     CustomAdapterSalon adapter;
     private FirebaseAuth mAuth;
     private String userId, ts, userName, TAG = "debug firestore";
@@ -51,7 +52,7 @@ public class SalonContentFragment extends Fragment {
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
     private DocumentReference docRef;
-
+    private CollectionReference CollRef;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class SalonContentFragment extends Fragment {
         salonMembre = new ArrayList<>();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         docRef = mFirestore.collection("chats").document();
+        CollRef = mFirestore.collection("chats");
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
         FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
@@ -125,13 +127,14 @@ public class SalonContentFragment extends Fragment {
                         Map<String, Object> chatsMap = new HashMap<>();
                         chatsMap.put("nom", nomsalon);
                         chatsMap.put("admin", userId);
-                        chatsMap.put("membres", "");
-                        chatsMap.put("pending", "");
 
                         docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 docRef.collection("messages").document();
+                                //CollRef.document()
+                                //mFirestore.collection("membres");
+                                //mFirestore.collection("pending");
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();
@@ -221,23 +224,16 @@ public class SalonContentFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult()) {
-
-                        if(document != null){
-                        Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
-                        String salonAdm = (String) document.get("nom");
-                        String salonIdAdm = document.getId();
-                        String salonLastMessageAdm = (String) document.get("last_message");
-                        FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
-                        salonAdmin.add(addedSalonAdmin);
-                        adapter.notifyDataSetChanged();
-                        }else{
-                            Log.d(TAG, "aucun salon creer");
-                            String salonAdm = "";
-                            String salonIdAdm = "";
-                            String salonLastMessageAdm = "Créer ou rejoins un salon ! ";
+                        if (document != null && document.exists()) {
+                            Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
+                            String salonAdm = (String) document.get("nom");
+                            String salonIdAdm = document.getId();
+                            String salonLastMessageAdm = (String) document.get("last_message");
                             FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
                             salonAdmin.add(addedSalonAdmin);
                             adapter.notifyDataSetChanged();
+                        }else {
+                            Log.d(TAG, "No admin rooms : ", task.getException());
                         }
                     }
                     salon.addAll(salonAdmin);
@@ -249,25 +245,37 @@ public class SalonContentFragment extends Fragment {
             @Override
             public void onSuccess(QuerySnapshot snapshots) {
                 // GET all membre rooms
-                mFirestore.collection("chats").whereEqualTo("membres", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                mFirestore.collection("members").whereEqualTo("userId", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
-
-                                if(document != null) {
-                                    Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
-                                    String salonMemb = (String) document.get("nom");
-                                    String salonIdMemb = document.getId();
-                                    String salonLastMessageMemb = (String) document.get("last_message");
-                                    FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
-                                    salonMembre.add(addedSalonMembre);
-                                    adapter.notifyDataSetChanged();
-                                }else{
-                                    Log.d(TAG, "aucun doc");
+                                if (document != null && document.exists()) {
+                                    String roomId = (String) document.get("roomId");
+                                    mFirestore.collection("chats").document(roomId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                Log.d(TAG, document.getId() + " => Membre : " +
+                                                           document.get("nom"));
+                                                String salonMemb = (String) document.get("nom");
+                                                String salonIdMemb = document.getId();
+                                                String salonLastMessageMemb = (String) document.get("last_message");
+                                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
+                                                salonMembre.add(addedSalonMembre);
+                                                adapter.notifyDataSetChanged();
+                                            } else {
+                                                Log.d(TAG, "aucun doc");
+                                            }
+                                            salon.addAll(salonMembre);
+                                        }
+                                    });
+                                }
+                                else{
+                                    Log.d(TAG, "No member room detected : ", task.getException());
                                 }
                             }
-                            salon.addAll(salonMembre);
                         } else {
                             Log.d(TAG, "Error getting membre rooms : ", task.getException());
                         }
@@ -275,8 +283,6 @@ public class SalonContentFragment extends Fragment {
                 });
             }
         });
-
-
 
 
         if (swipeRefreshLayout.isRefreshing()) {

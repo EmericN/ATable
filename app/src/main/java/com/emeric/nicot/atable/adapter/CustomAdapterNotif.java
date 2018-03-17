@@ -60,7 +60,7 @@ public class CustomAdapterNotif extends ArrayAdapter<FirebaseSalonRequest> {
                 TextView tv = (TextView) cl.findViewById(R.id.nomSalonInv);
                 String NomSalon = tv.getText().toString();
 
-                mAdapterCallback.onMethodCallback(NomSalon, salonFriendRequest.getSalonId());
+                mAdapterCallback.onMethodCallback(NomSalon, salonFriendRequest.getSalonId(), salonFriendRequest.getIdDoc());
             }
         });
 

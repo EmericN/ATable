@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ATable2.iml" filepath="$PROJECT_DIR$/ATable2.iml" />
-      <module fileurl="file://E:\APP_ANDROID\ATable2\.idea\ATable_wip2.iml" filepath="E:\APP_ANDROID\ATable2\.idea\ATable_wip2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

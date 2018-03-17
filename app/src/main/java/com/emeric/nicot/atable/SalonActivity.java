@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,6 +69,7 @@ public class SalonActivity extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
     private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat, collectionRefUser;
+    private DocumentReference docRefChat,docRefPending;
     private Message message;
     private Calendar calander;
     private SimpleDateFormat simpledateformat;
@@ -111,24 +113,8 @@ public class SalonActivity extends AppCompatActivity {
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
         collectionRefChat = mFirestore.collection("chats");
-        collectionRefUser = mFirestore.collection("user");
-
-        mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
-                                       int oldTop, int oldRight, int oldBottom) {
-                if (bottom < oldBottom) {
-                    mRecyclerViewChat.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerViewChat.smoothScrollToPosition(
-                                    mRecyclerViewChat.getAdapter().getItemCount() - 1);
-                        }
-                    }, 100);
-                }
-            }
-        });
-
+        collectionRefUser = mFirestore.collection("users");
+        docRefChat = mFirestore.collection("chats").document(salonId);
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
@@ -141,7 +127,6 @@ public class SalonActivity extends AppCompatActivity {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-
                         for (DocumentChange doc : value.getDocumentChanges()) {
 
                             ChatMessage newMessage = new ChatMessage();
@@ -154,16 +139,31 @@ public class SalonActivity extends AppCompatActivity {
                             newMessage.emot = doc.getDocument().getString("emot");
 
                             message.getListMessageData().add(newMessage);
-
                             mLayloutManager2.scrollToPosition(
                                     message.getListMessageData().size() - 1);
-
                         }
-                        mAdapterChat.notifyDataSetChanged();
-                        mRecyclerViewChat.setAdapter(mAdapterChat);
-                    }
+                            mAdapterChat.notifyDataSetChanged();
+                            mRecyclerViewChat.setAdapter(mAdapterChat);
+                        }
                 });
 
+            //TODO Bug quand le recyclervier est vide ...
+          /*  mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+                                           int oldTop, int oldRight, int oldBottom) {
+                    if (bottom < oldBottom) {
+                        mRecyclerViewChat.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRecyclerViewChat.smoothScrollToPosition(
+                                        mRecyclerViewChat.getAdapter().getItemCount() -
+                                        1);
+                            }
+                        }, 100);
+                    }
+                }
+            });*/
 
 
         /*mFirestore.collection("chats").document(salonId).collection("messages")
@@ -323,7 +323,8 @@ public class SalonActivity extends AppCompatActivity {
                 final String friend = edittext.getText().toString();
                 String[] separate = friend.split(" ");
                 Log.d(TAG, separate[0] + "_" + separate[1]);
-
+               // collectionRefChat.document(salonId).collection("pending");
+               // collectionRefChat.document(salonId).collection("members");
                 collectionRefUser.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
                         .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -331,8 +332,14 @@ public class SalonActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.get("nom"));
-                                collectionRefChat.document(salonId).update("pending", document.getId());
-                                Toast.makeText(getApplicationContext(), friend + " a été ajouté",
+
+                                Map<String, Object> InviteMap = new HashMap<>();
+                                InviteMap.put("idPending", document.getId());
+                                InviteMap.put("roomId", salonId);
+                                InviteMap.put("roomName", nomSalon);
+
+                                mFirestore.collection("pending").document().set(InviteMap);
+                                Toast.makeText(getApplicationContext(), "Invitation envoyé à "+friend,
                                         Toast.LENGTH_LONG).show();
                             }
                         } else {
