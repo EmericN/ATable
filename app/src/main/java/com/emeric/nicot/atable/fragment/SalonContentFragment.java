@@ -44,7 +44,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,10 +60,13 @@ public class SalonContentFragment extends Fragment {
     private String userName;
     private String TAG = "debug firestore";
     private Long tsLong;
+    private String date;
     private FirebaseFirestore mFirestore;
     private SwipeRefreshLayout swipeRefreshLayout;
     private DocumentReference docRef;
     private CollectionReference CollRef;
+    private BottomSheetDialog mBottomSheetDialog;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,6 +80,9 @@ public class SalonContentFragment extends Fragment {
         salonIdAdmin = new ArrayList<>();
         salonMembre = new ArrayList<>();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
+        Calendar calander = Calendar.getInstance();
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
+        date = simpledateformat.format(calander.getTime());
         docRef = mFirestore.collection("chats").document();
         CollRef = mFirestore.collection("chats");
 
@@ -140,9 +148,6 @@ public class SalonContentFragment extends Fragment {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 docRef.collection("messages").document();
-                                //CollRef.document()
-                                //mFirestore.collection("membres");
-                                //mFirestore.collection("pending");
                                 salon.clear();
                                 salonMembre.clear();
                                 salonAdmin.clear();
@@ -208,7 +213,56 @@ public class SalonContentFragment extends Fragment {
         salon.clear();
         salonMembre.clear();
         salonAdmin.clear();
-        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item_salon, salon, salonAdmin, salonMembre);
+        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item_salon, salon, salonAdmin, salonMembre, new CustomAdapterSalon.OnClickListener() {
+            @Override
+            public void onClick(final String salonId, final String nomSalon) {
+                
+                Integer [] image = {R.drawable.emotatable, R.drawable.sticker2};
+
+                mBottomSheetDialog = new BottomSheetDialog(getContext());
+                View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
+                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);
+                recyclerView.setHasFixedSize(true);
+                mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+                recyclerView.setLayoutManager(mLayoutManager);
+                recyclerView.setAdapter(new CustomAdapter(getContext(), image, new CustomAdapter.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(Integer item) {
+
+                        ChatMessage newMessage = new ChatMessage();
+
+                        Map<String, Object> notification = new HashMap<>();
+                        notification.put("roomID", salonId);
+                        notification.put("roomName", nomSalon);
+                        notification.put("userName", userName);
+                        notification.put("message", userName+" a envoyé un sticker.");
+                        notification.put("emot", item.toString());
+
+                        Map<String, Object> last_message = new HashMap<>();
+                        last_message.put("last_message", userName+" a envoyé un sticker.");
+
+                        newMessage.idSender = userId;
+                        newMessage.timestamp = date;
+                        newMessage.name = userName;
+                        newMessage.emot = item.toString();
+                        mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);
+                        mFirestore.collection("notifications").document().set(notification);
+                        mFirestore.collection("chats").document(salonId).update(last_message);
+                        mBottomSheetDialog.dismiss();
+                        // TODO looking for adding persistent listener for chat preview : adapter.notifyDataSetChanged();
+                    }
+                }));
+                mBottomSheetDialog.setContentView(view);
+                mBottomSheetDialog.show();
+                mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        mBottomSheetDialog = null;
+                    }
+                });
+            }
+
+        });
         LV.setAdapter(adapter);
 
         mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {

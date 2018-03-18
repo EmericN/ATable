@@ -72,7 +72,6 @@ public class SalonActivity extends AppCompatActivity {
     private DocumentReference docRefChat,docRefPending;
     private Message message;
     private Calendar calander;
-    private SimpleDateFormat simpledateformat;
     private String Date, userName;
     private BottomSheetDialog mBottomSheetDialog;
 
@@ -99,7 +98,7 @@ public class SalonActivity extends AppCompatActivity {
 
         message = new Message();
         calander = Calendar.getInstance();
-        simpledateformat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
         Date = simpledateformat.format(calander.getTime());
         buttonSend = (ImageButton) findViewById(R.id.buttonSend);
         buttonEmot = (ImageButton) findViewById(R.id.buttonEmot);

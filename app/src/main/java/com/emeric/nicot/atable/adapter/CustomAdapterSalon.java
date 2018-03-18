@@ -1,10 +1,6 @@
 package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,28 +10,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.SalonActivity;
-import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 
     private static final String TAG = "debug array";
-    public static int[] imageId = {R.drawable.ic_crown};
+    private static int[] imageId = {R.drawable.ic_crown};
     private final int layoutResourceId;
     private ArrayList<FirebaseSalonAdmin> salon,salonAdmin, salonMembre;
     private Context context;
-    private BottomSheetDialog mBottomSheetDialog;
+    private OnClickListener mListener;
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
                               ArrayList<FirebaseSalonAdmin> salon,
                               ArrayList<FirebaseSalonAdmin> salonAdmin,
-                              ArrayList<FirebaseSalonAdmin> salonMembre
-    ) {
+                              ArrayList<FirebaseSalonAdmin> salonMembre,
+                              OnClickListener mListener) {
 
         super(context, layoutResourceId, salon);
         this.salon = salon;
@@ -43,6 +35,11 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         this.salonMembre = salonMembre;
         this.context = context;
         this.layoutResourceId = layoutResourceId;
+        this.mListener = mListener;
+    }
+
+    public interface OnClickListener {
+        void onClick(String salonId, String nomSalon);
     }
 
     @Override
@@ -59,7 +56,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         row.setTag(holder);
 
         Log.d(TAG, "taille salon : " + salon.size());
-        FirebaseSalonAdmin salonAll = salon.get(position);
+        final FirebaseSalonAdmin salonAll = salon.get(position);
 
 
         if (position < salon.size()-salonMembre.size()) {
@@ -77,7 +74,9 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
             public void onClick(View v) {
 
                 //TODO call interface to show up bottomdialogbox
-
+                if(mListener != null){
+                    mListener.onClick(salonAll.getSalonId(), salonAll.getSalon());
+                }
             }
         });
 
