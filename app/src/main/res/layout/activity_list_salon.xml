@@ -9,9 +9,8 @@
         android:id="@+id/toolbarMain"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:elevation="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        android:background="@color/colorBackgroundTabs"
+        android:elevation="0dp"/>
 
 
     <android.support.design.widget.CoordinatorLayout
@@ -28,7 +27,8 @@
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/ThemeOverlay.AppTheme.ActionBar"/>
+                android:background="@color/colorBackgroundTabs"
+                app:tabIndicatorColor="@color/colorPrimaryDark"/>
 
         </android.support.design.widget.AppBarLayout>
 

@@ -1,6 +1,7 @@
 package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,8 +43,9 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         void onClick(String salonId, String nomSalon);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View row;
         SalonHolder holder;
 //TODO check for smoother scrolling view : https://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
@@ -58,30 +60,25 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         Log.d(TAG, "taille salon : " + salon.size());
         final FirebaseSalonAdmin salonAll = salon.get(position);
 
-
         if (position < salon.size()-salonMembre.size()) {
             holder.tvRoomName.setText(salonAll.getSalon());
             holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
             holder.iv.setImageResource(imageId[0]);
             holder.civ.setImageResource(imageId[0]);
-        } else {
-            holder.tvRoomName.setText(salonAll.getSalon());
-            holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
-        }
+            } else {
+                holder.tvRoomName.setText(salonAll.getSalon());
+                holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
+            }
 
         holder.civ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //TODO call interface to show up bottomdialogbox
                 if(mListener != null){
                     mListener.onClick(salonAll.getSalonId(), salonAll.getSalon());
                 }
             }
         });
-
-
-
 
         return row;
     }
@@ -89,6 +86,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     class SalonHolder {
         TextView tvRoomName;
         TextView tvLastMessage;
+        TextView welcomTextView;
         ImageView iv,civ;
     }
 }

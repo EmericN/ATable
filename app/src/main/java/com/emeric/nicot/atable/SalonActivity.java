@@ -55,23 +55,14 @@ import java.util.Map;
 public class SalonActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewChat;
-    private RecyclerView.LayoutManager mLayoutManager, mLayloutManager2;
+    private RecyclerView.LayoutManager mLayloutManager2;
     private RecyclerView.Adapter mAdapterChat;
-    private ArrayList<String> Ordre, listtest;
-    private ArrayList<String> image;
-    private String mail, nomSalon, ts, userId, salonId, tag;
-    private ArrayAdapter<String> adapter;
+    private String nomSalon, ts, userId, salonId, tag;
     private EditText editTextSend;
-    private TextView textV1;
-    private ImageButton buttonSend, buttonEmot;
-    private ListView listViewChat;
-    private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
     private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat, collectionRefUser;
-    private DocumentReference docRefChat,docRefPending;
     private Message message;
-    private Calendar calander;
     private String Date, userName;
     private BottomSheetDialog mBottomSheetDialog;
 
@@ -97,11 +88,12 @@ public class SalonActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         message = new Message();
-        calander = Calendar.getInstance();
+        final Long tsLong = System.currentTimeMillis();
+        Calendar calander = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
         Date = simpledateformat.format(calander.getTime());
-        buttonSend = (ImageButton) findViewById(R.id.buttonSend);
-        buttonEmot = (ImageButton) findViewById(R.id.buttonEmot);
+        ImageButton buttonSend = (ImageButton) findViewById(R.id.buttonSend);
+        ImageButton buttonEmot = (ImageButton) findViewById(R.id.buttonEmot);
         editTextSend = (EditText) findViewById(R.id.editTextSend);
         mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
         mLayloutManager2 = new LinearLayoutManager(this);
@@ -113,10 +105,10 @@ public class SalonActivity extends AppCompatActivity {
         collectionRefNotification = mFirestore.collection("notifications");
         collectionRefChat = mFirestore.collection("chats");
         collectionRefUser = mFirestore.collection("users");
-        docRefChat = mFirestore.collection("chats").document(salonId);
+        DocumentReference docRefChat = mFirestore.collection("chats").document(salonId);
 
         mFirestore.collection("chats").document(salonId).collection("messages")
-                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .orderBy("tsLong", Query.Direction.ASCENDING)
                 .limit(20)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -229,6 +221,7 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.timestamp = Date;
                     newMessage.name = userName;
                     newMessage.emot = null;
+                    newMessage.tsLong = tsLong;
                     collectionRefMessage.document().set(newMessage);
                     collectionRefNotification.document().set(notification);
                     collectionRefChat.document(salonId).update(last_message);
@@ -245,7 +238,7 @@ public class SalonActivity extends AppCompatActivity {
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);
         recyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(new CustomAdapter(SalonActivity.this, image, new CustomAdapter.OnItemClickListener(){
             @Override

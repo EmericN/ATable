@@ -7,4 +7,5 @@ public class ChatMessage {
     public String timestamp;
     public String name;
     public String emot;
+    public Long tsLong;
 }

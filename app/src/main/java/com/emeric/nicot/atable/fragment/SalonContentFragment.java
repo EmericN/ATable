@@ -81,7 +81,7 @@ public class SalonContentFragment extends Fragment {
         salonMembre = new ArrayList<>();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         Calendar calander = Calendar.getInstance();
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("EEE, HH:mm");
         date = simpledateformat.format(calander.getTime());
         docRef = mFirestore.collection("chats").document();
         CollRef = mFirestore.collection("chats");
@@ -143,6 +143,7 @@ public class SalonContentFragment extends Fragment {
                         Map<String, Object> chatsMap = new HashMap<>();
                         chatsMap.put("nom", nomsalon);
                         chatsMap.put("admin", userId);
+                        chatsMap.put("created_at", tsLong);
 
                         docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -160,7 +161,6 @@ public class SalonContentFragment extends Fragment {
                                         Log.d(TAG, "Error getting rooms after create one : ", e.getCause());
                                     }
                                 });
-
 
                         dialog.dismiss();
                     }
@@ -209,6 +209,7 @@ public class SalonContentFragment extends Fragment {
     }
 
     public void refreshRooms() {
+
 
         salon.clear();
         salonMembre.clear();
@@ -319,18 +320,23 @@ public class SalonContentFragment extends Fragment {
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                             if (task.isSuccessful()) {
                                                 DocumentSnapshot document = task.getResult();
-                                                Log.d(TAG, document.getId() + " => Membre : " +
-                                                           document.get("nom"));
-                                                String salonMemb = (String) document.get("nom");
-                                                String salonIdMemb = document.getId();
-                                                String salonLastMessageMemb = (String) document.get("last_message");
-                                                FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
-                                                salonMembre.add(addedSalonMembre);
-                                                adapter.notifyDataSetChanged();
+                                                if (document != null && document.exists()) {
+                                                    Log.d(TAG, document.getId() + " => Membre : " +
+                                                               document.get("nom"));
+                                                    String salonMemb = (String) document.get("nom");
+                                                    String salonIdMemb = document.getId();
+                                                    String salonLastMessageMemb = (String) document.get("last_message");
+                                                    FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
+                                                    salonMembre.add(addedSalonMembre);
+                                                    adapter.notifyDataSetChanged();
+                                                }else{
+                                                    Log.d(TAG, "aucun doc");
+                                                }
                                             } else {
-                                                Log.d(TAG, "aucun doc");
+                                                Log.d(TAG, "erreur sur le listener");
                                             }
                                             salon.addAll(salonMembre);
+
                                         }
                                     });
                                 }
