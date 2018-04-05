@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.services;
 
 import android.util.Log;
 

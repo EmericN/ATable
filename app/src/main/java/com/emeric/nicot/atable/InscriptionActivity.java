@@ -38,7 +38,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_inscription);
+        setContentView(R.layout.activity_classic_register);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
@@ -74,11 +74,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
     private void createAccount(String mail, String password) {
         Log.d(TAG, "createAccount:" + mail);
-        if (!validateForm()) {
-            return;
-        }
 
-        // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 
@@ -114,6 +110,9 @@ public class InscriptionActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "user successfully registered");
+                        Intent i = new Intent(getApplicationContext(), LoginChoiceActivity.class);
+                        startActivity(i);
+                        finish();
                     }
 
                 })
@@ -122,37 +121,6 @@ public class InscriptionActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "user not registered");
                     }
-                })
-
-        ;
-
-        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                            /*i.putExtra("Nom",nom);
-                            i.putExtra("Prenom",prenom);*/
-        startActivity(i);
-        finish();
-    }
-
-
-    private boolean validateForm() {
-        boolean valid = true;
-
-        String mail = inputMail.getText().toString();
-        if (TextUtils.isEmpty(mail)) {
-            inputMail.setError("Required.");
-            valid = false;
-        } else {
-            inputMail.setError(null);
-        }
-
-        String password = inputPassword.getText().toString();
-        if (TextUtils.isEmpty(password)) {
-            inputPassword.setError("Required.");
-            valid = false;
-        } else {
-            inputPassword.setError(null);
-        }
-
-        return valid;
+                });
     }
 }

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (user != null) {
         } else {
-            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent i = new Intent(getApplicationContext(), LoginChoiceActivity.class);
             startActivity(i);
             finish();
         }
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
 
                 mAuth.signOut();
-                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent i = new Intent(getApplicationContext(), LoginChoiceActivity.class);
                 startActivity(i);
                 finish();
 

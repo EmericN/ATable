@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.services;
 
 
 import android.app.NotificationManager;
@@ -11,6 +11,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 
+import com.emeric.nicot.atable.MainActivity;
+import com.emeric.nicot.atable.R;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
