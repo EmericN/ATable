@@ -30,11 +30,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
-        btnConnect = findViewById(R.id.buttonConnect);
-        txtInputLayoutMail = findViewById(R.id.inputLayoutMail);
-        getTxtInputLayoutPass =  findViewById(R.id.inputLayoutPass);
-        editTextMail =  findViewById(R.id.editTextMail);
-        editTextPass =  findViewById(R.id.editTextPassword);
+        btnConnect = findViewById(R.id.button_connect);
+        txtInputLayoutMail = findViewById(R.id.input_layout_mail);
+        getTxtInputLayoutPass =  findViewById(R.id.input_layout_pass);
+        editTextMail =  findViewById(R.id.edit_text_mail);
+        editTextPass =  findViewById(R.id.edit_text_password);
 
         mAuth = FirebaseAuth.getInstance();
 

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 
 import com.emeric.nicot.atable.fragment.NotifContentFragment;
 import com.emeric.nicot.atable.fragment.SalonContentFragment;
+import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
 
                 mAuth.signOut();
+                LoginManager.getInstance().logOut();
                 Intent i = new Intent(getApplicationContext(), LoginChoiceActivity.class);
                 startActivity(i);
                 finish();
