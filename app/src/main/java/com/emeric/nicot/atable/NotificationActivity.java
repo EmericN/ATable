@@ -1,20 +1,17 @@
-package com.emeric.nicot.atable.fragment;
+package com.emeric.nicot.atable;
 
-
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
 import com.emeric.nicot.atable.models.AdapterCallback;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
@@ -22,7 +19,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,22 +29,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+public class NotificationActivity extends AppCompatActivity  implements AdapterCallback {
 
-public class NotifContentFragment extends Fragment {
-    private ListView LV;
+    private RecyclerView mRecyclerViewChat;
+    private RecyclerView.LayoutManager mLayloutManager;
+    private RecyclerView.Adapter mAdapter;
+    private String TAG = "debug notif";
     private String userId;
-    private CustomAdapterNotif adapter;
-    private TextView textNotif;
-    private ArrayList<FirebaseSalonRequest> salonRequest;
-    private String TAG = "debug Notif";
-    private ProgressDialog pDialog;
     private FirebaseFirestore mFirestore;
     private FirebaseAuth mAuth;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private CollectionReference colRef;
+    private ArrayList<FirebaseSalonRequest> salonRequest;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-
-   /* public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
+    public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
         Log.d(TAG, "Salon accepté : " + NomSalon);
         // Delete pending invitation
         mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -63,7 +56,7 @@ public class NotifContentFragment extends Fragment {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Member added");
-                        Toast.makeText(getContext(), "Invitation acceptée" ,
+                        Toast.makeText(NotificationActivity.this, "Invitation acceptée" ,
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -71,46 +64,53 @@ public class NotifContentFragment extends Fragment {
         });
 
         FirebaseMessaging.getInstance().subscribeToTopic(salonId);
-        salonRequest.clear();
-        adapter.notifyDataSetChanged();
-        RefreshRequest();
-    }*/
+        mAdapter.notifyDataSetChanged();
+    }
 
-    /*public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.tab_notification_list, null);
 
-        textNotif = v.findViewById(R.id.textViewNotif);
-        swipeRefreshLayout = v.findViewById(R.id.swiperefreshNotif);
-        mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance();
-        salonRequest = new ArrayList<>();
-        LV = v.findViewById(R.id.ListView1);
-        adapter = new CustomAdapterNotif(getContext(), R.layout.list_item_notif, salonRequest,
-                NotifContentFragment.this);
-        LV.setAdapter(adapter);
 
-        final FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            userId = user.getUid();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.notification_activity);
+
+        Toolbar mToolbar = findViewById(R.id.toolbarNotif);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Notifications");
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            userId = extras.getString("userId");
         }
-        textNotif.setText("Invitation en attente");
+        salonRequest = new ArrayList<>();
+        mRecyclerViewChat = findViewById(R.id.recycler_view_notif);
+        mLayloutManager = new LinearLayoutManager(this);
+        mRecyclerViewChat.setLayoutManager(mLayloutManager);
+        mRecyclerViewChat.setHasFixedSize(true);
+        mAdapter = new CustomAdapterNotif(this, salonRequest,this);
+        mRecyclerViewChat.setAdapter(mAdapter);
+        mFirestore = FirebaseFirestore.getInstance();
+        mSwipeRefreshLayout = findViewById(R.id.swiperefreshNotif);
         RefreshRequest();
-        // Refresh list of rooms
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 RefreshRequest();
             }
         });
-        return v;
     }
 
-    public void RefreshRequest() {
-
-        salonRequest.clear();
-        colRef = mFirestore.collection("pending");
+    private void RefreshRequest() {
+        CollectionReference colRef = mFirestore.collection("pending");
         colRef.whereEqualTo("idPending", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -124,15 +124,16 @@ public class NotifContentFragment extends Fragment {
                         FirebaseSalonRequest addedSalonAdmin = new FirebaseSalonRequest(salonAdm, salonIdAdm, idDoc);
 
                         salonRequest.add(addedSalonAdmin);
-                        adapter.notifyDataSetChanged();
+                        mAdapter.notifyDataSetChanged();
                     }
                 } else {
                     Log.d(TAG, "Error getting friend request rooms : ", task.getException());
                 }
             }
         });
-        if (swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(false);
+
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
-        }*/
+    }
 }

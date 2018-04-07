@@ -13,4 +13,5 @@
     <string name="default_notification_channel_name" translatable="true">News</string>
     <string name="facebook_app_id">731900020532169</string>
     <string name="fb_login_protocol_scheme">fb731900020532169</string>
+    <string name="notification">notification</string>
 </resources>

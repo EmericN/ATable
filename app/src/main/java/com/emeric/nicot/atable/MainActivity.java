@@ -33,11 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_salon);
+        setContentView(R.layout.salon_header);
 
         mAuth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
-        mToolbar = (Toolbar) findViewById(R.id.toolbarMain);
+        mToolbar = findViewById(R.id.toolbarMain);
 
         if (user != null) {
         } else {
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_group);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_notifications);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_palette);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -90,18 +90,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-          /*  case R.id.action_picture:
-                // do some code
-                return true;*/
-            case R.id.action_settings:
+            case R.id.action_notification:
+                Intent i = new Intent(getApplicationContext(), NotificationActivity.class);
+                i.putExtra("userId",user.getUid());
+                startActivity(i);
+                return true;
 
+            case R.id.action_settings:
                 mAuth.signOut();
                 LoginManager.getInstance().logOut();
-                Intent i = new Intent(getApplicationContext(), LoginChoiceActivity.class);
-                startActivity(i);
+                Intent j = new Intent(getApplicationContext(), LoginChoiceActivity.class);
+                startActivity(j);
                 finish();
-
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

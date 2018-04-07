@@ -39,8 +39,6 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
             return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER_EMOT
                     : MESSAGE_RECEIVER_EMOT;
         }
-
-
     }
 
     @Override
@@ -102,8 +100,8 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ViewHolder0(View itemView) {
             super(itemView);
-            SenderMessage = (TextView) itemView.findViewById(R.id.msgr);
-            SenderTimestamp = (TextView) itemView.findViewById(R.id.timerSender);
+            SenderMessage = itemView.findViewById(R.id.msgr);
+            SenderTimestamp = itemView.findViewById(R.id.timerSender);
         }
     }
 
@@ -115,9 +113,9 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ViewHolder2(View itemView) {
             super(itemView);
-            ReceiverMessage = (TextView) itemView.findViewById(R.id.msgr2);
-            ReceiverTimestamp = (TextView) itemView.findViewById(R.id.timerReceiver);
-            ReceiverName = (TextView) itemView.findViewById(R.id.nameReceiver);
+            ReceiverMessage = itemView.findViewById(R.id.msgr2);
+            ReceiverTimestamp = itemView.findViewById(R.id.timerReceiver);
+            ReceiverName = itemView.findViewById(R.id.nameReceiver);
         }
     }
 
@@ -128,8 +126,8 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ViewHolder4(View itemView) {
             super(itemView);
-            SenderEmot = (ImageView) itemView.findViewById(R.id.emotSend);
-            SenderTimestampEmot = (TextView) itemView.findViewById(R.id.timerSenderEmot);
+            SenderEmot = itemView.findViewById(R.id.emotSend);
+            SenderTimestampEmot = itemView.findViewById(R.id.timerSenderEmot);
         }
     }
 
@@ -141,9 +139,9 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ViewHolder6(View itemView) {
             super(itemView);
-            ReceiverEmot = (ImageView) itemView.findViewById(R.id.emotReceiver);
-            ReceiverTimestampEmot = (TextView) itemView.findViewById(R.id.timerReceiverEmot);
-            ReceiverNameEmot = (TextView) itemView.findViewById(R.id.nameReceiverEmot);
+            ReceiverEmot = itemView.findViewById(R.id.emotReceiver);
+            ReceiverTimestampEmot = itemView.findViewById(R.id.timerReceiverEmot);
+            ReceiverNameEmot = itemView.findViewById(R.id.nameReceiverEmot);
         }
     }
 

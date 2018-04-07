@@ -17,12 +17,19 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LoginChoiceActivity extends AppCompatActivity {
@@ -86,7 +93,7 @@ public class LoginChoiceActivity extends AppCompatActivity {
 
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
-
+//TODO manage to get smoother transition between loginActivity & MainActivity
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
@@ -98,11 +105,7 @@ public class LoginChoiceActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            //FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
-                            Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(i);
-                            finish();
+                            onAuthSuccess(task.getResult().getUser());
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -110,6 +113,36 @@ public class LoginChoiceActivity extends AppCompatActivity {
                             Toast.makeText(LoginChoiceActivity.this, "Authentication failed.",
                                     Toast.LENGTH_LONG).show();
                         }
+                    }
+                });
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+
+        String[] separate = user.getDisplayName().split(" ");
+        Log.d(TAG, separate[0] + "_" + separate[1]);
+
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("nom", separate[1]);
+        userMap.put("prenom", separate[0]);
+        userMap.put("nom_prenom", separate[1]+"_"+separate[0]);
+
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid())
+                .set(userMap, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "user successfully registered");
+                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "user not registered");
                     }
                 });
     }

@@ -2,7 +2,6 @@ package com.emeric.nicot.atable;
 
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,12 +20,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
@@ -46,7 +42,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,11 +61,9 @@ public class SalonActivity extends AppCompatActivity {
     private String Date, userName;
     private BottomSheetDialog mBottomSheetDialog;
 
-
-    @SuppressLint("SimpleDateFormat")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.salon);
+        setContentView(R.layout.salon_activity);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -81,7 +74,7 @@ public class SalonActivity extends AppCompatActivity {
             userName = extras.getString("userName");
         }
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbarRoom);
+        Toolbar mToolbar = findViewById(R.id.toolbarRoom);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(nomSalon);
         ActionBar ab = getSupportActionBar();
@@ -92,10 +85,10 @@ public class SalonActivity extends AppCompatActivity {
         Calendar calander = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
         Date = simpledateformat.format(calander.getTime());
-        ImageButton buttonSend = (ImageButton) findViewById(R.id.buttonSend);
-        ImageButton buttonEmot = (ImageButton) findViewById(R.id.buttonEmot);
-        editTextSend = (EditText) findViewById(R.id.editTextSend);
-        mRecyclerViewChat = (RecyclerView) findViewById(R.id.recycler_view_chat);
+        ImageButton buttonSend = findViewById(R.id.buttonSend);
+        ImageButton buttonEmot = findViewById(R.id.buttonEmot);
+        editTextSend = findViewById(R.id.editTextSend);
+        mRecyclerViewChat = findViewById(R.id.recycler_view_chat);
         mLayloutManager2 = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager2);
         mRecyclerViewChat.setHasFixedSize(true);
@@ -106,6 +99,13 @@ public class SalonActivity extends AppCompatActivity {
         collectionRefChat = mFirestore.collection("chats");
         collectionRefUser = mFirestore.collection("users");
         DocumentReference docRefChat = mFirestore.collection("chats").document(salonId);
+
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("tsLong", Query.Direction.ASCENDING)

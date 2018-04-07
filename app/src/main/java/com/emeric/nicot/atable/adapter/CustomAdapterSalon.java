@@ -51,19 +51,17 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
 //TODO check for smoother scrolling view : https://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
         row = LayoutInflater.from(getContext()).inflate(layoutResourceId, parent, false);
         holder = new SalonHolder();
-        holder.tvRoomName = (TextView) row.findViewById(R.id.nomSalon);
-        holder.tvLastMessage = (TextView) row.findViewById(R.id.lastMessage);
-        holder.iv = (ImageView) row.findViewById(R.id.imageViewCrown);
-        holder.civ = (ImageView) row.findViewById(R.id.clickableImageViewCrown);
+        holder.tvRoomName =  row.findViewById(R.id.nomSalon);
+        holder.tvLastMessage = row.findViewById(R.id.lastMessage);
+        holder.civ = row.findViewById(R.id.clickableImageViewCrown);
         row.setTag(holder);
 
-        Log.d(TAG, "taille salon : " + salon.size());
+        Log.d(TAG, "taille salon_activity : " + salon.size());
         final FirebaseSalonAdmin salonAll = salon.get(position);
 
         if (position < salon.size()-salonMembre.size()) {
             holder.tvRoomName.setText(salonAll.getSalon());
             holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
-            holder.iv.setImageResource(imageId[0]);
             holder.civ.setImageResource(imageId[0]);
             } else {
                 holder.tvRoomName.setText(salonAll.getSalon());
@@ -86,8 +84,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     class SalonHolder {
         TextView tvRoomName;
         TextView tvLastMessage;
-        TextView welcomTextView;
-        ImageView iv,civ;
+        ImageView civ;
     }
 }
 

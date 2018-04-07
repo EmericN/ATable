@@ -21,8 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -87,13 +85,14 @@ public class SalonContentFragment extends Fragment {
         CollRef = mFirestore.collection("chats");
 
         View v = inflater.inflate(R.layout.tab_salon_list, null);
-        FloatingActionButton floatAdd = (FloatingActionButton) v.findViewById(R.id.FloatButtonAdd);
-        LV = (ListView) v.findViewById(R.id.ListView);
-        swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swiperefreshRooms);
+        FloatingActionButton floatAdd = v.findViewById(R.id.FloatButtonAdd);
+        LV = v.findViewById(R.id.ListView);
+        swipeRefreshLayout = v.findViewById(R.id.swiperefreshRooms);
 
         if (currentUser != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             userId = user.getUid();
+            refreshRooms();
 
         } else {
         }
@@ -105,8 +104,6 @@ public class SalonContentFragment extends Fragment {
                 refreshRooms();
             }
         });
-
-        refreshRooms();
 
         LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -222,7 +219,7 @@ public class SalonContentFragment extends Fragment {
 
                 mBottomSheetDialog = new BottomSheetDialog(getContext());
                 View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
-                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);
+                RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
                 recyclerView.setHasFixedSize(true);
                 mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
                 recyclerView.setLayoutManager(mLayoutManager);

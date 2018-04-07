@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:descendantFocusability="blocksDescendants" >
-
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
 
     <ImageView
-        android:id="@+id/imageViewCrown"
+        android:id="@+id/clickableImageViewCrown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="10dp"
         android:paddingStart="15dp"
         android:paddingTop="20dp"/>
-
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
@@ -48,16 +45,6 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/clickableImageViewCrown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="340dp"
-        android:layout_marginEnd="10dp"
-        android:paddingStart="15dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="20dp"/>
-
     <View
         android:id="@+id/line"
         android:layout_width="match_parent"
@@ -66,4 +53,5 @@
         android:layout_marginStart="25dp"
         android:layout_marginTop="70dp"
         android:background="@color/colorGrey"/>
+
 </RelativeLayout>

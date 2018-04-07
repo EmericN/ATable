@@ -41,6 +41,12 @@
                       android:value="com.emeric.nicot.atable.MainActivity" />
        </activity>
 
+        <activity android:name=".NotificationActivity"
+                  android:parentActivityName=".MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value="com.emeric.nicot.atable.MainActivity" />
+        </activity>
+
        <activity android:name=".LoginActivity"
                  android:label="Login"
                  android:parentActivityName=".LoginChoiceActivity">

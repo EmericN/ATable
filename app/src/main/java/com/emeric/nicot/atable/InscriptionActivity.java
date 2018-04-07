@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,22 +31,20 @@ public class InscriptionActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseFirestore mFirestore;
     private String nom, prenom, nomPrenom, mail, password;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_classic_register);
+        setContentView(R.layout.classic_registration_activity);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance();
 
         // Edit Text
-        inputNom = (EditText) findViewById(R.id.editTextNom);
-        inputPrenom = (EditText) findViewById(R.id.editTextPrenom);
-        inputMail = (EditText) findViewById(R.id.editTextMail);
-        inputPassword = (EditText) findViewById(R.id.editTextMDP);
+        inputNom = findViewById(R.id.editTextNom);
+        inputPrenom = findViewById(R.id.editTextPrenom);
+        inputMail = findViewById(R.id.editTextMail);
+        inputPassword = findViewById(R.id.editTextMDP);
 
         // Create button
         Button btnCreateUser = (Button) findViewById(R.id.buttonEnvoyer);
@@ -66,8 +63,6 @@ public class InscriptionActivity extends AppCompatActivity {
                 password = inputPassword.getText().toString();
 
                 createAccount(mail, password);
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
             }
         });
     }
@@ -104,7 +99,7 @@ public class InscriptionActivity extends AppCompatActivity {
         userMap.put("nom_prenom", nomPrenom);
         userMap.put("mail", user.getEmail());
 
-        mFirestore.collection("users").document(user.getUid())
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid())
                 .set(userMap, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
