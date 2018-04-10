@@ -11,27 +11,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
+import com.emeric.nicot.atable.models.FirebaseSalon;
 
 import java.util.ArrayList;
 
-public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
+public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalon> {
 
     private static final String TAG = "debug array";
     private static int[] imageId = {R.drawable.ic_crown};
     private final int layoutResourceId;
-    private ArrayList<FirebaseSalonAdmin> salon,salonAdmin, salonMembre;
+    private ArrayList<FirebaseSalon> salon,salonAdmin, salonMembre;
     private Context context;
     private OnClickListener mListener;
 
     public CustomAdapterSalon(Context context, int layoutResourceId,
-                              ArrayList<FirebaseSalonAdmin> salon,
-                              ArrayList<FirebaseSalonAdmin> salonAdmin,
-                              ArrayList<FirebaseSalonAdmin> salonMembre,
+                              ArrayList<FirebaseSalon> salonAdmin,
+                              ArrayList<FirebaseSalon> salonMembre,
                               OnClickListener mListener) {
 
-        super(context, layoutResourceId, salon);
-        this.salon = salon;
+        super(context, layoutResourceId);
+
         this.salonAdmin = salonAdmin;
         this.salonMembre = salonMembre;
         this.context = context;
@@ -46,6 +45,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        Log.d(TAG, "HELLO !");
         View row;
         SalonHolder holder;
 //TODO check for smoother scrolling view : https://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder
@@ -56,16 +56,19 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
         holder.civ = row.findViewById(R.id.clickableImageViewCrown);
         row.setTag(holder);
 
-        Log.d(TAG, "taille salon_activity : " + salon.size());
-        final FirebaseSalonAdmin salonAll = salon.get(position);
+        Log.d(TAG, "taille salon admin : " + salonAdmin.size());
+        Log.d(TAG, "taille salon membre : " + salonMembre.size());
 
-        if (position < salon.size()-salonMembre.size()) {
-            holder.tvRoomName.setText(salonAll.getSalon());
-            holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
+        final FirebaseSalon salonA = salonAdmin.get(position);
+        final FirebaseSalon salonM = salonMembre.get(position);
+
+        if (position < (salonAdmin.size()+salonMembre.size())-salonMembre.size()) {
+            holder.tvRoomName.setText(salonA.getSalon());
+            holder.tvLastMessage.setText(salonA.getSalonLastMessage());
             holder.civ.setImageResource(imageId[0]);
             } else {
-                holder.tvRoomName.setText(salonAll.getSalon());
-                holder.tvLastMessage.setText(salonAll.getSalonLastMessage());
+                holder.tvRoomName.setText(salonM.getSalon());
+                holder.tvLastMessage.setText(salonM.getSalonLastMessage());
             }
 
         holder.civ.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +76,7 @@ public class CustomAdapterSalon extends ArrayAdapter<FirebaseSalonAdmin> {
             public void onClick(View v) {
 
                 if(mListener != null){
-                    mListener.onClick(salonAll.getSalonId(), salonAll.getSalon());
+                    mListener.onClick(salonA.getSalonId(), salonA.getSalon());
                 }
             }
         });

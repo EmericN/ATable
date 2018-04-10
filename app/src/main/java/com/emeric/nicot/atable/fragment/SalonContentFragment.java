@@ -27,9 +27,11 @@ import android.widget.ListView;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
+import com.emeric.nicot.atable.adapter.CustomAdapterRoom;
 import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
+import com.emeric.nicot.atable.models.AdapterCallbackRoom;
 import com.emeric.nicot.atable.models.ChatMessage;
-import com.emeric.nicot.atable.models.FirebaseSalonAdmin;
+import com.emeric.nicot.atable.models.FirebaseSalon;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,6 +42,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
@@ -48,14 +51,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SalonContentFragment extends Fragment {
+public class SalonContentFragment extends Fragment implements AdapterCallbackRoom {
 
-    public ArrayList<FirebaseSalonAdmin> salon,salonAdmin,salonMembre,salonIdAdmin,salonIdMembre;
-    CustomAdapterSalon adapter;
-    private ListView LV;
+    public ArrayList<FirebaseSalon> salon, salonAdmin, salonMembre, salonIdAdmin;
     private FirebaseAuth mAuth;
     private String userId;
-    private String userName;
     private String TAG = "debug firestore";
     private Long tsLong;
     private String date;
@@ -65,9 +65,14 @@ public class SalonContentFragment extends Fragment {
     private CollectionReference CollRef;
     private BottomSheetDialog mBottomSheetDialog;
     private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView mRecyclerViewRoom;
+    private RecyclerView.LayoutManager mLayloutManager;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.tab_salon_list, null);
 
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
@@ -81,13 +86,67 @@ public class SalonContentFragment extends Fragment {
         Calendar calander = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("EEE, HH:mm");
         date = simpledateformat.format(calander.getTime());
-        docRef = mFirestore.collection("chats").document();
         CollRef = mFirestore.collection("chats");
+        mLayloutManager = new LinearLayoutManager(getContext());
+        mRecyclerViewRoom = v.findViewById(R.id.recycler_view_room);
+        mRecyclerViewRoom.setLayoutManager(mLayloutManager);
+        mRecyclerViewRoom.setHasFixedSize(true);
+        mAdapter = new CustomAdapterRoom(this, salonAdmin, salonMembre, this);
+        mRecyclerViewRoom.setAdapter(mAdapter);
 
-        View v = inflater.inflate(R.layout.tab_salon_list, null);
-        FloatingActionButton floatAdd = v.findViewById(R.id.FloatButtonAdd);
-        LV = v.findViewById(R.id.ListView);
+        FloatingActionButton floatAddSalon = v.findViewById(R.id.FloatButtonAdd);
         swipeRefreshLayout = v.findViewById(R.id.swiperefreshRooms);
+
+       /* mAdapter = new CustomAdapterSalon(getContext(), R.layout.list_item_salon, salonAdmin, salonMembre, new CustomAdapterSalon.OnClickListener() {
+            @Override
+            public void onClick(final String salonId, final String nomSalon) {
+
+                Integer[] image = {R.drawable.emotatable, R.drawable.sticker2};
+
+                mBottomSheetDialog = new BottomSheetDialog(getContext());
+                View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
+                RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
+                recyclerView.setHasFixedSize(true);
+                mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+                recyclerView.setLayoutManager(mLayoutManager);
+                recyclerView.setAdapter(new CustomAdapter(getContext(), image, new CustomAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(Integer item) {
+
+                        ChatMessage newMessage = new ChatMessage();
+
+                        Map<String, Object> notification = new HashMap<>();
+                        notification.put("roomID", salonId);
+                        notification.put("roomName", nomSalon);
+                        notification.put("userName", userName);
+                        notification.put("message", userName + " a envoyé un sticker.");
+                        notification.put("emot", item.toString());
+
+                        Map<String, Object> last_message = new HashMap<>();
+                        last_message.put("last_message", userName + " a envoyé un sticker.");
+
+                        newMessage.idSender = userId;
+                        newMessage.timestamp = date;
+                        newMessage.name = userName;
+                        newMessage.emot = item.toString();
+                        mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);
+                        mFirestore.collection("notifications").document().set(notification);
+                        mFirestore.collection("chats").document(salonId).update(last_message);
+                        mBottomSheetDialog.dismiss();
+                        // TODO looking for adding persistent listener for chat preview : adapter.notifyDataSetChanged();
+                    }
+                }));
+                mBottomSheetDialog.setContentView(view);
+                mBottomSheetDialog.show();
+                mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        mBottomSheetDialog = null;
+                    }
+                });
+            }
+
+        });*/
 
         if (currentUser != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -97,6 +156,7 @@ public class SalonContentFragment extends Fragment {
         } else {
         }
 
+
         // Refresh list of rooms
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -105,27 +165,27 @@ public class SalonContentFragment extends Fragment {
             }
         });
 
-        LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
                 Intent i = new Intent(getContext(), SalonActivity.class);
-                FirebaseSalonAdmin PossalonAdmin = salon.get(position);
+                FirebaseSalon PossalonAdmin = salon.get(position);
                 i.putExtra("NomSalon", PossalonAdmin.getSalon());
                 i.putExtra("SalonId", PossalonAdmin.getSalonId());
                 i.putExtra("userId", userId);
                 i.putExtra("userName", userName);
 
-                if (position < salon.size()-salonMembre.size()) {
+                if (position < salon.size() - salonMembre.size()) {
                     i.putExtra("tag", "admin");
                 } else {
                     i.putExtra("tag", "member");
                 }
                 startActivity(i);
             }
-        });
+        });*/
 
-        floatAdd.setOnClickListener(new View.OnClickListener() {
+        floatAddSalon.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -136,7 +196,7 @@ public class SalonContentFragment extends Fragment {
                 alert.setPositiveButton("Créer", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         final String nomsalon = edittext.getText().toString();
-
+                        docRef = mFirestore.collection("chats").document();
                         Map<String, Object> chatsMap = new HashMap<>();
                         chatsMap.put("nom", nomsalon);
                         chatsMap.put("admin", userId);
@@ -206,64 +266,10 @@ public class SalonContentFragment extends Fragment {
     }
 
     public void refreshRooms() {
-
-
         salon.clear();
         salonMembre.clear();
         salonAdmin.clear();
-        adapter = new CustomAdapterSalon(getContext(), R.layout.list_item_salon, salon, salonAdmin, salonMembre, new CustomAdapterSalon.OnClickListener() {
-            @Override
-            public void onClick(final String salonId, final String nomSalon) {
-                
-                Integer [] image = {R.drawable.emotatable, R.drawable.sticker2};
-
-                mBottomSheetDialog = new BottomSheetDialog(getContext());
-                View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
-                RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
-                recyclerView.setHasFixedSize(true);
-                mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setAdapter(new CustomAdapter(getContext(), image, new CustomAdapter.OnItemClickListener(){
-                    @Override
-                    public void onItemClick(Integer item) {
-
-                        ChatMessage newMessage = new ChatMessage();
-
-                        Map<String, Object> notification = new HashMap<>();
-                        notification.put("roomID", salonId);
-                        notification.put("roomName", nomSalon);
-                        notification.put("userName", userName);
-                        notification.put("message", userName+" a envoyé un sticker.");
-                        notification.put("emot", item.toString());
-
-                        Map<String, Object> last_message = new HashMap<>();
-                        last_message.put("last_message", userName+" a envoyé un sticker.");
-
-                        newMessage.idSender = userId;
-                        newMessage.timestamp = date;
-                        newMessage.name = userName;
-                        newMessage.emot = item.toString();
-                        mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);
-                        mFirestore.collection("notifications").document().set(notification);
-                        mFirestore.collection("chats").document(salonId).update(last_message);
-                        mBottomSheetDialog.dismiss();
-                        // TODO looking for adding persistent listener for chat preview : adapter.notifyDataSetChanged();
-                    }
-                }));
-                mBottomSheetDialog.setContentView(view);
-                mBottomSheetDialog.show();
-                mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        mBottomSheetDialog = null;
-                    }
-                });
-            }
-
-        });
-        LV.setAdapter(adapter);
-
-        mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        /*mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -277,33 +283,63 @@ public class SalonContentFragment extends Fragment {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
-        });
+        });*/
 
         mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
                         if (document != null && document.exists()) {
-                            Log.d(TAG, document.getId() + " => Admin : " + document.get("nom"));
+                            Log.d(TAG, "ID ADMIN : " + document.getId() + " => Admin : " +
+                                       document.get("nom"));
                             String salonAdm = (String) document.get("nom");
                             String salonIdAdm = document.getId();
                             String salonLastMessageAdm = (String) document.get("last_message");
-                            FirebaseSalonAdmin addedSalonAdmin = new FirebaseSalonAdmin(salonAdm, salonIdAdm, salonLastMessageAdm);
+                            FirebaseSalon addedSalonAdmin = new FirebaseSalon(salonAdm, salonIdAdm, salonLastMessageAdm);
                             salonAdmin.add(addedSalonAdmin);
-                            adapter.notifyDataSetChanged();
-                        }else {
+                            mAdapter.notifyDataSetChanged();
+                        } else {
                             Log.d(TAG, "No admin rooms : ", task.getException());
                         }
                     }
-                    salon.addAll(salonAdmin);
+                    //salon.addAll(salonAdmin);
                 } else {
                     Log.d(TAG, "Error getting admin rooms : ", task.getException());
                 }
             }
-        }).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        });
+
+        String idMember = "members."+userId;
+        mFirestore.collection("chats").whereEqualTo(idMember, true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot snapshots) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (document != null && document.exists()) {
+                            Log.d(TAG, "ID MEMBRE : " + document.getId() + " => Membre : " +
+                                       document.get("nom"));
+                            String salonMemb = (String) document.get("nom");
+                            String salonIdMemb = document.getId();
+                            String salonLastMessageMemb = (String) document.get("last_message");
+                            FirebaseSalon addedSalonMembre = new FirebaseSalon(salonMemb, salonIdMemb, salonLastMessageMemb);
+                            salonMembre.add(addedSalonMembre);
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.d(TAG, "No member rooms : ", task.getException());
+                        }
+                    }
+                    //salon.addAll(salonAdmin);
+                } else {
+                    Log.d(TAG, "Error getting member rooms : ", task.getException());
+                }
+            }
+        });
+
+
+        //.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        //@Override
+           /* public void onSuccess(QuerySnapshot snapshots) {
                 // GET all membre rooms
                 mFirestore.collection("members").whereEqualTo("userId", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -318,22 +354,20 @@ public class SalonContentFragment extends Fragment {
                                             if (task.isSuccessful()) {
                                                 DocumentSnapshot document = task.getResult();
                                                 if (document != null && document.exists()) {
-                                                    Log.d(TAG, document.getId() + " => Membre : " +
-                                                               document.get("nom"));
+                                                    Log.d(TAG, document.getId() + " => Membre : " + document.get("nom"));
                                                     String salonMemb = (String) document.get("nom");
                                                     String salonIdMemb = document.getId();
                                                     String salonLastMessageMemb = (String) document.get("last_message");
-                                                    FirebaseSalonAdmin addedSalonMembre = new FirebaseSalonAdmin(salonMemb, salonIdMemb, salonLastMessageMemb);
+                                                    FirebaseSalon addedSalonMembre = new FirebaseSalon(salonMemb, salonIdMemb, salonLastMessageMemb);
                                                     salonMembre.add(addedSalonMembre);
                                                     adapter.notifyDataSetChanged();
                                                 }else{
                                                     Log.d(TAG, "aucun doc");
                                                 }
+
                                             } else {
                                                 Log.d(TAG, "erreur sur le listener");
                                             }
-                                            salon.addAll(salonMembre);
-
                                         }
                                     });
                                 }
@@ -341,17 +375,72 @@ public class SalonContentFragment extends Fragment {
                                     Log.d(TAG, "No member room detected : ", task.getException());
                                 }
                             }
+                            salon.addAll(salonMembre);
                         } else {
                             Log.d(TAG, "Error getting membre rooms : ", task.getException());
                         }
                     }
                 });
-            }
-        });
+            }*/
+        //});
 
+       /* FirebaseSalon addedSalon2 = new FirebaseSalon("yo2", "yo2", "yo2");
+        salonMembre.add(addedSalon2);
+        FirebaseSalon addedSalon1 = new FirebaseSalon("yo", "yo", "yo");
+        salonAdmin.add(addedSalon1);
+        adapter.notifyDataSetChanged();*/
 
         if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+
+    @Override
+    public void onMethodCallback(final String nomSalon, final String salonId) {
+
+        Integer[] image = {R.drawable.emotatable, R.drawable.sticker2};
+
+        mBottomSheetDialog = new BottomSheetDialog(getContext());
+        View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
+        recyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(new CustomAdapter(getContext(), image, new CustomAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Integer item) {
+
+                ChatMessage newMessage = new ChatMessage();
+
+                Map<String, Object> notification = new HashMap<>();
+                notification.put("roomID", salonId);
+                notification.put("roomName", nomSalon);
+                //notification.put("userName", userName);
+                //notification.put("message", userName + " a envoyé un sticker.");
+                notification.put("emot", item.toString());
+
+                Map<String, Object> last_message = new HashMap<>();
+               // last_message.put("last_message", userName + " a envoyé un sticker.");
+
+                newMessage.idSender = userId;
+                newMessage.timestamp = date;
+                //newMessage.name = userName;
+                newMessage.emot = item.toString();
+                mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);
+                mFirestore.collection("notifications").document().set(notification);
+                mFirestore.collection("chats").document(salonId).update(last_message);
+                mBottomSheetDialog.dismiss();
+                // TODO looking for adding persistent listener for chat preview : adapter.notifyDataSetChanged();
+            }
+        }));
+        mBottomSheetDialog.setContentView(view);
+        mBottomSheetDialog.show();
+        mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mBottomSheetDialog = null;
+            }
+        });
     }
 }

@@ -41,33 +41,6 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
     private ArrayList<FirebaseSalonRequest> salonRequest;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
-        Log.d(TAG, "Salon accepté : " + NomSalon);
-        // Delete pending invitation
-        mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "invitation supprimé");
-                Map<String, Object> members = new HashMap<>();
-                members.put("userId", userId);
-                members.put("roomId", salonId);
-
-                mFirestore.collection("members").document().set(members).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Member added");
-                        Toast.makeText(NotificationActivity.this, "Invitation acceptée" ,
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
-
-        FirebaseMessaging.getInstance().subscribeToTopic(salonId);
-        mAdapter.notifyDataSetChanged();
-    }
-
-
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +65,7 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
         mRecyclerViewChat.setAdapter(mAdapter);
         mFirestore = FirebaseFirestore.getInstance();
         mSwipeRefreshLayout = findViewById(R.id.swiperefreshNotif);
+
         RefreshRequest();
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -135,5 +109,31 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+    public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
+        Log.d(TAG, "Salon accepté : " + NomSalon);
+        // Delete pending invitation
+        mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG, "invitation supprimé");
+                Map<String, Object> members = new HashMap<>();
+                Map<String, Object> infoMember = new HashMap<>();
+                infoMember.put(userId,true);
+                members.put("members",infoMember);
+                mFirestore.collection("chats").document(salonId).update(members).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Member added");
+                        Toast.makeText(NotificationActivity.this, "Invitation acceptée" ,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        FirebaseMessaging.getInstance().subscribeToTopic(salonId);
+        mAdapter.notifyDataSetChanged();
     }
 }
