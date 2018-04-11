@@ -62,7 +62,7 @@ public class CustomAdapterRoom extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((CustomAdapterRoom.ViewHolder) holder).clickableImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAdapterCallback.onMethodCallback(salonPosition.getSalon(), salonPosition.getSalonId());
+                mAdapterCallback.onMethodCallbackQuickSticker(salonPosition.getSalon(), salonPosition.getSalonId());
             }
         });
     }
@@ -72,7 +72,7 @@ public class CustomAdapterRoom extends RecyclerView.Adapter<RecyclerView.ViewHol
         return salonAdmin.size()+salonMembre.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    private class ViewHolder extends RecyclerView.ViewHolder {
         private TextView textViewRoomName;
         private TextView textViewLastMessage;
         private ImageView clickableImageView;
@@ -82,6 +82,13 @@ public class CustomAdapterRoom extends RecyclerView.Adapter<RecyclerView.ViewHol
             textViewRoomName = itemView.findViewById(R.id.nomSalon);
             textViewLastMessage = itemView.findViewById(R.id.lastMessage);
             clickableImageView = itemView.findViewById(R.id.clickableImageViewCrown);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mAdapterCallback.onMethodCallbackEnterRoom(salonAll, getAdapterPosition());
+                }
+            });
         }
     }
 }

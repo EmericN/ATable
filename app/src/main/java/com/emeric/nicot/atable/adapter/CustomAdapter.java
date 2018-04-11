@@ -51,7 +51,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
          private ViewHolder(View itemView) {
             super(itemView);
-            emot = (ImageView) itemView.findViewById(R.id.emot);
+            emot = itemView.findViewById(R.id.emot);
         }
          private void bind(final Integer item, final OnItemClickListener listener) {
 
