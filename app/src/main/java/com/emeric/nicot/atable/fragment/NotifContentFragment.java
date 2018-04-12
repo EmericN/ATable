@@ -62,7 +62,7 @@ public class NotifContentFragment extends Fragment {
                 mFirestore.collection("members").document().set(members).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Member added");
+                        Log.d(TAG, "Members added");
                         Toast.makeText(getContext(), "Invitation acceptée" ,
                                 Toast.LENGTH_LONG).show();
                     }

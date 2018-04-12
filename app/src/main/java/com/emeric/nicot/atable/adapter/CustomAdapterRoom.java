@@ -92,7 +92,3 @@ public class CustomAdapterRoom extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 }
-
-
-//TODO work on this customadapter : callback on row click & callback for clickableImageView click !
-// TODO try to merge AdapterCallback too !

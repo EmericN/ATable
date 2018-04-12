@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
 import com.emeric.nicot.atable.models.AdapterCallback;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
+import com.emeric.nicot.atable.models.Members;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -40,6 +41,7 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
     private FirebaseAuth mAuth;
     private ArrayList<FirebaseSalonRequest> salonRequest;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private Members existingMembers;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -112,26 +114,39 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
     }
 
     public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
+        //Firestore don't implement update method on Object so I get all existing members and I add the new one
         Log.d(TAG, "Salon accepté : " + NomSalon);
-        // Delete pending invitation
-        mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+        mFirestore.collection("chats").document(salonId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "invitation supprimé");
-                Map<String, Object> members = new HashMap<>();
-                Map<String, Object> infoMember = new HashMap<>();
-                infoMember.put(userId,true);
-                members.put("members",infoMember);
-                mFirestore.collection("chats").document(salonId).update(members).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Member added");
-                        Toast.makeText(NotificationActivity.this, "Invitation acceptée" ,
-                                Toast.LENGTH_LONG).show();
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        Log.d(TAG, "GET DATA FROM DB CHATS : " + document.get("members"));
+                        existingMembers = document.toObject(Members.class);
+                    } else {
+                        Log.d(TAG, "No such document");
                     }
-                });
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
             }
         });
+
+         Map<String, Object> allMembers = new HashMap<>();
+         HashMap<String,Boolean> members = existingMembers.getMembers();
+         members.put(userId,true);
+         allMembers.put("members",members);
+
+         mFirestore.collection("chats").document(salonId).update(allMembers).addOnSuccessListener(new OnSuccessListener<Void>() {
+              @Override
+              public void onSuccess(Void aVoid) {
+                  Log.d(TAG, "Members added");
+                  mFirestore.collection("pending").document(idDoc).delete(); //Delete pending row
+                  Toast.makeText(NotificationActivity.this, "Invitation acceptée",
+                          Toast.LENGTH_LONG).show();
+              }
+         });
 
         FirebaseMessaging.getInstance().subscribeToTopic(salonId);
         mAdapter.notifyDataSetChanged();

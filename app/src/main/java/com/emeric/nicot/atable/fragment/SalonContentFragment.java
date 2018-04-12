@@ -234,8 +234,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
             }
         });
 
-        String idMember = "members."+userId;
-        mFirestore.collection("chats").whereEqualTo(idMember, true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        mFirestore.collection("chats").whereEqualTo("members."+userId, true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
