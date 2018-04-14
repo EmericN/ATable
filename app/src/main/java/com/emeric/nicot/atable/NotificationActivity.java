@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
-import com.emeric.nicot.atable.models.AdapterCallback;
+import com.emeric.nicot.atable.models.AdapterCallbackNotif;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 import com.emeric.nicot.atable.models.Members;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotificationActivity extends AppCompatActivity  implements AdapterCallback {
+public class NotificationActivity extends AppCompatActivity  implements AdapterCallbackNotif {
 
     private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayloutManager;
@@ -87,6 +87,7 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
     }
 
     private void RefreshRequest() {
+        salonRequest.clear();
         CollectionReference colRef = mFirestore.collection("pending");
         colRef.whereEqualTo("idPending", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -113,9 +114,25 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
         }
     }
 
-    public void onMethodCallback(String NomSalon, final String salonId, final String idDoc) {
+    private void addMember(String salonId, final String idDoc, Map<String,Object> memberMap){
+        mFirestore.collection("chats").document(salonId).set(memberMap, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Member added");
+                mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(NotificationActivity.this, "Invitation acceptée",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+    }
+
+    public void onMethodCallbackTick(String nomSalon, final String salonId, final String idDoc) {
         //Firestore don't implement update method on Object so I get all existing members and I add the new one
-        Log.d(TAG, "Salon accepté : " + NomSalon);
+        Log.d(TAG, "Salon accepté : " + nomSalon);
         mFirestore.collection("chats").document(salonId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -152,13 +169,12 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
         mAdapter.notifyDataSetChanged();
     }
 
-    private void addMember(String salonId, final String idDoc, Map<String,Object> memberMap){
-        mFirestore.collection("chats").document(salonId).set(memberMap, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+    @Override
+    public void onMethodCallbackCross(final String nomSalon, String idDoc) {
+        mFirestore.collection("pending").document(idDoc).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Member added");
-                mFirestore.collection("pending").document(idDoc).delete(); //Delete pending row
-                Toast.makeText(NotificationActivity.this, "Invitation acceptée",
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(NotificationActivity.this, "Invitation à "+nomSalon+" refusé",
                         Toast.LENGTH_LONG).show();
             }
         });

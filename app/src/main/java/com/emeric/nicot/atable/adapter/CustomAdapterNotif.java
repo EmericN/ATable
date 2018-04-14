@@ -2,10 +2,7 @@ package com.emeric.nicot.atable.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.models.AdapterCallback;
+import com.emeric.nicot.atable.models.AdapterCallbackNotif;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;
 
 import java.util.ArrayList;
@@ -23,46 +20,16 @@ public class CustomAdapterNotif extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private Context context;
     private ArrayList<FirebaseSalonRequest> salonRequest;
-    private AdapterCallback mAdapterCallback;
+    private AdapterCallbackNotif mAdapterCallbackNotif;
 
     public CustomAdapterNotif(Context context,
                               ArrayList<FirebaseSalonRequest> salonRequest,
-                              AdapterCallback callback) {
+                              AdapterCallbackNotif callback) {
 
         this.salonRequest = salonRequest;
         this.context = context;
-        this.mAdapterCallback = callback;
+        this.mAdapterCallbackNotif = callback;
     }
-
-    /*public View getView(int position, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
-        View row;
-
-        row = LayoutInflater.from(convertView.getContext()).inflate(layoutResourceId, parent, false);
-        holder.tv = (TextView) row.findViewById(R.id.nomSalonInv);
-        final FirebaseSalonRequest salonFriendRequest = salonRequest.get(position);
-        row.setTag(holder);
-        String TAG = "debug notif";
-        Log.d(TAG, "Tableau de friend request : " + salonRequest.size());
-        holder.tv.setText(salonFriendRequest.getSalon());
-
-        FloatingActionButton floatAddFriend = row.findViewById(R.id.floatingActionButtonAccept);
-
-        floatAddFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                CoordinatorLayout cl = (CoordinatorLayout) v.getParent();
-                TextView tv = cl.findViewById(R.id.nomSalonInv);
-                String NomSalon = tv.getText().toString();
-
-                mAdapterCallback.onMethodCallback(NomSalon, salonFriendRequest.getSalonId(), salonFriendRequest.getIdDoc());
-            }
-        });
-
-
-        return row;
-    }*/
 
     @NonNull
     @Override
@@ -80,7 +47,7 @@ public class CustomAdapterNotif extends RecyclerView.Adapter<RecyclerView.ViewHo
         ((ViewHolder) holder).imageButtonTick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAdapterCallback.onMethodCallback(salonRequest.get(position).getSalon(), salonRequest.get(position).getSalonId(), salonRequest.get(position).getIdDoc());
+                mAdapterCallbackNotif.onMethodCallbackTick(salonRequest.get(position).getSalon(), salonRequest.get(position).getSalonId(), salonRequest.get(position).getIdDoc());
                 salonRequest.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position,salonRequest.size());
@@ -90,7 +57,10 @@ public class CustomAdapterNotif extends RecyclerView.Adapter<RecyclerView.ViewHo
         ((ViewHolder) holder).imageButtonCross.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO delete invitation
+                mAdapterCallbackNotif.onMethodCallbackCross(salonRequest.get(position).getSalon(), salonRequest.get(position).getIdDoc());
+                salonRequest.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position,salonRequest.size());
             }
         });
 
