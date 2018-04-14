@@ -129,6 +129,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                         chatsMap.put("nom", nomsalon);
                         chatsMap.put("admin", userId);
                         chatsMap.put("created_at", tsLong);
+                        chatsMap.put("members", "");
 
                         docRef.set(chatsMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

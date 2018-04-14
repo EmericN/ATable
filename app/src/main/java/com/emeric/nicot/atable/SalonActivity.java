@@ -196,7 +196,7 @@ public class SalonActivity extends AppCompatActivity {
             });
         } else {
             invalidateOptionsMenu();
-            buttonEmot.setVisibility(View.INVISIBLE);
+            buttonEmot.setClickable(false);
         }
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -315,8 +315,7 @@ public class SalonActivity extends AppCompatActivity {
                 final String friend = edittext.getText().toString();
                 String[] separate = friend.split(" ");
                 Log.d(TAG, separate[0] + "_" + separate[1]);
-               // collectionRefChat.document(salonId).collection("pending");
-               // collectionRefChat.document(salonId).collection("members");
+
                 collectionRefUser.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
                         .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

@@ -24,6 +24,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
@@ -98,7 +99,6 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
                         String idDoc = document.getId();
 
                         FirebaseSalonRequest addedSalonAdmin = new FirebaseSalonRequest(salonAdm, salonIdAdm, idDoc);
-
                         salonRequest.add(addedSalonAdmin);
                         mAdapter.notifyDataSetChanged();
                     }
@@ -133,22 +133,34 @@ public class NotificationActivity extends AppCompatActivity  implements AdapterC
             }
         });
 
-         Map<String, Object> allMembers = new HashMap<>();
-         HashMap<String,Boolean> members = existingMembers.getMembers();
-         members.put(userId,true);
-         allMembers.put("members",members);
+        if(existingMembers != null){
+            Map<String, Object> allMembers = new HashMap<>();
+            HashMap<String,Boolean> members = existingMembers.getMembers();
+            members.put(userId,true);
+            allMembers.put("members",members);
+            addMember(salonId,idDoc,allMembers);
 
-         mFirestore.collection("chats").document(salonId).update(allMembers).addOnSuccessListener(new OnSuccessListener<Void>() {
-              @Override
-              public void onSuccess(Void aVoid) {
-                  Log.d(TAG, "Members added");
-                  mFirestore.collection("pending").document(idDoc).delete(); //Delete pending row
-                  Toast.makeText(NotificationActivity.this, "Invitation acceptée",
-                          Toast.LENGTH_LONG).show();
-              }
-         });
+        } else {
+            Map<String, Object> firstMember = new HashMap<>();
+            Map<String, Object> member = new HashMap<>();
+            member.put(userId,true);
+            firstMember.put("members",member);
+            addMember(salonId,idDoc,firstMember);
+        }
 
         FirebaseMessaging.getInstance().subscribeToTopic(salonId);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void addMember(String salonId, final String idDoc, Map<String,Object> memberMap){
+        mFirestore.collection("chats").document(salonId).set(memberMap, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Member added");
+                mFirestore.collection("pending").document(idDoc).delete(); //Delete pending row
+                Toast.makeText(NotificationActivity.this, "Invitation acceptée",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

@@ -93,7 +93,7 @@ public class LoginChoiceActivity extends AppCompatActivity {
 
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
-//TODO manage to get smoother transition between loginActivity & MainActivity
+//TODO manage to get smoother transition between Facebooklogin & MainActivity
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
