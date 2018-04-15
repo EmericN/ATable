@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 if (position == 0) {
                     getSupportActionBar().setTitle("Salon");
                 } else {
-                    getSupportActionBar().setTitle("Notification");
+                    getSupportActionBar().setTitle("Création");
                 }
             }
 

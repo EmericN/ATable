@@ -19,16 +19,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterRoom;
-import com.emeric.nicot.atable.adapter.CustomAdapterSalon;
 import com.emeric.nicot.atable.models.AdapterCallbackRoom;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.FirebaseSalon;

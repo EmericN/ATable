@@ -1,7 +1,6 @@
 package com.emeric.nicot.atable;
 
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +15,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,8 +27,12 @@ import android.widget.Toast;
 
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
+import com.emeric.nicot.atable.adapter.CustomAdapterFindUser;
+import com.emeric.nicot.atable.models.AdapterCallbackFindUser;
 import com.emeric.nicot.atable.models.ChatMessage;
+import com.emeric.nicot.atable.models.ListUsers;
 import com.emeric.nicot.atable.models.Message;
+import com.emeric.nicot.atable.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -39,20 +43,23 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class SalonActivity extends AppCompatActivity {
+public class SalonActivity extends AppCompatActivity implements AdapterCallbackFindUser{
 
     private RecyclerView mRecyclerViewChat;
-    private RecyclerView.LayoutManager mLayloutManager2;
-    private RecyclerView.Adapter mAdapterChat;
-    private String nomSalon, ts, userId, salonId, tag;
+    private RecyclerView.LayoutManager mLayloutManager, mLayoutManagerFindUser;
+    private RecyclerView.Adapter mAdapterChat,mAdapterFindUser;
+    private String nomSalon, ts, userId, salonId, tag, userFindName;
     private EditText editTextSend;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
@@ -60,6 +67,9 @@ public class SalonActivity extends AppCompatActivity {
     private Message message;
     private String Date, userName;
     private BottomSheetDialog mBottomSheetDialog;
+    private ListUsers findUser;
+    private EditText editTextFindUser;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +91,8 @@ public class SalonActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         message = new Message();
+        findUser = new ListUsers();
+
         final Long tsLong = System.currentTimeMillis();
         Calendar calander = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
@@ -89,8 +101,8 @@ public class SalonActivity extends AppCompatActivity {
         ImageButton buttonEmot = findViewById(R.id.buttonEmot);
         editTextSend = findViewById(R.id.editTextSend);
         mRecyclerViewChat = findViewById(R.id.recycler_view_chat);
-        mLayloutManager2 = new LinearLayoutManager(this);
-        mRecyclerViewChat.setLayoutManager(mLayloutManager2);
+        mLayloutManager = new LinearLayoutManager(this);
+        mRecyclerViewChat.setLayoutManager(mLayloutManager);
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapterChat = new CustomAdapterChat(this, message, userId);
         mFirestore = FirebaseFirestore.getInstance();
@@ -130,61 +142,13 @@ public class SalonActivity extends AppCompatActivity {
                             newMessage.emot = doc.getDocument().getString("emot");
 
                             message.getListMessageData().add(newMessage);
-                            mLayloutManager2.scrollToPosition(
+                            mLayloutManager.scrollToPosition(
                                     message.getListMessageData().size() - 1);
                         }
                             mAdapterChat.notifyDataSetChanged();
                             mRecyclerViewChat.setAdapter(mAdapterChat);
                         }
                 });
-
-            //TODO Bug quand le recyclervier est vide ...
-          /*  mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
-                                           int oldTop, int oldRight, int oldBottom) {
-                    if (bottom < oldBottom) {
-                        mRecyclerViewChat.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRecyclerViewChat.smoothScrollToPosition(
-                                        mRecyclerViewChat.getAdapter().getItemCount() -
-                                        1);
-                            }
-                        }, 100);
-                    }
-                }
-            });*/
-
-
-        /*mFirestore.collection("chats").document(salonId).collection("messages")
-                .orderBy("timestamp", Query.Direction.ASCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot snapshots, FirebaseFirestoreException e) {
-                        for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                            ChatMessage newMessage = new ChatMessage();
-                            switch (doc.getType()) {
-                                case ADDED:
-                                    Log.d(TAG, "text : " + doc.getDocument().getString("text"));
-                                    newMessage.text = doc.getDocument().getString("text");
-                                    newMessage.timestamp = doc.getDocument().getString("timestamp");
-                                    newMessage.idSender = doc.getDocument().getString("idSender");
-                                    newMessage.name = doc.getDocument().getString("name");
-                                    message.getListMessageData().add(newMessage);
-                                    mAdapter2.notifyDataSetChanged();
-                                    mLayloutManager2.scrollToPosition(
-                                            message.getListMessageData().size() - 1);
-                                    break;
-                                case MODIFIED:
-                                    break;
-                                case REMOVED:
-                                    break;
-                            }
-                        }
-                        mRecyclerViewChat.setAdapter(mAdapter2);
-                    }
-                });*/
 
         if (tag.equals("admin")) {
 
@@ -236,7 +200,7 @@ public class SalonActivity extends AppCompatActivity {
 
         mBottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_emot);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(SalonActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -292,7 +256,7 @@ public class SalonActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.action_addFriend:
-                addFriend();
+                addFriend(this);
                 return true;
 
             case R.id.action_settings:
@@ -304,19 +268,65 @@ public class SalonActivity extends AppCompatActivity {
         }
     }
 
-    public void addFriend() {
-
+    public void addFriend(final AdapterCallbackFindUser callback) {
+        findUser.getListUsers().clear();
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        final EditText edittext = new EditText(this);
-        alert.setTitle("Ajouter une personne :");
-        alert.setView(edittext);
-        alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                final String friend = edittext.getText().toString();
-                String[] separate = friend.split(" ");
-                Log.d(TAG, separate[0] + "_" + separate[1]);
 
-                collectionRefUser.whereEqualTo("nom_prenom", separate[0] + "_" + separate[1])
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.invite_friend, null);
+        RecyclerView recyclerViewFindUser = view.findViewById(R.id.recycler_view_find_user);
+        editTextFindUser = view.findViewById(R.id.edit_text_find_user);
+        mLayoutManagerFindUser = new LinearLayoutManager(this);
+        recyclerViewFindUser.setLayoutManager(mLayoutManagerFindUser);
+        recyclerViewFindUser.setHasFixedSize(true);
+        mAdapterFindUser = new CustomAdapterFindUser(this, findUser, this);
+        recyclerViewFindUser.setAdapter(mAdapterFindUser);
+        alert.setView(view);
+        editTextFindUser.setMaxLines(1);
+
+        editTextFindUser.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                if(!charSequence.toString().isEmpty()) {
+                    mFirestore.collection("users").orderBy("nom").startAt(charSequence.toString()).endAt(
+                            charSequence.toString() +
+                            "\uf8ff").limit(5).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            findUser.getListUsers().clear();
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                Log.d(TAG, "Nom : " + doc.getString("nom"));
+                                Log.d(TAG, "Prenom : " + doc.getString("prenom"));
+
+                                Users users = new Users();
+                                users.nomPrenom = doc.getString("nom_prenom");
+
+
+                                findUser.getListUsers().add(users);
+                                }
+                                mAdapterFindUser.notifyDataSetChanged();
+                            }
+                    });
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                final String friend = editTextFindUser.getText().toString();
+
+                collectionRefUser.whereEqualTo("nom_prenom", friend)
                         .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -330,63 +340,34 @@ public class SalonActivity extends AppCompatActivity {
                                 InviteMap.put("roomName", nomSalon);
 
                                 mFirestore.collection("pending").document().set(InviteMap);
-                                Toast.makeText(getApplicationContext(), "Invitation envoyé à "+friend,
+                                Toast.makeText(getApplicationContext(),
+                                        "Invitation envoyé à " + friend,
                                         Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Log.d(TAG, "Error getting friend id : ", task.getException());
                         }
                     }
-
-
                 });
             }
-        });
-
-        alert.setNegativeButton("Quitter", new AlertDialog.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
+            });
+                alert.setNegativeButton("Quitter", new AlertDialog.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
             }
-        });
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        edittext.setLayoutParams(lp);
-        alert.setView(edittext);
-        final AlertDialog dialog = alert.create();
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setEnabled(false);
-
-        edittext.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
-
-            public void afterTextChanged(Editable s) {
-                if (TextUtils.isEmpty(s)) {
-                    dialog.getButton(
-                            AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                } else {
-                    dialog.getButton(
-                            AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                }
-            }
-        });
-    }
 
     private void friendlist() {
         //collectionRefChat
         //TODO dialog return friend list
-
     }
 
+    @Override
+    public void onMethodCallbackFindUser(String nomPrenom) {
+        editTextFindUser.setText(nomPrenom);
+    }
 }
 
 

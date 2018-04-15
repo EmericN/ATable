@@ -46,11 +46,7 @@ public class InscriptionActivity extends AppCompatActivity {
         inputMail = findViewById(R.id.editTextMail);
         inputPassword = findViewById(R.id.editTextMDP);
 
-        // Create button
-        Button btnCreateUser = (Button) findViewById(R.id.buttonEnvoyer);
-
-
-        // button click event
+        Button btnCreateUser = findViewById(R.id.buttonEnvoyer);
         btnCreateUser.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -58,7 +54,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
                 nom = inputNom.getText().toString();
                 prenom = inputPrenom.getText().toString();
-                nomPrenom = nom + "_" + prenom;
+                nomPrenom = nom + " " + prenom;
                 mail = inputMail.getText().toString();
                 password = inputPassword.getText().toString();
 
