@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.emeric.nicot.atable.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;

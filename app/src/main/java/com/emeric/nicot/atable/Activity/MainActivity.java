@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.fragment.NotifContentFragment;
 import com.emeric.nicot.atable.fragment.SalonContentFragment;
 import com.facebook.login.LoginManager;

@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapterNotif;
 import com.emeric.nicot.atable.models.AdapterCallbackNotif;
 import com.emeric.nicot.atable.models.FirebaseSalonRequest;

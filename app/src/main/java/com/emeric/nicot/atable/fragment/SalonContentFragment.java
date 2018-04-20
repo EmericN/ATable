@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.SalonActivity;
+import com.emeric.nicot.atable.Activity.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterRoom;
 import com.emeric.nicot.atable.models.AdapterCallbackRoom;
@@ -198,7 +198,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-                        userName = document.getString("prenom");
+                        userName = document.getString("prenom_nom");
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -314,8 +314,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
     public void onMethodCallbackEnterRoom(ArrayList<FirebaseSalon> salon, int position) {
         Intent i = new Intent(getContext(), SalonActivity.class);
         FirebaseSalon PosSalon = salon.get(position);
-        i.putExtra("NomSalon", PosSalon.getSalon());
-        i.putExtra("SalonId", PosSalon.getSalonId());
+        i.putExtra("nomSalon", PosSalon.getSalon());
+        i.putExtra("salonId", PosSalon.getSalonId());
         i.putExtra("userId", userId);
         i.putExtra("userName", userName);
 

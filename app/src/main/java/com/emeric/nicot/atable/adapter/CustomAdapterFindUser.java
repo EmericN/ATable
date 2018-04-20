@@ -13,19 +13,21 @@ import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.models.AdapterCallbackFindUser;
 import com.emeric.nicot.atable.models.ListUsers;
 
+import java.util.ArrayList;
+
 public class CustomAdapterFindUser extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private Context context;
-    private ListUsers users;
     private AdapterCallbackFindUser mAdapterCallbackUserFind;
     private String TAG="debug custom adapter user find";
+    private ArrayList<String> response;
 
     public CustomAdapterFindUser(Context context,
-                                 ListUsers users,
+                                 ArrayList<String> response,
                                  AdapterCallbackFindUser callback){
 
-        this.users = users;
         this.context = context;
+        this.response = response;
         this.mAdapterCallbackUserFind = callback;
     }
 
@@ -38,18 +40,18 @@ public class CustomAdapterFindUser extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-        ((CustomAdapterFindUser.ViewHolder) holder).textViewFindUser.setText(users.getListUsers().get(position).nomPrenom);
+        ((CustomAdapterFindUser.ViewHolder) holder).textViewFindUser.setText(response.get(position));
         ((ViewHolder) holder).textViewFindUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAdapterCallbackUserFind.onMethodCallbackFindUser(users.getListUsers().get(position).nomPrenom);
+                mAdapterCallbackUserFind.onMethodCallbackFindUser(response.get(position));
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return users.getListUsers().size();
+        return response.size();
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder {

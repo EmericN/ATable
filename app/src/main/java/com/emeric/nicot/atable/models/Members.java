@@ -1,8 +1,6 @@
 package com.emeric.nicot.atable.models;
 
 
-import com.emeric.nicot.atable.MainActivity;
-
 import java.util.HashMap;
 
 public class Members {

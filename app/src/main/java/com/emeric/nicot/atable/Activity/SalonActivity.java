@@ -1,7 +1,9 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.Activity;
 
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
@@ -12,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,17 +23,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.adapter.CustomAdapterFindUser;
 import com.emeric.nicot.atable.models.AdapterCallbackFindUser;
 import com.emeric.nicot.atable.models.ChatMessage;
+import com.emeric.nicot.atable.models.JSONParser;
 import com.emeric.nicot.atable.models.ListUsers;
 import com.emeric.nicot.atable.models.Message;
-import com.emeric.nicot.atable.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -43,32 +44,32 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class SalonActivity extends AppCompatActivity implements AdapterCallbackFindUser{
+public class SalonActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewChat;
-    private RecyclerView.LayoutManager mLayloutManager, mLayoutManagerFindUser;
-    private RecyclerView.Adapter mAdapterChat,mAdapterFindUser;
-    private String nomSalon, ts, userId, salonId, tag, userFindName;
+    private RecyclerView.LayoutManager mLayloutManager;
+    private RecyclerView.Adapter mAdapterChat;
+    private String nomSalon, ts, userId, salonId, tag;
     private EditText editTextSend;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
-    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat, collectionRefUser;
+    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat,collectionRefUser;
     private Message message;
     private String Date, userName;
     private BottomSheetDialog mBottomSheetDialog;
-    private ListUsers findUser;
-    private EditText editTextFindUser;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -77,10 +78,10 @@ public class SalonActivity extends AppCompatActivity implements AdapterCallbackF
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            nomSalon = extras.getString("NomSalon");
+            nomSalon = extras.getString("nomSalon");
             userId = extras.getString("userId");
             tag = extras.getString("tag");
-            salonId = extras.getString("SalonId");
+            salonId = extras.getString("salonId");
             userName = extras.getString("userName");
         }
 
@@ -91,7 +92,6 @@ public class SalonActivity extends AppCompatActivity implements AdapterCallbackF
         ab.setDisplayHomeAsUpEnabled(true);
 
         message = new Message();
-        findUser = new ListUsers();
 
         final Long tsLong = System.currentTimeMillis();
         Calendar calander = Calendar.getInstance();
@@ -110,7 +110,6 @@ public class SalonActivity extends AppCompatActivity implements AdapterCallbackF
         collectionRefNotification = mFirestore.collection("notifications");
         collectionRefChat = mFirestore.collection("chats");
         collectionRefUser = mFirestore.collection("users");
-        DocumentReference docRefChat = mFirestore.collection("chats").document(salonId);
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,7 +255,7 @@ public class SalonActivity extends AppCompatActivity implements AdapterCallbackF
         switch (item.getItemId()) {
 
             case R.id.action_addFriend:
-                addFriend(this);
+                addFriend();
                 return true;
 
             case R.id.action_settings:
@@ -268,105 +267,17 @@ public class SalonActivity extends AppCompatActivity implements AdapterCallbackF
         }
     }
 
-    public void addFriend(final AdapterCallbackFindUser callback) {
-        findUser.getListUsers().clear();
-        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.invite_friend, null);
-        RecyclerView recyclerViewFindUser = view.findViewById(R.id.recycler_view_find_user);
-        editTextFindUser = view.findViewById(R.id.edit_text_find_user);
-        mLayoutManagerFindUser = new LinearLayoutManager(this);
-        recyclerViewFindUser.setLayoutManager(mLayoutManagerFindUser);
-        recyclerViewFindUser.setHasFixedSize(true);
-        mAdapterFindUser = new CustomAdapterFindUser(this, findUser, this);
-        recyclerViewFindUser.setAdapter(mAdapterFindUser);
-        alert.setView(view);
-        editTextFindUser.setMaxLines(1);
-
-        editTextFindUser.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                if(!charSequence.toString().isEmpty()) {
-                    mFirestore.collection("users").orderBy("nom").startAt(charSequence.toString()).endAt(
-                            charSequence.toString() +
-                            "\uf8ff").limit(5).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            findUser.getListUsers().clear();
-                            for (QueryDocumentSnapshot doc : task.getResult()) {
-                                Log.d(TAG, "Nom : " + doc.getString("nom"));
-                                Log.d(TAG, "Prenom : " + doc.getString("prenom"));
-
-                                Users users = new Users();
-                                users.nomPrenom = doc.getString("nom_prenom");
-
-
-                                findUser.getListUsers().add(users);
-                                }
-                                mAdapterFindUser.notifyDataSetChanged();
-                            }
-                    });
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        alert.setPositiveButton("Ajouter", new AlertDialog.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                final String friend = editTextFindUser.getText().toString();
-
-                collectionRefUser.whereEqualTo("nom_prenom", friend)
-                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.get("nom"));
-
-                                Map<String, Object> InviteMap = new HashMap<>();
-                                InviteMap.put("idPending", document.getId());
-                                InviteMap.put("roomId", salonId);
-                                InviteMap.put("roomName", nomSalon);
-
-                                mFirestore.collection("pending").document().set(InviteMap);
-                                Toast.makeText(getApplicationContext(),
-                                        "Invitation envoyé à " + friend,
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting friend id : ", task.getException());
-                        }
-                    }
-                });
-            }
-            });
-                alert.setNegativeButton("Quitter", new AlertDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                });
-                alert.show();
-            }
+    public void addFriend() {
+        Intent i = new Intent(getApplicationContext(), FindUserActivity.class);
+        i.putExtra("salonId", salonId);
+        i.putExtra("nomSalon", nomSalon);
+        i.putExtra("userName", userName);
+        startActivity(i);
+    }
 
     private void friendlist() {
         //collectionRefChat
         //TODO dialog return friend list
-    }
-
-    @Override
-    public void onMethodCallbackFindUser(String nomPrenom) {
-        editTextFindUser.setText(nomPrenom);
     }
 }
 

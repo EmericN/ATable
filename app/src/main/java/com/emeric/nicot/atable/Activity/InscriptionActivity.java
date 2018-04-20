@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable;
+package com.emeric.nicot.atable.Activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.emeric.nicot.atable.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,13 +32,13 @@ public class InscriptionActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private String nom, prenom, nomPrenom, mail, password;
+    private String nom, prenom, prenomNom, mail, password;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.classic_registration_activity);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
 
         // Edit Text
@@ -54,7 +55,7 @@ public class InscriptionActivity extends AppCompatActivity {
 
                 nom = inputNom.getText().toString();
                 prenom = inputPrenom.getText().toString();
-                nomPrenom = nom + " " + prenom;
+                prenomNom = prenom + " " + nom;
                 mail = inputMail.getText().toString();
                 password = inputPassword.getText().toString();
 
@@ -92,7 +93,7 @@ public class InscriptionActivity extends AppCompatActivity {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("nom", nom);
         userMap.put("prenom", prenom);
-        userMap.put("nom_prenom", nomPrenom);
+        userMap.put("prenom_nom", prenomNom);
         userMap.put("mail", user.getEmail());
 
         FirebaseFirestore.getInstance().collection("users").document(user.getUid())
