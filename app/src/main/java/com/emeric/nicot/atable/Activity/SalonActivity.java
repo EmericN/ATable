@@ -3,56 +3,35 @@ package com.emeric.nicot.atable.Activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
-import com.emeric.nicot.atable.adapter.CustomAdapterFindUser;
-import com.emeric.nicot.atable.models.AdapterCallbackFindUser;
 import com.emeric.nicot.atable.models.ChatMessage;
-import com.emeric.nicot.atable.models.JSONParser;
-import com.emeric.nicot.atable.models.ListUsers;
 import com.emeric.nicot.atable.models.Message;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,13 +41,13 @@ public class SalonActivity extends AppCompatActivity {
     private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayloutManager;
     private RecyclerView.Adapter mAdapterChat;
-    private String nomSalon, ts, userId, salonId, tag;
+    private String nomSalon, userId, salonId, tag;
     private EditText editTextSend;
     private FirebaseFirestore mFirestore;
     private String TAG = "debug add friend";
     private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat,collectionRefUser;
     private Message message;
-    private String Date, userName;
+    private String userName;
     private BottomSheetDialog mBottomSheetDialog;
 
 
@@ -84,6 +63,7 @@ public class SalonActivity extends AppCompatActivity {
             salonId = extras.getString("salonId");
             userName = extras.getString("userName");
         }
+        message = new Message();
 
         Toolbar mToolbar = findViewById(R.id.toolbarRoom);
         setSupportActionBar(mToolbar);
@@ -91,12 +71,6 @@ public class SalonActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        message = new Message();
-
-        final Long tsLong = System.currentTimeMillis();
-        Calendar calander = Calendar.getInstance();
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("HH:mm");
-        Date = simpledateformat.format(calander.getTime());
         ImageButton buttonSend = findViewById(R.id.buttonSend);
         ImageButton buttonEmot = findViewById(R.id.buttonEmot);
         editTextSend = findViewById(R.id.editTextSend);
@@ -118,6 +92,7 @@ public class SalonActivity extends AppCompatActivity {
             }
         });
 
+
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("tsLong", Query.Direction.ASCENDING)
                 .limit(20)
@@ -132,10 +107,8 @@ public class SalonActivity extends AppCompatActivity {
                         for (DocumentChange doc : value.getDocumentChanges()) {
 
                             ChatMessage newMessage = new ChatMessage();
-                            Log.d(TAG, "Message : " + doc.getDocument().getString("text"));
-                            Log.d(TAG, "Timestamp : " + doc.getDocument().getString("timestamp"));
                             newMessage.text = doc.getDocument().getString("text");
-                            newMessage.timestamp = doc.getDocument().getString("timestamp");
+                            newMessage.date = doc.getDocument().getString("date");
                             newMessage.idSender = doc.getDocument().getString("idSender");
                             newMessage.name = doc.getDocument().getString("name");
                             newMessage.emot = doc.getDocument().getString("emot");
@@ -179,9 +152,14 @@ public class SalonActivity extends AppCompatActivity {
                     Map<String, Object> last_message = new HashMap<>();
                     last_message.put("last_message", newMessage.text = content);
 
+                    Long tsLong = System.currentTimeMillis();
+                    Date curDate = new Date();
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    String DateToStr = format.format(curDate);
+
                     newMessage.text = content;
                     newMessage.idSender = userId;
-                    newMessage.timestamp = Date;
+                    newMessage.date = DateToStr;
                     newMessage.name = userName;
                     newMessage.emot = null;
                     newMessage.tsLong = tsLong;
@@ -208,6 +186,10 @@ public class SalonActivity extends AppCompatActivity {
             public void onItemClick(Integer item) {
 
                 ChatMessage newMessage = new ChatMessage();
+                Long tsLong = System.currentTimeMillis();
+                Date curDate = new Date();
+                SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                String DateToStr = format.format(curDate);
 
                 Map<String, Object> notification = new HashMap<>();
                 notification.put("roomID", salonId);
@@ -220,9 +202,10 @@ public class SalonActivity extends AppCompatActivity {
                 last_message.put("last_message", userName+" a envoyé un sticker.");
 
                 newMessage.idSender = userId;
-                newMessage.timestamp = Date;
+                newMessage.date = DateToStr;
                 newMessage.name = userName;
                 newMessage.emot = item.toString();
+                newMessage.tsLong = tsLong;
                 collectionRefMessage.document().set(newMessage);
                 collectionRefNotification.document().set(notification);
                 collectionRefChat.document(salonId).update(last_message);

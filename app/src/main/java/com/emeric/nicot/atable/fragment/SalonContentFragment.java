@@ -290,7 +290,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                 last_message.put("last_message", userName + " a envoyé un sticker.");
 
                 newMessage.idSender = userId;
-                newMessage.timestamp = date;
+                newMessage.date = date;
                 newMessage.name = userName;
                 newMessage.emot = item.toString();
                 mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);

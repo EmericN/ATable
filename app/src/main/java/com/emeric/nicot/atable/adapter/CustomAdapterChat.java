@@ -66,23 +66,23 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
         switch (holder.getItemViewType()) {
             case 0:
                 ((ViewHolder0) holder).SenderMessage.setText(message.getListMessageData().get(position).text);
-                ((ViewHolder0) holder).SenderTimestamp.setText(message.getListMessageData().get(position).timestamp);
+                ((ViewHolder0) holder).SenderTimestamp.setText(message.getListMessageData().get(position).date);
                 break;
 
             case 2:
                 ((ViewHolder2) holder).ReceiverMessage.setText(message.getListMessageData().get(position).text);
-                ((ViewHolder2) holder).ReceiverTimestamp.setText(message.getListMessageData().get(position).timestamp);
+                ((ViewHolder2) holder).ReceiverTimestamp.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder2) holder).ReceiverName.setText(message.getListMessageData().get(position).name);
                 break;
 
             case 4:
-                ((ViewHolder4) holder).SenderTimestampEmot.setText(message.getListMessageData().get(position).timestamp);
+                ((ViewHolder4) holder).SenderTimestampEmot.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder4) holder).SenderEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
                 break;
 
             case 6:
                 ((ViewHolder6) holder).ReceiverEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
-                ((ViewHolder6) holder).ReceiverTimestampEmot.setText(message.getListMessageData().get(position).timestamp);
+                ((ViewHolder6) holder).ReceiverTimestampEmot.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder6) holder).ReceiverNameEmot.setText(message.getListMessageData().get(position).name);
                 break;
         }
