@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.Activity.SalonActivity;
+import com.emeric.nicot.atable.activity.SalonActivity;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterRoom;
 import com.emeric.nicot.atable.models.AdapterCallbackRoom;
@@ -52,7 +52,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
 
     public ArrayList<FirebaseSalon> salonAdmin, salonMembre, salonIdAdmin;
     private FirebaseAuth mAuth;
-    private String userId, userName;
+    private String userId, userName, picUrl;
     private String TAG = "debug firestore";
     private Long tsLong;
     private String date;
@@ -199,6 +199,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         userName = document.getString("prenom_nom");
+                        picUrl = document.getString("picUrl");
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -318,6 +319,7 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
         i.putExtra("salonId", PosSalon.getSalonId());
         i.putExtra("userId", userId);
         i.putExtra("userName", userName);
+        i.putExtra("picUrl", picUrl);
 
         if (position < salon.size() - salonMembre.size()) {
             i.putExtra("tag", "admin");

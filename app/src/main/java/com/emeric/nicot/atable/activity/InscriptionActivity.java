@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable.Activity;
+package com.emeric.nicot.atable.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;

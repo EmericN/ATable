@@ -1,18 +1,13 @@
-package com.emeric.nicot.atable.Activity;
+package com.emeric.nicot.atable.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -39,17 +35,9 @@ import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
-
-import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser user;
     private FirebaseAuth mAuth;
     private String userId, facebookId;
-    private Bitmap facebookProfilPicture;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Glide.with(this)
                         .load("https://graph.facebook.com/" + facebookId + "/picture?type=normal")
-                        .apply(RequestOptions.circleCropTransform())
+                        .apply(new RequestOptions().circleCrop())
                         .into(new SimpleTarget<Drawable>() {
                             @Override
                             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {

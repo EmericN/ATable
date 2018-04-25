@@ -1,4 +1,4 @@
-package com.emeric.nicot.atable.Activity;
+package com.emeric.nicot.atable.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -127,6 +127,7 @@ public class LoginChoiceActivity extends AppCompatActivity {
         userMap.put("nom", separate[1]);
         userMap.put("prenom", separate[0]);
         userMap.put("nom_prenom", separate[1]+"_"+separate[0]);
+        userMap.put("picUrl", "https://graph.facebook.com/" + user.getProviderData().get(1).getUid() + "/picture?type=normal");
 
         FirebaseFirestore.getInstance().collection("users").document(user.getUid())
                 .set(userMap, SetOptions.merge())

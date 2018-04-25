@@ -11,21 +11,21 @@
                  android:theme="@style/AppTheme"
                  android:screenOrientation="portrait">
 
-       <activity android:name=".Activity.MainActivity">
+       <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-       <activity android:name=".Activity.InscriptionActivity"
+       <activity android:name=".activity.InscriptionActivity"
                  android:label="Inscription"
-                 android:parentActivityName=".Activity.LoginChoiceActivity">
+                 android:parentActivityName=".activity.LoginChoiceActivity">
            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                      android:value="com.emeric.nicot.atable.Activity.LoginChoiceActivity" />
+                      android:value="com.emeric.nicot.atable.activity.LoginChoiceActivity" />
        </activity>
 
-       <activity android:name=".Activity.LoginChoiceActivity"
+       <activity android:name=".activity.LoginChoiceActivity"
                  android:exported="true">
            <intent-filter>
                <action android:name="android.intent.action.VIEW" />
@@ -35,29 +35,29 @@
            </intent-filter>
        </activity>
 
-       <activity android:name=".Activity.SalonActivity"
-                 android:parentActivityName=".Activity.MainActivity">
+       <activity android:name=".activity.SalonActivity"
+                 android:parentActivityName=".activity.MainActivity">
            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                      android:value="com.emeric.nicot.atable.Activity.MainActivity" />
+                      android:value="com.emeric.nicot.atable.activity.MainActivity" />
        </activity>
 
-        <activity android:name=".Activity.NotificationActivity"
-                  android:parentActivityName=".Activity.MainActivity">
+        <activity android:name=".activity.NotificationActivity"
+                  android:parentActivityName=".activity.MainActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value="com.emeric.nicot.atable.Activity.MainActivity" />
+                       android:value="com.emeric.nicot.atable.activity.MainActivity" />
         </activity>
 
-        <activity android:name=".Activity.FindUserActivity"
-                  android:parentActivityName=".Activity.SalonActivity">
+        <activity android:name=".activity.FindUserActivity"
+                  android:parentActivityName=".activity.SalonActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value="com.emeric.nicot.atable.Activity.SalonActivity" />
+                       android:value="com.emeric.nicot.atable.activity.SalonActivity" />
         </activity>
 
-       <activity android:name=".Activity.LoginActivity"
+       <activity android:name=".activity.LoginActivity"
                  android:label="Login"
-                 android:parentActivityName=".Activity.LoginChoiceActivity">
+                 android:parentActivityName=".activity.LoginChoiceActivity">
         <meta-data android:name="android.support.PARENT_ACTIVITY"
-                   android:value="com.emeric.nicot.atable.Activity.LoginChoiceActivity" />
+                   android:value="com.emeric.nicot.atable.activity.LoginChoiceActivity" />
        </activity>
 
        <service android:name=".services.MyFirebaseMessagingService">

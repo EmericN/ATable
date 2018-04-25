@@ -1,9 +1,10 @@
-package com.emeric.nicot.atable.Activity;
+package com.emeric.nicot.atable.activity;
 
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,18 +19,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.bumptech.glide.Glide;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,10 +47,10 @@ public class SalonActivity extends AppCompatActivity {
     private RecyclerView mRecyclerViewChat;
     private RecyclerView.LayoutManager mLayloutManager;
     private RecyclerView.Adapter mAdapterChat;
-    private String nomSalon, userId, salonId, tag;
+    private String nomSalon, userId, salonId, tag, picUrl;
     private EditText editTextSend;
     private FirebaseFirestore mFirestore;
-    private String TAG = "debug add friend";
+    private String TAG = "debug salon";
     private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat,collectionRefUser;
     private Message message;
     private String userName;
@@ -62,6 +68,7 @@ public class SalonActivity extends AppCompatActivity {
             tag = extras.getString("tag");
             salonId = extras.getString("salonId");
             userName = extras.getString("userName");
+            picUrl = extras.getString("picUrl");
         }
         message = new Message();
 
@@ -78,7 +85,7 @@ public class SalonActivity extends AppCompatActivity {
         mLayloutManager = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager);
         mRecyclerViewChat.setHasFixedSize(true);
-        mAdapterChat = new CustomAdapterChat(this, message, userId);
+        mAdapterChat = new CustomAdapterChat(this, message, userId, Glide.with(this));
         mFirestore = FirebaseFirestore.getInstance();
         collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
         collectionRefNotification = mFirestore.collection("notifications");
@@ -91,7 +98,6 @@ public class SalonActivity extends AppCompatActivity {
                 finish();
             }
         });
-
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("tsLong", Query.Direction.ASCENDING)
@@ -106,16 +112,16 @@ public class SalonActivity extends AppCompatActivity {
                         }
                         for (DocumentChange doc : value.getDocumentChanges()) {
 
-                            ChatMessage newMessage = new ChatMessage();
+                            final ChatMessage newMessage = new ChatMessage();
                             newMessage.text = doc.getDocument().getString("text");
                             newMessage.date = doc.getDocument().getString("date");
                             newMessage.idSender = doc.getDocument().getString("idSender");
                             newMessage.name = doc.getDocument().getString("name");
                             newMessage.emot = doc.getDocument().getString("emot");
+                            newMessage.picUrl = doc.getDocument().getString("picUrl");
 
                             message.getListMessageData().add(newMessage);
-                            mLayloutManager.scrollToPosition(
-                                    message.getListMessageData().size() - 1);
+                            mLayloutManager.scrollToPosition(message.getListMessageData().size() - 1);
                         }
                             mAdapterChat.notifyDataSetChanged();
                             mRecyclerViewChat.setAdapter(mAdapterChat);
@@ -163,6 +169,8 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.name = userName;
                     newMessage.emot = null;
                     newMessage.tsLong = tsLong;
+                    newMessage.picUrl = picUrl;
+
                     collectionRefMessage.document().set(newMessage);
                     collectionRefNotification.document().set(notification);
                     collectionRefChat.document(salonId).update(last_message);
