@@ -1,12 +1,6 @@
 package com.emeric.nicot.atable.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,16 +16,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.fragment.NotifContentFragment;
 import com.emeric.nicot.atable.fragment.SalonContentFragment;
-import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -49,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser user;
     private FirebaseAuth mAuth;
     private String userId, facebookId;
+    private ImageView imageViewProfilPic;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,16 +59,6 @@ public class MainActivity extends AppCompatActivity {
             if (!user.getProviderData().isEmpty() && user.getProviderData().get(1).getProviderId().equals("facebook.com") ){
                 Log.d(TAG, "provider id : " + user.getProviderData().get(1).getUid());
                 facebookId = user.getProviderData().get(1).getUid();
-
-                Glide.with(this)
-                        .load("https://graph.facebook.com/" + facebookId + "/picture?type=normal")
-                        .apply(new RequestOptions().circleCrop())
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                mToolbar.setOverflowIcon(resource);
-                            }
-                        });
             }
             else{
                 Log.d(TAG, "provider id : " + user.getProviderData().get(1).getUid());
@@ -112,28 +98,37 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Salon");
-        }
-
-    public Bitmap BitmapCircularCroper(Bitmap bitmapimg) {
-        Bitmap output = Bitmap.createBitmap(bitmapimg.getWidth(),
-                bitmapimg.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmapimg.getWidth(),
-                bitmapimg.getHeight());
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawCircle(bitmapimg.getWidth() / 2,
-                bitmapimg.getHeight() / 2, bitmapimg.getWidth() / 2, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmapimg, rect, rect, paint);
-        return output;
     }
 
+    public boolean onPrepareOptionsMenu(Menu menu){
+        final MenuItem profilPicItem = menu.findItem(R.id.profil_pic_menu);
+        FrameLayout rootView = (FrameLayout) profilPicItem.getActionView();
+        imageViewProfilPic = rootView.findViewById(R.id.image_view_profil_pic_menu);
+
+        //TODO Work on placeholder & different url than facebook
+        Glide.with(this)
+                .load("")
+                .apply(new RequestOptions()
+                        .placeholder(R.drawable.ic_checked)
+                        .error(R.drawable.ic_checked)
+                        .circleCrop()
+                        .dontAnimate())
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        imageViewProfilPic.setImageDrawable(resource);
+                    }
+                });
+
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onOptionsItemSelected(profilPicItem);
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -150,12 +145,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
                 return true;
 
-            case R.id.action_settings:
-                mAuth.signOut();
-                LoginManager.getInstance().logOut();
-                Intent j = new Intent(getApplicationContext(), LoginChoiceActivity.class);
+            case R.id.profil_pic_menu:
+                Intent j = new Intent(getApplicationContext(), ProfilSettingsActivity.class);
+                j.putExtra("facebookId", facebookId);
                 startActivity(j);
-                finish();
                 return true;
 
             default:

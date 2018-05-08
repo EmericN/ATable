@@ -75,8 +75,13 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((ViewHolder0) holder).senderMessage.setText(message.getListMessageData().get(position).text);
                 ((ViewHolder0) holder).senderTimestamp.setText(message.getListMessageData().get(position).date);
                 glideRequest.load(message.getListMessageData().get(position).picUrl)
-                        .apply(new RequestOptions().override(80,80).circleCrop().dontAnimate())
+                        .apply(new RequestOptions().override(80, 80)
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked)
+                                .circleCrop()
+                                .dontAnimate())
                         .into(((ViewHolder0) holder).senderImageView);
+
                 break;
 
             case 2:

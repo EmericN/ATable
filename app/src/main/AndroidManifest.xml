@@ -60,6 +60,13 @@
                    android:value="com.emeric.nicot.atable.activity.LoginChoiceActivity" />
        </activity>
 
+        <activity android:name=".activity.ProfilSettingsActivity"
+                  android:label="Login"
+                  android:parentActivityName=".activity.MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value="com.emeric.nicot.atable.activity.MainActivity" />
+        </activity>
+
        <service android:name=".services.MyFirebaseMessagingService">
            <intent-filter>
                <action android:name="com.google.firebase.MESSAGING_EVENT"/>

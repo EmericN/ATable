@@ -3,7 +3,7 @@
     <string name="err_msg_email">Email requis</string>
     <string name="err_msg_password">Mot de passe requis</string>
     <string name="help">Help</string>
-    <string name="deconnexion">Deconnexion</string>
+    <string name="deconnexion">se déconnecter</string>
     <string name="APropos">A Propos</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <!--

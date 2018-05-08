@@ -8,7 +8,8 @@
         android:title="@string/notification"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/profil_pic_menu"
         android:title="@string/deconnexion"
-        app:showAsAction="never"/>
+        app:actionLayout="@layout/view_profil_pic_menu"
+        app:showAsAction="ifRoom"/>
 </menu>
