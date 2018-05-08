@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO Work on placeholder & different url than facebook
         Glide.with(this)
-                .load("")
+                .load("https://graph.facebook.com/" + facebookId + "/picture?type=normal")
                 .apply(new RequestOptions()
                         .placeholder(R.drawable.ic_checked)
                         .error(R.drawable.ic_checked)
