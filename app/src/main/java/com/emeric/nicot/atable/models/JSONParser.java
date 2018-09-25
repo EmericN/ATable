@@ -76,7 +76,7 @@ public class JSONParser {
 
                 JSONObject serveroff = new JSONObject();
                 try {
-                    serveroff.put("success", new Integer(3));
+                    serveroff.put("success", Integer.valueOf(3));
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }

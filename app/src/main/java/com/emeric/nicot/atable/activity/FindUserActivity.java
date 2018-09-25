@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class FindUserActivity extends AppCompatActivity implements AdapterCallbackFindUser{
 
-    private static final String urlGetUserFind ="http://192.168.1.24/atable/getUser.php";
+    private static final String urlGetUserFind ="http://192.168.1.24/Atable/getUser.php";
     private String TAG = "debug findUser";
     private String nomSalon, salonId, userName;
     private RecyclerView.Adapter mAdapterFindUser;
@@ -152,27 +152,37 @@ public class FindUserActivity extends AppCompatActivity implements AdapterCallba
 
 
         protected String doInBackground(String... args) {
+
+            Log.d(TAG, "text input : "+args[0]);
             findUserArray = new ArrayList<>();
             HashMap<String, String> params = new HashMap<>();
             params.put("user", args[0]);
 
-            JSONParser jsonParser = new JSONParser();
-            JSONObject json = jsonParser.makeHttpRequest(urlGetUserFind,
-                    "POST", params);
-
             try {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject json = jsonParser.makeHttpRequest(urlGetUserFind,
+                        "POST", params);
+
                 charsequenceMatchArray = json.getJSONArray("response");
-                Log.d(TAG, "charsequence JSON : "+charsequenceMatchArray.toString());
+
+                Log.d(TAG, "charsequence JSON : " + charsequenceMatchArray.toString());
                 findUserArray.clear();
 
-                for (int i = 0; i < charsequenceMatchArray.length(); i++) {
-                    String c = charsequenceMatchArray.getString(i);
-                    findUserArray.add(c);
-                    Log.d(TAG, "array find user : "+findUserArray.get(i));
+                if(charsequenceMatchArray.length() != 0) {
+                    for (int i = 0; i < charsequenceMatchArray.length(); i++) {
+                        String c = charsequenceMatchArray.getString(i);
+                        findUserArray.add(c);
+                        Log.d(TAG, "array find user : " + findUserArray.get(i));
+                    }
+                }else{
+                    findUserArray.add("Utilisateur introuvable");
                 }
                 mAdapterFindUser = new CustomAdapterFindUser(FindUserActivity.this, findUserArray, FindUserActivity.this);
-            } catch (JSONException e) {
+            }
+
+        catch (JSONException e) {
                 e.printStackTrace();
+                Log.d(TAG, "error JSON : "+e.getMessage());
             }
             return null;
         }

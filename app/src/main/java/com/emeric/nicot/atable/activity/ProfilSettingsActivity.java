@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,11 +23,13 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class ProfilSettingsActivity extends AppCompatActivity {
 
+    private static final String TAG = "debug profil settings ";
     private String facebookId;
     private Toolbar mToolbar;
     private ImageView imageViewProfilPicture;
-    private Button buttonDisconnect;
+    private Button buttonDisconnect, buttonChangeProfilPic;
     private FirebaseAuth mAuth;
+    public static final int PICK_IMAGE = 1;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,7 @@ public class ProfilSettingsActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         imageViewProfilPicture = findViewById(R.id.imageViewProfilPicture);
         buttonDisconnect = findViewById(R.id.buttonDisconnect);
+        buttonChangeProfilPic = findViewById(R.id.buttonChangeProfilPic);
         mToolbar = findViewById(R.id.toolbarProfilSettings);
 
         Bundle extras = getIntent().getExtras();
@@ -47,16 +50,21 @@ public class ProfilSettingsActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        Glide.with(this)
-                .load("https://graph.facebook.com/" + facebookId + "/picture?type=large")
-                .apply(new RequestOptions().placeholder(R.drawable.ic_checked).circleCrop())
-                .into(new SimpleTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                        imageViewProfilPicture.setImageDrawable(resource);
-                    }
-                });
-
+       if(facebookId == null){
+           imageViewProfilPicture.setImageResource(R.drawable.placeholderprofilpic);
+       }else {
+           Glide.with(this)
+                   .load("https://graph.facebook.com/" + facebookId + "/picture?type=large")
+                   .apply(new RequestOptions()
+                           .override(300, 300)
+                           .circleCrop())
+                   .into(new SimpleTarget<Drawable>() {
+                       @Override
+                       public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                           imageViewProfilPicture.setImageDrawable(resource);
+                       }
+                   });
+       }
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,6 +76,24 @@ public class ProfilSettingsActivity extends AppCompatActivity {
             }
         });
 
+        buttonChangeProfilPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO open camera or file explorer
+
+                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                getIntent.setType("image/*");
+
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
+
+                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+                startActivityForResult(chooserIntent, PICK_IMAGE);
+            }
+        });
+
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,5 +101,14 @@ public class ProfilSettingsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == PICK_IMAGE) {
+            //TODO: action
+            Log.d(TAG, "chosen image id : "+resultCode);
+        }
     }
 }
