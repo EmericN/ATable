@@ -25,7 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.emeric.nicot.atable.R;
-import com.emeric.nicot.atable.fragment.NotifContentFragment;
+import com.emeric.nicot.atable.fragment.CreativeContentFragment;
 import com.emeric.nicot.atable.fragment.SalonContentFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new SalonContentFragment(), "");
-        adapter.addFragment(new NotifContentFragment(), "");
+        adapter.addFragment(new CreativeContentFragment(), "");
         viewPager.setAdapter(adapter);
     }
 
