@@ -24,13 +24,16 @@ import java.util.ArrayList;
 public class CreativeContentFragment extends Fragment {
 
     private String TAG = "debug Creative TAB";
-    private TextView textView;
+    private TextView textViewCreativeTitle, textViewCreativeTitle2;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tab_creative, null);
-        textView = v.findViewById(R.id.textViewCreative);
-        textView.setText("CREATIVE !");
+        textViewCreativeTitle = v.findViewById(R.id.textViewCreativeTitle);
+        textViewCreativeTitle2 = v.findViewById(R.id.textViewCreativeTitle2);
+
+        textViewCreativeTitle.setText("Créer ton propre Sticker !");
+        textViewCreativeTitle2.setText("Choisi comment le créer ...");
 
         return v;
     }
