@@ -24,86 +24,82 @@
         android:textSize="12sp"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearlayout_camera"
+            android:layout_gravity="center"
             android:layout_marginTop="30dp"
-            android:layout_weight="1"
             android:background="#728a74"
-            android:orientation="vertical"
-            android:weightSum="3">
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="25dp"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_weight="1.5"
-                android:src="@drawable/ic_add_24dp"/>
+                android:src="@drawable/ic_photo_camera"/>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_weight="1"
                 android:gravity="center"
-                android:text="Inbox"
+                android:text="Prend une photo"
                 android:textColor="#fff"
                 android:textSize="12sp"/>
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearlayout_sticker"
+            android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:layout_weight="1"
             android:background="#a180a4"
-            android:orientation="vertical"
-            android:weightSum="3">
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="25dp"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_weight="1.5"
                 android:src="@drawable/ic_add_24dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_weight="1"
                 android:gravity="center"
-                android:text="Wishlist"
+                android:text="Dessine ton sticker"
                 android:textColor="#fff"
                 android:textSize="12sp"/>
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearlayout_import"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:background="#9d997e"
-            android:orientation="vertical"
-            android:weightSum="3">
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="25dp"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_weight="1.5"
                 android:src="@drawable/ic_add_24dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_weight="1"
                 android:gravity="center"
-                android:text="Search"
+                android:text="Importe une image"
                 android:textColor="#fff"
                 android:textSize="12sp"/>
 
