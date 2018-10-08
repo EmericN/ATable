@@ -19,29 +19,33 @@
             android:id="@+id/recycler_view_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/line"
+            android:layout_above="@+id/relativeLayoutNotch"
             android:background="@color/colorChat"/>
 
-        <View
-            android:id="@+id/line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_above="@id/editTextSend"
-            android:layout_marginBottom="7dp"
-            android:background="@color/colorGrey"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/relativeLayoutNotch"
+            android:layout_above="@+id/buttonSend">
 
-        <ImageButton
-            android:id="@+id/buttonEmot"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:background="#00000000"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_crown"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/notch"
+                android:adjustViewBounds="true"/>
+
+            <ImageButton
+                android:id="@+id/buttonEmot"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="#00000000"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_crown"/>
+
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/buttonSend"
@@ -62,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="7dp"
-            android:layout_toEndOf="@+id/buttonEmot"
+            android:layout_marginStart="20dp"
             android:layout_toStartOf="@+id/buttonSend"
             android:background="@drawable/layout_rounded"
             android:ems="10"
