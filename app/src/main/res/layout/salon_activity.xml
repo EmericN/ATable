@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:weightSum="1">
+              android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarRoom"
@@ -15,64 +14,96 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <FrameLayout
+            android:id="@+id/frame_layout_admin_choice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="200dp"
+            android:background="@color/colorTransparent"
+            android:elevation="1dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="30dp"
+                    android:layout_weight="1.0"/>
+
+                <Button
+                    android:id="@+id/button_sticker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_weight="1.0"/>
+
+            </LinearLayout>
+        </FrameLayout>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/relativeLayoutNotch"
+            android:layout_above="@+id/image_view_notch"
             android:background="@color/colorChat"/>
 
-        <RelativeLayout
+        <ImageView
+            android:id="@+id/image_view_notch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/relativeLayoutNotch"
-            android:layout_above="@+id/buttonSend">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/notch"
-                android:adjustViewBounds="true"/>
-
-            <ImageButton
-                android:id="@+id/buttonEmot"
-                android:layout_width="70dp"
-                android:layout_height="40dp"
-                android:background="#00000000"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="7dp"
-                android:src="@drawable/ic_crown"/>
-
-        </RelativeLayout>
+            android:layout_above="@+id/linear_layout_text"
+            android:adjustViewBounds="true"
+            android:src="@drawable/notch"/>
 
         <ImageButton
-            android:id="@+id/buttonSend"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
+            android:id="@+id/buttonEmot"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_above="@+id/linear_layout_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
             android:background="#00000000"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_send"/>
+            android:src="@drawable/ic_crown"/>
 
-        <EditText
-            android:id="@+id/editTextSend"
+        <LinearLayout
+            android:id="@+id/linear_layout_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="7dp"
-            android:layout_marginStart="20dp"
-            android:layout_toStartOf="@+id/buttonSend"
-            android:background="@drawable/layout_rounded"
-            android:ems="10"
-            android:hint="message"
-            android:inputType="textCapSentences|textMultiLine"
-            android:maxLength="20000"
-            android:maxLines="5"
-            android:padding="3dp"/>
+            android:orientation="horizontal">
 
+            <EditText
+                android:id="@+id/editTextSend"
+                android:layout_width="266dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/layout_rounded"
+                android:ems="10"
+                android:hint="message"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="20000"
+                android:maxLines="5"
+                android:padding="3dp"/>
+
+            <ImageButton
+                android:id="@+id/buttonSend"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:background="#00000000"
+                android:layout_marginStart="15dp"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_send"/>
+
+        </LinearLayout>
     </RelativeLayout>
 </LinearLayout>
+

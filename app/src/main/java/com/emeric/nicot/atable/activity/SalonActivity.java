@@ -17,7 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.emeric.nicot.atable.R;
@@ -55,6 +57,7 @@ public class SalonActivity extends AppCompatActivity {
     private Message message;
     private String userName;
     private BottomSheetDialog mBottomSheetDialog;
+    private FrameLayout frameLayoutAdminChoice;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,7 @@ public class SalonActivity extends AppCompatActivity {
         ImageButton buttonSend = findViewById(R.id.buttonSend);
         ImageButton buttonEmot = findViewById(R.id.buttonEmot);
         editTextSend = findViewById(R.id.editTextSend);
+        frameLayoutAdminChoice = findViewById(R.id.frame_layout_admin_choice);
         mRecyclerViewChat = findViewById(R.id.recycler_view_chat);
         mLayloutManager = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager);
@@ -133,7 +137,13 @@ public class SalonActivity extends AppCompatActivity {
             buttonEmot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showBottomEmotLayout();
+                    //showBottomEmotLayout();
+                    if(frameLayoutAdminChoice.getVisibility() != View.VISIBLE){
+                        frameLayoutAdminChoice.setVisibility(View.VISIBLE);
+                    }else{
+                        frameLayoutAdminChoice.setVisibility(View.GONE);
+                    }
+
                 }
             });
         } else {
