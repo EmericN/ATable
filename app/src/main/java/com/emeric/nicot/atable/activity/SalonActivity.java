@@ -1,6 +1,7 @@
 package com.emeric.nicot.atable.activity;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -126,6 +128,7 @@ public class SalonActivity extends AppCompatActivity {
 
                             message.getListMessageData().add(newMessage);
                             mLayloutManager.scrollToPosition(message.getListMessageData().size() - 1);
+                            //TODO issue with recycler view when soft keyboard show up and don't display the last message
                         }
                             mAdapterChat.notifyDataSetChanged();
                             mRecyclerViewChat.setAdapter(mAdapterChat);
@@ -139,6 +142,12 @@ public class SalonActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     //showBottomEmotLayout();
                     if(frameLayoutAdminChoice.getVisibility() != View.VISIBLE){
+                        if (v != null) {
+                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                            if (imm != null) {
+                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                            }
+                        }
                         frameLayoutAdminChoice.setVisibility(View.VISIBLE);
                     }else{
                         frameLayoutAdminChoice.setVisibility(View.GONE);
