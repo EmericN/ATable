@@ -4,8 +4,10 @@ package com.emeric.nicot.atable.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.os.Environment;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,10 +20,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.emeric.nicot.atable.R;
@@ -29,11 +31,9 @@ import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.emeric.nicot.atable.services.CameraPreview;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -48,18 +48,20 @@ import java.util.Map;
 
 public class SalonActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerViewChat;
-    private RecyclerView.LayoutManager mLayloutManager;
-    private RecyclerView.Adapter mAdapterChat;
-    private String nomSalon, userId, salonId, tag, picUrl;
-    private EditText editTextSend;
-    private FirebaseFirestore mFirestore;
-    private String TAG = "debug salon";
-    private CollectionReference collectionRefMessage, collectionRefNotification, collectionRefChat,collectionRefUser;
-    private Message message;
-    private String userName;
+    private static String TAG2= "debug salon";
     private BottomSheetDialog mBottomSheetDialog;
-    private FrameLayout frameLayoutAdminChoice;
+    private CollectionReference mCollectionRefNotification;
+    private CollectionReference mCollectionRefChat;
+    private CollectionReference mCollectionRefMessage;
+    private EditText mEditTextSend;
+    private FrameLayout mFrameLayoutAdminChoice;
+    private Message message;
+    private RecyclerView.Adapter mAdapterChat;
+    private RecyclerView.LayoutManager mLayloutManager;
+    private RecyclerView mRecyclerViewChat;
+    private String userName;
+    private String TAG = "debug salon";
+    private String nomSalon, userId, salonId, tag, picUrl;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -77,26 +79,28 @@ public class SalonActivity extends AppCompatActivity {
         }
         message = new Message();
 
-        Toolbar mToolbar = findViewById(R.id.toolbarRoom);
+        Toolbar mToolbar = findViewById(R.id.toolbar_room);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(nomSalon);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        ImageButton buttonSend = findViewById(R.id.buttonSend);
-        ImageButton buttonEmot = findViewById(R.id.buttonEmot);
-        editTextSend = findViewById(R.id.editTextSend);
-        frameLayoutAdminChoice = findViewById(R.id.frame_layout_admin_choice);
+        ImageButton mButtonSend = findViewById(R.id.button_send);
+        ImageButton mButtonEmot = findViewById(R.id.button_emot);
+        Button mButtonCamera = findViewById(R.id.button_camera);
+        Button mButtonSticker = findViewById(R.id.button_sticker);
+        mEditTextSend = findViewById(R.id.editText_send);
+        mFrameLayoutAdminChoice = findViewById(R.id.frame_layout_admin_choice);
         mRecyclerViewChat = findViewById(R.id.recycler_view_chat);
         mLayloutManager = new LinearLayoutManager(this);
         mRecyclerViewChat.setLayoutManager(mLayloutManager);
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapterChat = new CustomAdapterChat(this, message, userId, Glide.with(this));
-        mFirestore = FirebaseFirestore.getInstance();
-        collectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
-        collectionRefNotification = mFirestore.collection("notifications");
-        collectionRefChat = mFirestore.collection("chats");
-        collectionRefUser = mFirestore.collection("users");
+        FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+        mCollectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
+        mCollectionRefNotification = mFirestore.collection("notifications");
+        mCollectionRefChat = mFirestore.collection("chats");
+        CollectionReference collectionRefUser = mFirestore.collection("users");
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,35 +141,35 @@ public class SalonActivity extends AppCompatActivity {
 
         if (tag.equals("admin")) {
 
-            buttonEmot.setOnClickListener(new View.OnClickListener() {
+            mButtonEmot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //showBottomEmotLayout();
-                    if(frameLayoutAdminChoice.getVisibility() != View.VISIBLE){
+                    if(mFrameLayoutAdminChoice.getVisibility() != View.VISIBLE){
                         if (v != null) {
                             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                             if (imm != null) {
                                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                             }
                         }
-                        frameLayoutAdminChoice.setVisibility(View.VISIBLE);
+                        mFrameLayoutAdminChoice.setVisibility(View.VISIBLE);
                     }else{
-                        frameLayoutAdminChoice.setVisibility(View.GONE);
+                        mFrameLayoutAdminChoice.setVisibility(View.GONE);
                     }
 
                 }
             });
         } else {
             invalidateOptionsMenu();
-            buttonEmot.setClickable(false);
+            mButtonEmot.setClickable(false);
         }
 
-        buttonSend.setOnClickListener(new View.OnClickListener() {
+        mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String content = editTextSend.getText().toString();
+                String content = mEditTextSend.getText().toString();
                 if (content.length() > 0) {
-                    editTextSend.setText("");
+                    mEditTextSend.setText("");
                     ChatMessage newMessage = new ChatMessage();
 
                     Map<String, Object> notification = new HashMap<>();
@@ -190,19 +194,41 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.tsLong = tsLong;
                     newMessage.picUrl = picUrl;
 
-                    collectionRefMessage.document().set(newMessage);
-                    collectionRefNotification.document().set(notification);
-                    collectionRefChat.document(salonId).update(last_message);
+                    mCollectionRefMessage.document().set(newMessage);
+                    mCollectionRefNotification.document().set(notification);
+                    mCollectionRefChat.document(salonId).update(last_message);
                 }
+            }
+        });
+
+        mButtonCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mFrameLayoutAdminChoice.setVisibility(View.GONE);
+
+                if(checkCameraHardware(SalonActivity.this)){
+                    Intent i = new Intent(getApplicationContext(), CameraActivity.class);
+                    startActivity(i);
+                }else{
+                    Log.d(TAG, "debug camera error hardware");
+                }
+            }
+        });
+
+        mButtonSticker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showBottomEmotLayout();
+                mFrameLayoutAdminChoice.setVisibility(View.GONE);
             }
         });
     }
 
     private void showBottomEmotLayout() {
-
         Integer [] image = {R.drawable.emotatable, R.drawable.sticker2};
 
-        mBottomSheetDialog = new BottomSheetDialog(this);
+        mBottomSheetDialog = new BottomSheetDialog(SalonActivity.this);
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
         recyclerView.setHasFixedSize(true);
@@ -233,9 +259,9 @@ public class SalonActivity extends AppCompatActivity {
                 newMessage.name = userName;
                 newMessage.emot = item.toString();
                 newMessage.tsLong = tsLong;
-                collectionRefMessage.document().set(newMessage);
-                collectionRefNotification.document().set(notification);
-                collectionRefChat.document(salonId).update(last_message);
+                mCollectionRefMessage.document().set(newMessage);
+                mCollectionRefNotification.document().set(notification);
+                mCollectionRefChat.document(salonId).update(last_message);
                 mBottomSheetDialog.dismiss();
             }
         }));
@@ -286,8 +312,18 @@ public class SalonActivity extends AppCompatActivity {
     }
 
     private void friendlist() {
-        //collectionRefChat
+        //mCollectionRefChat
         //TODO dialog return friend list
+    }
+
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
     }
 }
 
