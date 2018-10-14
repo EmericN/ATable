@@ -30,6 +30,13 @@ public class CameraActivity extends AppCompatActivity {
     private CameraPreview mPreview;
     private FrameLayout mFrameLayoutPreview;
 
+        protected void onPause(){
+            super.onPause();
+            mCamera.release();
+            mCamera=null;
+            mPreview=null;
+        }
+
        protected void onResume(){
            Log.d(TAG, "je passe dans le onResume :)");
            super.onResume();
@@ -77,7 +84,7 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                mCamera.release();
+                /*mCamera.release();*/
             }
         });
 
