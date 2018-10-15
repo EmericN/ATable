@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/camera_preview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_above="@id/linear_layout_text"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:id="@+id/button_return"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="start"
+        android:elevation="1dp"
+        android:background="#00000000"
+        android:src="@drawable/ic_arrow_back"/>
+
+    <ImageButton
+        android:id="@+id/button_capture"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center|bottom"
+        android:elevation="1dp"
+        android:background="#00000000"
+        android:src="@drawable/ic_crown"/>
+
+</FrameLayout>
