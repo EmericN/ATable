@@ -64,7 +64,6 @@ public class CameraActivity extends AppCompatActivity {
         ImageButton buttonCapture = findViewById(R.id.button_capture);
         ImageButton buttonReturn = findViewById(R.id.button_return);
 
-
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
