@@ -9,6 +9,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.emeric.nicot.atable.activity.CameraActivity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +45,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
         this.getHolder().removeCallback(this);
-     /*   Log.d(TAG,"why not");
-        mCamera.stopPreview();
-        mCamera.setPreviewCallback(null);
-        mCamera.release();
-        mCamera = null;*/
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -68,10 +65,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         Camera.Parameters params = mCamera.getParameters();
         List<String> focusModes = params.getSupportedFocusModes();
-
-        for(int i =0; i<focusModes.size();i++){
-            Log.d(TAG, "focus mode : "+focusModes.get(i));
-        }
 
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
