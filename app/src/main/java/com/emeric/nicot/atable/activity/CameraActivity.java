@@ -1,10 +1,12 @@
 package com.emeric.nicot.atable.activity;
 
+import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -25,10 +27,10 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 public class CameraActivity extends AppCompatActivity {
 
     private String TAG = "debug camera";
-    private static String mTAG2 = "debug camera";
     private Camera mCamera;
     private CameraPreview mPreview;
     private FrameLayout mFrameLayoutPreview;
+    private int mCurrentCameraId;
 
         protected void onPause(){
             super.onPause();
@@ -38,16 +40,11 @@ public class CameraActivity extends AppCompatActivity {
         }
 
        protected void onResume(){
-           Log.d(TAG, "je passe dans le onResume :)");
            super.onResume();
            if (mCamera == null) {
-               Log.d(TAG, "ok pas mal");
                mCamera = getCameraInstance();
-           }else{
-               Log.d(TAG, "please non !");
            }
            if (mPreview == null) {
-               Log.d(TAG, "hey gros");
                mCamera.setPreviewCallback(null);
                mPreview = new CameraPreview(this, mCamera);
                mFrameLayoutPreview.removeAllViews();
@@ -60,9 +57,9 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
-        Log.d(TAG, "je repasse par là ?! j'espère pas");
         ImageButton buttonCapture = findViewById(R.id.button_capture);
         ImageButton buttonReturn = findViewById(R.id.button_return);
+        ImageButton buttonSwapCamera = findViewById(R.id.button_front_cam);
 
         // Create an instance of Camera
         mCamera = getCameraInstance();
@@ -83,9 +80,34 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                /*mCamera.release();*/
             }
         });
+
+        buttonSwapCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mCamera.stopPreview();
+                mCamera.release();
+
+                //swap the id of the camera to be used
+                if(mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
+                    mCurrentCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+                }
+                else {
+                    mCurrentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+                }
+                mCamera = Camera.open(mCurrentCameraId);
+                setCameraDisplayOrientation(CameraActivity.this, mCurrentCameraId, mCamera);
+                try {
+                    mCamera.setPreviewDisplay(mPreview.getHolder());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mCamera.startPreview();
+            }
+        });
+
 
     }
 
@@ -93,11 +115,9 @@ public class CameraActivity extends AppCompatActivity {
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
-            Log.d(mTAG2, "héhé yes");
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
-            Log.d(mTAG2, "héhé nop");
         }
         return c; // returns null if camera is unavailable
     }
@@ -158,11 +178,28 @@ public class CameraActivity extends AppCompatActivity {
         return mediaFile;
     }
 
-    private void releaseCamera(){
-        if (mCamera != null){
-            mCamera.release();        // release the camera for other applications
-            mCamera = null;
+    public static void setCameraDisplayOrientation(Activity activity,
+                                                   int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
         }
-    }
 
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }
 }
