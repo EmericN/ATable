@@ -39,12 +39,13 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
-        ImageButton buttonCapture = findViewById(R.id.button_capture);
+        final ImageButton buttonCapture = findViewById(R.id.button_capture);
         ImageButton buttonReturn = findViewById(R.id.button_return);
-        ImageButton buttonSwapCamera = findViewById(R.id.button_front_cam);
+        final ImageButton buttonSwapCamera = findViewById(R.id.button_front_cam);
+        final ImageButton buttonAccept = findViewById(R.id.button_accept);
+        final ImageButton buttonRefresh = findViewById(R.id.button_delete);
 
         // Create our Preview view and set it as the content of our activity.
-
         mFrameLayoutPreview = findViewById(R.id.camera_preview);
 
         mCamera = getCameraInstance();
@@ -70,8 +71,12 @@ public class CameraActivity extends AppCompatActivity {
         buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "mCamera state : "+mCamera.getParameters());
                 mCamera.takePicture(null, null, mPicture);
+                buttonSwapCamera.setVisibility(View.INVISIBLE);
+                buttonCapture.setVisibility(View.INVISIBLE);
+                buttonAccept.setVisibility(View.VISIBLE);
+                buttonRefresh.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -85,6 +90,7 @@ public class CameraActivity extends AppCompatActivity {
         buttonSwapCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
                 mCamera.stopPreview();
                 mCamera.release();
@@ -103,6 +109,25 @@ public class CameraActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                mCamera.startPreview();
+            }
+        });
+
+        buttonAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //envoie l'image
+                finish();
+            }
+        });
+
+        buttonRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonSwapCamera.setVisibility(View.VISIBLE);
+                buttonCapture.setVisibility(View.VISIBLE);
+                buttonAccept.setVisibility(View.INVISIBLE);
+                buttonRefresh.setVisibility(View.INVISIBLE);
                 mCamera.startPreview();
             }
         });
@@ -129,7 +154,6 @@ public class CameraActivity extends AppCompatActivity {
             setCameraDisplayOrientation(CameraActivity.this, 0, mCamera);
             mPreview = new CameraPreview(this, mCamera);
             mFrameLayoutPreview.addView(mPreview);
-
         }
     }
 
