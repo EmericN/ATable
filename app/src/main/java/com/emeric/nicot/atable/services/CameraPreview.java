@@ -29,12 +29,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
+
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
-            Log.d(TAG, "je repasse par là ?!");
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
@@ -51,6 +51,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
+        Log.d(TAG, "Passage SurfaceChanged !");
         if (mHolder.getSurface() == null){
             // preview surface does not exist
             return;
@@ -62,17 +63,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception e){
             // ignore: tried to stop a non-existent preview
         }
-
-        Camera.Parameters params = mCamera.getParameters();
-        List<String> focusModes = params.getSupportedFocusModes();
-
-        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        }else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-        }
-
-        mCamera.setParameters(params);
 
         // start preview with new settings
         try {

@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
@@ -31,29 +32,10 @@ public class CameraActivity extends AppCompatActivity {
     private CameraPreview mPreview;
     private FrameLayout mFrameLayoutPreview;
     private int mCurrentCameraId;
-
-        protected void onPause(){
-            super.onPause();
-            mCamera.release();
-            mCamera=null;
-            mPreview=null;
-        }
-
-       protected void onResume(){
-           super.onResume();
-           if (mCamera == null) {
-               mCamera = getCameraInstance();
-           }
-           if (mPreview == null) {
-               mCamera.setPreviewCallback(null);
-               mPreview = new CameraPreview(this, mCamera);
-               mFrameLayoutPreview.removeAllViews();
-               mFrameLayoutPreview.addView(mPreview);
-               mCamera.startPreview();
-        }
-    }
+    private Camera.Parameters params;
 
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "passage onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
@@ -61,18 +43,34 @@ public class CameraActivity extends AppCompatActivity {
         ImageButton buttonReturn = findViewById(R.id.button_return);
         ImageButton buttonSwapCamera = findViewById(R.id.button_front_cam);
 
-        // Create an instance of Camera
-        mCamera = getCameraInstance();
-        setCameraDisplayOrientation(CameraActivity.this, 0, mCamera);
-
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
+
         mFrameLayoutPreview = findViewById(R.id.camera_preview);
+
+        mCamera = getCameraInstance();
+        mCamera.setPreviewCallback(null);
+        setCameraDisplayOrientation(CameraActivity.this, 0, mCamera);
+        params = mCamera.getParameters();
+        List<String> focusModes = params.getSupportedFocusModes();
+
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        }else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        }
+        mCamera.setParameters(params);
+
+        mPreview = new CameraPreview(this, mCamera);
         mFrameLayoutPreview.addView(mPreview);
+
+        if(mCamera == null){
+            Log.d(TAG, "mCamera state Walla mon frr ");
+        }
 
         buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "mCamera state : "+mCamera.getParameters());
                 mCamera.takePicture(null, null, mPicture);
             }
         });
@@ -108,8 +106,31 @@ public class CameraActivity extends AppCompatActivity {
                 mCamera.startPreview();
             }
         });
+    }
 
+    protected void onPause(){
+        super.onPause();
+        Log.d(TAG, "Passage onPause !");
+        if(mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mPreview.getHolder().removeCallback(mPreview);
+            mCamera.release();
+            mCamera = null;
+        }
+    }
 
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "Passage onResume !");
+
+        if(mCamera == null){
+            mCamera = getCameraInstance();
+            mCamera.setParameters(params);
+            setCameraDisplayOrientation(CameraActivity.this, 0, mCamera);
+            mPreview = new CameraPreview(this, mCamera);
+            mFrameLayoutPreview.addView(mPreview);
+
+        }
     }
 
     public static Camera getCameraInstance(){
