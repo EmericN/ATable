@@ -2,51 +2,83 @@ package com.emeric.nicot.atable.activity;
 
 import android.app.Activity;
 import android.hardware.Camera;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.emeric.nicot.atable.R;
+import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.services.CameraPreview;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+import cz.msebera.android.httpclient.Header;
 
 public class CameraActivity extends AppCompatActivity {
 
-    private String TAG = "debug camera";
     private Camera mCamera;
     private CameraPreview mPreview;
+    private Camera.Parameters params;
+    private CollectionReference mCollectionRefNotification;
+    private CollectionReference mCollectionRefChat;
+    private CollectionReference mCollectionRefMessage;
+    private ImageButton buttonCapture, buttonSwapCamera, buttonAccept, buttonRefresh;
+    private FirebaseUser user;
     private FrameLayout mFrameLayoutPreview;
     private int mCurrentCameraId;
-    private Camera.Parameters params;
+    RequestParams uploadParams = new RequestParams();
+    private String encodedString, nomSalon, userId, userName, salonId, picUrl;
+    private String TAG = "debug camera";
 
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "passage onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
-        final ImageButton buttonCapture = findViewById(R.id.button_capture);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            nomSalon = extras.getString("nomSalon");
+            userId = extras.getString("userId");
+            salonId = extras.getString("salonId");
+            userName = extras.getString("userName");
+            picUrl = extras.getString("picUrl");
+        }
+
+        buttonCapture = findViewById(R.id.button_capture);
         ImageButton buttonReturn = findViewById(R.id.button_return);
-        final ImageButton buttonSwapCamera = findViewById(R.id.button_front_cam);
-        final ImageButton buttonAccept = findViewById(R.id.button_accept);
-        final ImageButton buttonRefresh = findViewById(R.id.button_delete);
+        buttonSwapCamera = findViewById(R.id.button_front_cam);
+        buttonAccept = findViewById(R.id.button_accept);
+        buttonRefresh = findViewById(R.id.button_delete);
 
         // Create our Preview view and set it as the content of our activity.
         mFrameLayoutPreview = findViewById(R.id.camera_preview);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+        mCollectionRefMessage = mFirestore.collection("chats").document(salonId).collection("messages");
+        mCollectionRefNotification = mFirestore.collection("notifications");
+        mCollectionRefChat = mFirestore.collection("chats");
 
         mCamera = getCameraInstance();
         mCamera.setPreviewCallback(null);
@@ -56,7 +88,7 @@ public class CameraActivity extends AppCompatActivity {
 
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        }else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+        } else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         }
         mCamera.setParameters(params);
@@ -64,18 +96,11 @@ public class CameraActivity extends AppCompatActivity {
         mPreview = new CameraPreview(this, mCamera);
         mFrameLayoutPreview.addView(mPreview);
 
-        if(mCamera == null){
-            Log.d(TAG, "mCamera state Walla mon frr ");
-        }
-
         buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCamera.takePicture(null, null, mPicture);
-                buttonSwapCamera.setVisibility(View.INVISIBLE);
-                buttonCapture.setVisibility(View.INVISIBLE);
-                buttonAccept.setVisibility(View.VISIBLE);
-                buttonRefresh.setVisibility(View.VISIBLE);
+
 
             }
         });
@@ -96,10 +121,9 @@ public class CameraActivity extends AppCompatActivity {
                 mCamera.release();
 
                 //swap the id of the camera to be used
-                if(mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
+                if (mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
                     mCurrentCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-                }
-                else {
+                } else {
                     mCurrentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
                 }
                 mCamera = Camera.open(mCurrentCameraId);
@@ -110,14 +134,6 @@ public class CameraActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 mCamera.startPreview();
-            }
-        });
-
-        buttonAccept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //envoie l'image
-                finish();
             }
         });
 
@@ -133,10 +149,10 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         Log.d(TAG, "Passage onPause !");
-        if(mCamera != null) {
+        if (mCamera != null) {
             mCamera.setPreviewCallback(null);
             mPreview.getHolder().removeCallback(mPreview);
             mCamera.release();
@@ -144,11 +160,11 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         Log.d(TAG, "Passage onResume !");
 
-        if(mCamera == null){
+        if (mCamera == null) {
             mCamera = getCameraInstance();
             mCamera.setParameters(params);
             setCameraDisplayOrientation(CameraActivity.this, 0, mCamera);
@@ -157,12 +173,11 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    public static Camera getCameraInstance(){
+    public static Camera getCameraInstance() {
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             // Camera is not available (in use or does not exist)
         }
         return c; // returns null if camera is unavailable
@@ -171,58 +186,56 @@ public class CameraActivity extends AppCompatActivity {
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
         @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
+        public void onPictureTaken(final byte[] data, Camera camera) {
 
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null) {
-                Log.d(TAG, "Error creating media file, check storage permissions");
-                return;
-            }
+            buttonSwapCamera.setVisibility(View.INVISIBLE);
+            buttonCapture.setVisibility(View.INVISIBLE);
+            buttonAccept.setVisibility(View.VISIBLE);
+            buttonRefresh.setVisibility(View.VISIBLE);
 
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d(TAG, "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "Error accessing file: " + e.getMessage());
-            }
+            buttonAccept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //envoie l'image
+                    Long tsLong = System.currentTimeMillis();
+                    Date curDate = new Date();
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    String DateToStr = format.format(curDate);
+
+                    uploadParams.put("filename", userName+"-"+tsLong);
+                    encodeImagetoString(data);
+
+                    ChatMessage newMessage = new ChatMessage();
+
+                    Map<String, Object> notification = new HashMap<>();
+                    notification.put("roomID", salonId);
+                    notification.put("roomName", nomSalon);
+                    notification.put("userName", userName);
+                    notification.put("message", newMessage.text = userName+" send picture");
+
+                    Map<String, Object> last_message = new HashMap<>();
+                    last_message.put("last_message", newMessage.text = userName+" send picture");
+                    last_message.put("created_at", newMessage.tsLong = tsLong);
+
+
+                    newMessage.text = "";
+                    newMessage.idSender = userId;
+                    newMessage.date = DateToStr;
+                    newMessage.name = userName;
+                    newMessage.emot = null;
+                    newMessage.picture = userName+"-"+tsLong;
+                    newMessage.tsLong = tsLong;
+                    newMessage.picUrl = picUrl;
+
+                    mCollectionRefMessage.document().set(newMessage);
+                    mCollectionRefNotification.document().set(notification);
+                    mCollectionRefChat.document(salonId).update(last_message);
+
+                    finish();
+                }
+            });
         }
     };
-
-    private static File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "ATable");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("ATable", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
 
     public static void setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
@@ -233,10 +246,18 @@ public class CameraActivity extends AppCompatActivity {
                 .getRotation();
         int degrees = 0;
         switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
         }
 
         int result;
@@ -247,5 +268,71 @@ public class CameraActivity extends AppCompatActivity {
             result = (info.orientation - degrees + 360) % 360;
         }
         camera.setDisplayOrientation(result);
+    }
+
+    public void encodeImagetoString(final byte[] data) {
+
+        new AsyncTask<Void, Void, String>() {
+            protected void onPreExecute() {
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                // Encode Image to String
+                encodedString = Base64.encodeToString(data, 0);
+                return "";
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                // Trigger Image upload
+                uploadParams.put("image", encodedString);
+                triggerImageUpload();
+            }
+        }.execute(null, null, null);
+    }
+
+    public void triggerImageUpload() {
+        makeHTTPCall();
+    }
+
+    public void makeHTTPCall(){
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post("http://192.168.1.24/ATable/uploadPicture.php",
+                uploadParams, new AsyncHttpResponseHandler() {
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                       /* Toast.makeText(CameraActivity.this, statusCode,
+                                Toast.LENGTH_LONG).show();*/
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody,
+                                          Throwable error) {
+                        if (statusCode == 404) {
+                            Toast.makeText(CameraActivity.this,
+                                    "Requested resource not found",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code is '500'
+                        else if (statusCode == 500) {
+                            Toast.makeText(CameraActivity.this,
+                                    "Something went wrong at server end",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        // When Http response code other than 404, 500
+                        else {
+                            Toast.makeText(
+                                    CameraActivity.this,
+                                    "Error Occured n Most Common Error: n1. Device not " +
+                                    "connected to Internetn2. Web App is not deployed in App " +
+                                    "servern3. App server is not runningn HTTP Status code : "
+                                    + statusCode, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+
+                });
     }
 }

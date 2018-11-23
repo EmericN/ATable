@@ -2,6 +2,11 @@ package com.emeric.nicot.atable.adapter;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,11 +17,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.emeric.nicot.atable.R;
 import com.emeric.nicot.atable.models.Message;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -25,6 +37,8 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int MESSAGE_RECEIVER = 2;
     private static final int MESSAGE_SENDER_EMOT = 4;
     private static final int MESSAGE_RECEIVER_EMOT = 6;
+    private static final int MESSAGE_SENDER_PICTURE = 8;
+    private static final int MESSAGE_RECEIVER_PICTURE = 10;
     private static final String TAG = "debug adapter chat";
     private Context context;
     private Message message;
@@ -39,13 +53,19 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public int getItemViewType(int position) {
-        if (message.getListMessageData().get(position).emot == null) {
+        if (message.getListMessageData().get(position).emot == null && message.getListMessageData().get(position).picture == null) {
             return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER
                     : MESSAGE_RECEIVER;
-        }else{
+        }
+        if(message.getListMessageData().get(position).emot != null){
             return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER_EMOT
                     : MESSAGE_RECEIVER_EMOT;
         }
+        if(message.getListMessageData().get(position).picture != null){
+            return message.getListMessageData().get(position).idSender.equals(userId) ? MESSAGE_SENDER_PICTURE
+                                                                                      : MESSAGE_RECEIVER_PICTURE;
+        }
+        return position;
     }
 
     @Override
@@ -64,12 +84,18 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
             case MESSAGE_RECEIVER_EMOT:
                             View v6 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.emot_receive, viewGroup, false);
                             return new ViewHolder6(v6);
+            case MESSAGE_SENDER_PICTURE:
+                            View v8 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.picture_send, viewGroup, false);
+                            return new ViewHolder8(v8);
+            case MESSAGE_RECEIVER_PICTURE:
+                            View v10 = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.picture_receive, viewGroup, false);
+                            return new ViewHolder10(v10);
         }
         return null;
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case 0:
                 ((ViewHolder0) holder).senderMessage.setText(message.getListMessageData().get(position).text);
@@ -101,6 +127,24 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((ViewHolder6) holder).receiverTimestampEmot.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder6) holder).receiverNameEmot.setText(message.getListMessageData().get(position).name);
                 //Glide.with(context).load(message.getListMessageData().get(position).picUrl).into(((ViewHolder6) holder).receiverImageView);
+                break;
+
+            case 8:
+                ((ViewHolder8) holder).senderTimestampPicture.setText(message.getListMessageData().get(position).date);
+                //((ViewHolder8) holder).senderPicture.setImageResource(Integer.parseInt(message.getListMessageData().get(position).picture));
+                Log.d(TAG, "glide param : "+message.getListMessageData().get(position).picture);
+
+               // "http://localhost/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg"
+                glideRequest.load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg").apply(new RequestOptions().override(200, 200)
+                        .placeholder(R.drawable.ic_checked)
+                        .error(R.drawable.ic_checked))
+                        .into(((ViewHolder8) holder).senderPicture);
+                break;
+
+            case 10:
+                ((ViewHolder10) holder).receiverTimestampPicture.setText(message.getListMessageData().get(position).date);
+                ((ViewHolder10) holder).receiverNamePicture.setText(message.getListMessageData().get(position).name);
+                Glide.with(context).load("http://localhost/ATable/image_upload/"+message.getListMessageData().get(position).picture).into(((ViewHolder10) holder).receiverPicture);
                 break;
         }
     }
@@ -166,5 +210,29 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    private class ViewHolder8 extends RecyclerView.ViewHolder {
 
+        private TextView senderTimestampPicture;
+        private ImageView senderPicture;
+
+        private ViewHolder8(View itemView) {
+            super(itemView);
+            senderPicture = itemView.findViewById(R.id.pictureSend);
+            senderTimestampPicture = itemView.findViewById(R.id.timerSenderPicture);
+        }
+    }
+
+    private class ViewHolder10 extends RecyclerView.ViewHolder {
+
+        private ImageView receiverPicture;
+        private TextView receiverTimestampPicture;
+        private TextView receiverNamePicture;
+
+        private ViewHolder10(View itemView) {
+            super(itemView);
+            receiverPicture = itemView.findViewById(R.id.pictureReceiver);
+            receiverTimestampPicture = itemView.findViewById(R.id.timerReceiverPicture);
+            receiverNamePicture = itemView.findViewById(R.id.nameReceiverPicture);
+        }
+    }
 }

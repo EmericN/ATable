@@ -128,6 +128,7 @@ public class SalonActivity extends AppCompatActivity {
                             newMessage.idSender = doc.getDocument().getString("idSender");
                             newMessage.name = doc.getDocument().getString("name");
                             newMessage.emot = doc.getDocument().getString("emot");
+                            newMessage.picture = doc.getDocument().getString("picture");
                             newMessage.picUrl = doc.getDocument().getString("picUrl");
 
                             message.getListMessageData().add(newMessage);
@@ -170,6 +171,12 @@ public class SalonActivity extends AppCompatActivity {
                 String content = mEditTextSend.getText().toString();
                 if (content.length() > 0) {
                     mEditTextSend.setText("");
+
+                    Long tsLong = System.currentTimeMillis();
+                    Date curDate = new Date();
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    String DateToStr = format.format(curDate);
+
                     ChatMessage newMessage = new ChatMessage();
 
                     Map<String, Object> notification = new HashMap<>();
@@ -180,17 +187,14 @@ public class SalonActivity extends AppCompatActivity {
 
                     Map<String, Object> last_message = new HashMap<>();
                     last_message.put("last_message", newMessage.text = content);
-
-                    Long tsLong = System.currentTimeMillis();
-                    Date curDate = new Date();
-                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-                    String DateToStr = format.format(curDate);
+                    last_message.put("created_at", newMessage.tsLong = tsLong);
 
                     newMessage.text = content;
                     newMessage.idSender = userId;
                     newMessage.date = DateToStr;
                     newMessage.name = userName;
                     newMessage.emot = null;
+                    newMessage.picture = null;
                     newMessage.tsLong = tsLong;
                     newMessage.picUrl = picUrl;
 
@@ -209,6 +213,11 @@ public class SalonActivity extends AppCompatActivity {
 
                 if(checkCameraHardware(SalonActivity.this)){
                     Intent i = new Intent(getApplicationContext(), CameraActivity.class);
+                    i.putExtra("nomSalon", nomSalon);
+                    i.putExtra("salonId", salonId);
+                    i.putExtra("userId", userId);
+                    i.putExtra("userName", userName);
+                    i.putExtra("picUrl", picUrl);
                     startActivity(i);
                 }else{
                     Log.d(TAG, "debug camera error hardware");
