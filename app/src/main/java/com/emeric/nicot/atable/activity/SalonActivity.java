@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +29,6 @@ import com.emeric.nicot.atable.adapter.CustomAdapter;
 import com.emeric.nicot.atable.adapter.CustomAdapterChat;
 import com.emeric.nicot.atable.models.ChatMessage;
 import com.emeric.nicot.atable.models.Message;
-import com.emeric.nicot.atable.services.CameraPreview;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -41,6 +38,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,6 +91,8 @@ public class SalonActivity extends AppCompatActivity {
         mFrameLayoutAdminChoice = findViewById(R.id.frame_layout_admin_choice);
         mRecyclerViewChat = findViewById(R.id.recycler_view_chat);
         mLayloutManager = new LinearLayoutManager(this);
+        /*((LinearLayoutManager) mLayloutManager).setReverseLayout(true);
+        ((LinearLayoutManager) mLayloutManager).setStackFromEnd(true);*/
         mRecyclerViewChat.setLayoutManager(mLayloutManager);
         mRecyclerViewChat.setHasFixedSize(true);
         mAdapterChat = new CustomAdapterChat(this, message, userId, Glide.with(this));
@@ -111,7 +111,6 @@ public class SalonActivity extends AppCompatActivity {
 
         mFirestore.collection("chats").document(salonId).collection("messages")
                 .orderBy("tsLong", Query.Direction.ASCENDING)
-                .limit(20)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot value, FirebaseFirestoreException e) {
@@ -132,20 +131,33 @@ public class SalonActivity extends AppCompatActivity {
                             newMessage.picUrl = doc.getDocument().getString("picUrl");
 
                             message.getListMessageData().add(newMessage);
-                            mLayloutManager.scrollToPosition(message.getListMessageData().size() - 1);
-                            //TODO issue with recycler view when soft keyboard show up and don't display the last message
                         }
+                            mLayloutManager.scrollToPosition(message.getListMessageData().size() -1);
                             mAdapterChat.notifyDataSetChanged();
                             mRecyclerViewChat.setAdapter(mAdapterChat);
                         }
                 });
+
+        mRecyclerViewChat.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4,
+                                       int i5, int i6, int i7) {
+                if ( i3 < i7) {
+                    mRecyclerViewChat.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerViewChat.scrollToPosition(message.getListMessageData().size() -1);
+                        }
+                    }, 100);
+                }
+            }
+        });
 
         if (tag.equals("admin")) {
 
             mButtonEmot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //showBottomEmotLayout();
                     if(mFrameLayoutAdminChoice.getVisibility() != View.VISIBLE){
                         if (v != null) {
                             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -175,7 +187,7 @@ public class SalonActivity extends AppCompatActivity {
                     Long tsLong = System.currentTimeMillis();
                     Date curDate = new Date();
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-                    String DateToStr = format.format(curDate);
+                    String dateToStr = format.format(curDate);
 
                     ChatMessage newMessage = new ChatMessage();
 
@@ -191,7 +203,7 @@ public class SalonActivity extends AppCompatActivity {
 
                     newMessage.text = content;
                     newMessage.idSender = userId;
-                    newMessage.date = DateToStr;
+                    newMessage.date = dateToStr;
                     newMessage.name = userName;
                     newMessage.emot = null;
                     newMessage.picture = null;

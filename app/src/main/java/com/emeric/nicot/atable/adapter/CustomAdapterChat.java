@@ -29,6 +29,7 @@ import com.emeric.nicot.atable.models.Message;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 
 
 public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -131,11 +132,8 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             case 8:
                 ((ViewHolder8) holder).senderTimestampPicture.setText(message.getListMessageData().get(position).date);
-                //((ViewHolder8) holder).senderPicture.setImageResource(Integer.parseInt(message.getListMessageData().get(position).picture));
-                Log.d(TAG, "glide param : "+message.getListMessageData().get(position).picture);
-
-               // "http://localhost/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg"
-                glideRequest.load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg").apply(new RequestOptions().override(200, 200)
+                glideRequest.load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg")
+                        .apply(new RequestOptions().override(200, 200)
                         .placeholder(R.drawable.ic_checked)
                         .error(R.drawable.ic_checked))
                         .into(((ViewHolder8) holder).senderPicture);
@@ -144,7 +142,7 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
             case 10:
                 ((ViewHolder10) holder).receiverTimestampPicture.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder10) holder).receiverNamePicture.setText(message.getListMessageData().get(position).name);
-                Glide.with(context).load("http://localhost/ATable/image_upload/"+message.getListMessageData().get(position).picture).into(((ViewHolder10) holder).receiverPicture);
+                Glide.with(context).load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture).into(((ViewHolder10) holder).receiverPicture);
                 break;
         }
     }

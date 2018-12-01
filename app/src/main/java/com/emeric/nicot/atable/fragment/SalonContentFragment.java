@@ -87,7 +87,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
         mRecyclerViewRoom = v.findViewById(R.id.recycler_view_room);
         mRecyclerViewRoom.setLayoutManager(mLayloutManager);
         mRecyclerViewRoom.setHasFixedSize(true);
-        mAdapter = new CustomAdapterRoom(this, salonAdmin, salonMembre, this);
+        mAdapter = new CustomAdapterRoom(this, salonAdmin, salonMembre,
+                this);
         mRecyclerViewRoom.setAdapter(mAdapter);
 
         FloatingActionButton floatAddSalon = v.findViewById(R.id.FloatButtonAdd);
@@ -138,7 +139,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "Error getting rooms after create one : ", e.getCause());
+                                        Log.d(TAG, "Error getting rooms after create one : ",
+                                                e.getCause());
                                     }
                                 });
 
@@ -192,7 +194,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
         salonMembre.clear();
         salonAdmin.clear();
 
-        mFirestore.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        mFirestore.collection("users").document(userId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -209,7 +212,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
             }
         });
 
-        mFirestore.collection("chats").whereEqualTo("admin", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        mFirestore.collection("chats").whereEqualTo("admin", userId).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -220,7 +224,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                             String salonAdm = (String) document.get("nom");
                             String salonIdAdm = document.getId();
                             String salonLastMessageAdm = (String) document.get("last_message");
-                            FirebaseSalon addedSalonAdmin = new FirebaseSalon(salonAdm, salonIdAdm, salonLastMessageAdm);
+                            FirebaseSalon addedSalonAdmin = new FirebaseSalon(salonAdm, salonIdAdm,
+                                    salonLastMessageAdm);
                             salonAdmin.add(addedSalonAdmin);
                             mAdapter.notifyDataSetChanged();
                         } else {
@@ -233,7 +238,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
             }
         });
 
-        mFirestore.collection("chats").whereEqualTo("members."+userId, true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        mFirestore.collection("chats").whereEqualTo("members."+userId, true).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -244,7 +250,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                             String salonMemb = (String) document.get("nom");
                             String salonIdMemb = document.getId();
                             String salonLastMessageMemb = (String) document.get("last_message");
-                            FirebaseSalon addedSalonMembre = new FirebaseSalon(salonMemb, salonIdMemb, salonLastMessageMemb);
+                            FirebaseSalon addedSalonMembre = new FirebaseSalon(salonMemb,
+                                    salonIdMemb, salonLastMessageMemb);
                             salonMembre.add(addedSalonMembre);
                             mAdapter.notifyDataSetChanged();
                         } else {
@@ -272,7 +279,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
         View view = getLayoutInflater().inflate(R.layout.emot_layout, null);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_emot);
         recyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,
+                false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(new CustomAdapter(getContext(), image, new CustomAdapter.OnItemClickListener() {
             @Override
@@ -294,7 +302,8 @@ public class SalonContentFragment extends Fragment implements AdapterCallbackRoo
                 newMessage.date = date;
                 newMessage.name = userName;
                 newMessage.emot = item.toString();
-                mFirestore.collection("chats").document(salonId).collection("messages").document().set(newMessage);
+                mFirestore.collection("chats").document(salonId).collection("messages")
+                        .document().set(newMessage);
                 mFirestore.collection("notifications").document().set(notification);
                 mFirestore.collection("chats").document(salonId).update(last_message);
                 mBottomSheetDialog.dismiss();
