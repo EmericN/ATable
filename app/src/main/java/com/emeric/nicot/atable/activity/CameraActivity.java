@@ -221,7 +221,7 @@ public class CameraActivity extends AppCompatActivity {
                 realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                 ExifInterface exif = new ExifInterface(pictureFile.toString());
-
+                Log.d(TAG, "exif orientation : "+exif.getAttribute(ExifInterface.TAG_ORIENTATION));
                 if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
                     realImage= rotate(realImage, 90);
                 } else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
@@ -230,13 +230,11 @@ public class CameraActivity extends AppCompatActivity {
                     realImage= rotate(realImage, 180);
                 }
                 if((exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("0") && mCurrentCameraId==1)){
-                    realImage= rotate(realImage, -90);
+                    realImage= rotate(realImage, 270);
                 } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("0")){
                     realImage = rotate(realImage, 90);
                 }
-
-                boolean bo = realImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-
+                realImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                 fos.close();
 
             } catch (FileNotFoundException e) {
@@ -258,7 +256,7 @@ public class CameraActivity extends AppCompatActivity {
                     Date curDate = new Date();
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm");
                     dateToStr = format.format(curDate);
-                    uploadParams.put("filename", userName+"-"+tsLong);
+                    uploadParams.put("filename", userName + "-" + tsLong);
                     encodeImagetoString(realImage);
 
                     finish();
@@ -276,6 +274,7 @@ public class CameraActivity extends AppCompatActivity {
 
         return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
     }
+
     public static void setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
@@ -303,15 +302,15 @@ public class CameraActivity extends AppCompatActivity {
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             result = (info.orientation + degrees) % 360;
             result = (360 - result) % 360;  // compensate the mirror
-            Log.d(TAG, "result = "+result);
+            Log.d(TAG, "result = " + result);
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
-            Log.d(TAG, "result = "+result);
+            Log.d(TAG, "result = " + result);
         }
         camera.setDisplayOrientation(result);
     }
 
-    private static File getOutputMediaFile(int type){
+    private static File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -319,18 +318,18 @@ public class CameraActivity extends AppCompatActivity {
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
         // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("ATable", "failed to create directory");
                 return null;
             }
         }
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        if (type == MEDIA_TYPE_IMAGE){
+        if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                                 "IMG_"+ timeStamp + ".jpg");
-        }else {
+                                 "IMG_" + timeStamp + ".jpg");
+        } else {
             return null;
         }
         return mediaFile;
@@ -363,7 +362,7 @@ public class CameraActivity extends AppCompatActivity {
         }.execute(null, null, null);
     }
 
-    public void imageUpload(){
+    public void imageUpload() {
         AsyncHttpClient client = new AsyncHttpClient();
         client.post("http://192.168.1.24/ATable/uploadPicture.php",
                 uploadParams, new AsyncHttpResponseHandler() {
@@ -377,10 +376,11 @@ public class CameraActivity extends AppCompatActivity {
                         notification.put("roomID", salonId);
                         notification.put("roomName", nomSalon);
                         notification.put("userName", userName);
-                        notification.put("message", newMessage.text = userName+" send picture");
+                        notification.put("message", newMessage.text = userName + " send picture");
 
                         Map<String, Object> last_message = new HashMap<>();
-                        last_message.put("last_message", newMessage.text = userName+" send picture");
+                        last_message.put("last_message", newMessage.text =
+                                userName + " send picture");
                         last_message.put("created_at", newMessage.tsLong = tsLong);
 
                         newMessage.text = "";
@@ -388,7 +388,7 @@ public class CameraActivity extends AppCompatActivity {
                         newMessage.date = dateToStr;
                         newMessage.name = userName;
                         newMessage.emot = null;
-                        newMessage.picture = userName+"-"+tsLong;
+                        newMessage.picture = userName + "-" + tsLong;
                         newMessage.tsLong = tsLong;
                         newMessage.picUrl = picUrl;
 

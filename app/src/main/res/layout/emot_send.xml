@@ -4,6 +4,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp">
 
+    <ImageView
+        android:id="@+id/imageView_profil_pic_sender_emot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="1dp"
+        android:layout_marginTop="30dp"/>
 
     <TextView
         android:id="@+id/timerSenderEmot"
@@ -11,8 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="1dp"
-        android:layout_marginStart="50dp"
+        android:layout_marginEnd="25dp"
         android:layout_marginTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
@@ -28,7 +34,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="25dp"
         android:layout_below="@id/timerSenderEmot"/>
 
 </RelativeLayout>

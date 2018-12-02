@@ -20,6 +20,7 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
@@ -103,10 +104,9 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((ViewHolder0) holder).senderTimestamp.setText(message.getListMessageData().get(position).date);
                 glideRequest.load(message.getListMessageData().get(position).picUrl)
                         .apply(new RequestOptions().override(80, 80)
-                                .placeholder(R.drawable.ic_checked)
-                                .error(R.drawable.ic_checked)
                                 .circleCrop()
-                                .dontAnimate())
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
                         .into(((ViewHolder0) holder).senderImageView);
 
                 break;
@@ -115,34 +115,68 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((ViewHolder2) holder).receiverMessage.setText(message.getListMessageData().get(position).text);
                 ((ViewHolder2) holder).receiverTimestamp.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder2) holder).receiverName.setText(message.getListMessageData().get(position).name);
+                glideRequest.load(message.getListMessageData().get(position).picUrl)
+                        .apply(new RequestOptions().override(80, 80)
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder2) holder).receiverImageView);
                 break;
 
             case 4:
                 ((ViewHolder4) holder).senderTimestampEmot.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder4) holder).senderEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
-                //Glide.with(context).load(message.getListMessageData().get(position).picUrl).into(((ViewHolder4) holder).senderImageView);
+                glideRequest.load(message.getListMessageData().get(position).picUrl)
+                        .apply(new RequestOptions().override(80, 80)
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder4) holder).senderImageViewEmot);
                 break;
 
             case 6:
                 ((ViewHolder6) holder).receiverEmot.setImageResource(Integer.parseInt(message.getListMessageData().get(position).emot));
                 ((ViewHolder6) holder).receiverTimestampEmot.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder6) holder).receiverNameEmot.setText(message.getListMessageData().get(position).name);
-                //Glide.with(context).load(message.getListMessageData().get(position).picUrl).into(((ViewHolder6) holder).receiverImageView);
+                glideRequest.load(message.getListMessageData().get(position).picUrl)
+                        .apply(new RequestOptions().override(80, 80)
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder6) holder).receiverImageViewEmot);
                 break;
 
             case 8:
                 ((ViewHolder8) holder).senderTimestampPicture.setText(message.getListMessageData().get(position).date);
+                glideRequest.load(message.getListMessageData().get(position).picUrl)
+                        .apply(new RequestOptions().override(80, 80)
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder8) holder).senderImageViewPicture);
                 glideRequest.load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg")
-                        .apply(new RequestOptions().override(200, 200)
-                        .placeholder(R.drawable.ic_checked)
-                        .error(R.drawable.ic_checked))
+                        .apply(new RequestOptions()
+                                .transform(new RoundedCorners(50))
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
                         .into(((ViewHolder8) holder).senderPicture);
                 break;
 
             case 10:
                 ((ViewHolder10) holder).receiverTimestampPicture.setText(message.getListMessageData().get(position).date);
                 ((ViewHolder10) holder).receiverNamePicture.setText(message.getListMessageData().get(position).name);
-                Glide.with(context).load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture).into(((ViewHolder10) holder).receiverPicture);
+                glideRequest.load(message.getListMessageData().get(position).picUrl)
+                        .apply(new RequestOptions().override(80, 80)
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder10) holder).receiverImageViewPicture);
+                glideRequest.load("http://192.168.1.24/ATable/image_upload/"+message.getListMessageData().get(position).picture+".jpg")
+                        .apply(new RequestOptions()
+                                .transform(new RoundedCorners(50))
+                                .placeholder(R.drawable.ic_checked)
+                                .error(R.drawable.ic_checked))
+                        .into(((ViewHolder10) holder).receiverPicture);
                 break;
         }
     }
@@ -186,11 +220,13 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private TextView senderTimestampEmot;
         private ImageView senderEmot;
+        private ImageView senderImageViewEmot;
 
         private ViewHolder4(View itemView) {
             super(itemView);
             senderEmot = itemView.findViewById(R.id.emotSend);
             senderTimestampEmot = itemView.findViewById(R.id.timerSenderEmot);
+            senderImageViewEmot = itemView.findViewById(R.id.imageView_profil_pic_sender_emot);
         }
     }
 
@@ -199,12 +235,14 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
         private ImageView receiverEmot;
         private TextView receiverTimestampEmot;
         private TextView receiverNameEmot;
+        private ImageView receiverImageViewEmot;
 
         private ViewHolder6(View itemView) {
             super(itemView);
             receiverEmot = itemView.findViewById(R.id.emotReceiver);
             receiverTimestampEmot = itemView.findViewById(R.id.timerReceiverEmot);
             receiverNameEmot = itemView.findViewById(R.id.nameReceiverEmot);
+            receiverImageViewEmot = itemView.findViewById(R.id.imageView_profil_pic_receiver_emot);
         }
     }
 
@@ -212,11 +250,13 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private TextView senderTimestampPicture;
         private ImageView senderPicture;
+        private ImageView senderImageViewPicture;
 
         private ViewHolder8(View itemView) {
             super(itemView);
             senderPicture = itemView.findViewById(R.id.pictureSend);
             senderTimestampPicture = itemView.findViewById(R.id.timerSenderPicture);
+            senderImageViewPicture = itemView.findViewById(R.id.imageView_profil_pic_sender_picture);
         }
     }
 
@@ -225,12 +265,14 @@ public class CustomAdapterChat extends RecyclerView.Adapter<RecyclerView.ViewHol
         private ImageView receiverPicture;
         private TextView receiverTimestampPicture;
         private TextView receiverNamePicture;
+        private ImageView receiverImageViewPicture;
 
         private ViewHolder10(View itemView) {
             super(itemView);
             receiverPicture = itemView.findViewById(R.id.pictureReceiver);
             receiverTimestampPicture = itemView.findViewById(R.id.timerReceiverPicture);
             receiverNamePicture = itemView.findViewById(R.id.nameReceiverPicture);
+            receiverImageViewPicture = itemView.findViewById(R.id.imageView_profil_pic_receiver_picture);
         }
     }
 }

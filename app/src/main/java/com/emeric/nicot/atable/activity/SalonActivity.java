@@ -148,7 +148,7 @@ public class SalonActivity extends AppCompatActivity {
                         public void run() {
                             mRecyclerViewChat.scrollToPosition(message.getListMessageData().size() -1);
                         }
-                    }, 100);
+                    }, 0);
                 }
             }
         });
@@ -191,12 +191,6 @@ public class SalonActivity extends AppCompatActivity {
 
                     ChatMessage newMessage = new ChatMessage();
 
-                    Map<String, Object> notification = new HashMap<>();
-                    notification.put("roomID", salonId);
-                    notification.put("roomName", nomSalon);
-                    notification.put("userName", userName);
-                    notification.put("message", newMessage.text = content);
-
                     Map<String, Object> last_message = new HashMap<>();
                     last_message.put("last_message", newMessage.text = content);
                     last_message.put("created_at", newMessage.tsLong = tsLong);
@@ -210,8 +204,17 @@ public class SalonActivity extends AppCompatActivity {
                     newMessage.tsLong = tsLong;
                     newMessage.picUrl = picUrl;
 
+                    if(true) {
+                        Map<String, Object> notification = new HashMap<>();
+                        notification.put("roomID", salonId);
+                        notification.put("roomName", nomSalon);
+                        notification.put("userName", userName);
+                        notification.put("message", newMessage.text = content);
+
+                        mCollectionRefNotification.document().set(notification);
+                    }
+
                     mCollectionRefMessage.document().set(newMessage);
-                    mCollectionRefNotification.document().set(notification);
                     mCollectionRefChat.document(salonId).update(last_message);
                 }
             }
